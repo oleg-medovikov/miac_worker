@@ -14,7 +14,7 @@ SQL_NAMES = [
 ['bez_ambulat_level_noMO.sql', 'Пациенты зависшие без МО']
     ]
 
-async def zamechania():
+def zamechania():
     SQL = """
     SELECT max([Дата изменения РЗ]) as 'дата отчета'
         from robo.v_FedReg

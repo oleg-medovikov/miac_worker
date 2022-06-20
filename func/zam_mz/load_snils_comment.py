@@ -19,7 +19,7 @@ insert [robo].[snils_comment]
     where a.[УНРЗ] is null
 """
 
-async def load_snils_comment():
+def load_snils_comment():
     MASK = Dir.get('snils_com') + '/*'
     
     text = ''
@@ -40,5 +40,3 @@ async def load_snils_comment():
 
             text += '\n Хорошо обработан файл ' + file.split('/')[-1]
     return text
-
-

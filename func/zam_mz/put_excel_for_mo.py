@@ -3,7 +3,7 @@ import pandas as pd
 from clas import Dir
 
 
-async def put_excel_for_mo(DF,NAME,DATE):
+def put_excel_for_mo(DF,NAME,DATE):
     "Раскладываем файлы по папкам организаций"
     
     if DATE is None:

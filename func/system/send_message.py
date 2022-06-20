@@ -4,7 +4,7 @@ from conf import TELEGRAM_API
 def bot_send_text(mess, chat_id):
 
     send_text = 'https://api.telegram.org/bot' + TELEGRAM_API \
-            + '/sendMessage?chat_id=' + chat_id \
+            + '/sendMessage?chat_id=' + str(chat_id) \
             + '&parse_mode=Markdown&text=' + mess
     requests.get(send_text)
 

@@ -10,7 +10,6 @@ class Dir(BaseModel):
     description : str
     working     : bool
 
-
     def get( NAME ) -> str:
         "Получить директорию по имени"
         HEADERS = dict(

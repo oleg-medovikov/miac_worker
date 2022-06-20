@@ -61,9 +61,9 @@ S_org = [
 class my_except(Exception):
     pass
 
-async def IVL():
+def IVL():
     DATE = datetime.datetime.now().strftime('%Y_%m_%d')
-    PATH = await Dir.get('path_robot')
+    PATH = Dir.get('path_robot')
     
     FILE_VP = PATH + '/Мониторинг_ВП.xlsx'
     if not os.path.exists( FILE_VP ):
@@ -228,18 +228,18 @@ async def IVL():
 
     medorg_zan_otchet = zan_otchet['Медицинская организация'].unique()
 
-    PATH_OTC = await Dir.get('zam_svod') + '/сверка ИВЛ и занятые койки'
+    PATH_OTC = Dir.get('zam_svod') + '/сверка ИВЛ и занятые койки'
     FILE_OTCH = PATH_OTCH +'/'+ DATE_OTCH.strftime('%Y_%m_%d') + ' пациенты на ИВЛ новый.xlsx' 
 
     with pd.ExcelWriter( FILE_OTCH ) as writer:
         ivl_otchet.to_excel(writer,sheet_name='ИВЛ')
         zan_otchet.to_excel(writer,sheet_name='занятые койки')
     
-    STAT_1 = await put_excel_for_mo(
+    STAT_1 = put_excel_for_mo(
             ivl_otchet,
             'Пациенты на ИВЛ',
             DATE_OTCH)
-    STAT_2 = await put_excel_for_mo(
+    STAT_2 = put_excel_for_mo(
             zan_otchet,
             'Занятые койки',
             DATE_OTCH)

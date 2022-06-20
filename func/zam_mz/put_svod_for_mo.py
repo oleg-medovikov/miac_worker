@@ -3,7 +3,7 @@ import pandas as pd
 
 from clas import Dir
 
-async def put_svod_for_mo(DF,NAME, DATE):
+def put_svod_for_mo(DF,NAME, DATE):
     if DATE is None:
         DATE = datetime.datetime.now().strftime( '%Y-%m-%d' )
 
@@ -25,6 +25,3 @@ async def put_svod_for_mo(DF,NAME, DATE):
         DF.to_excel(writer)
 
     return 1
-
-
-
