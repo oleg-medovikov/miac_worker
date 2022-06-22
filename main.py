@@ -1,4 +1,4 @@
-from clas import Task
+from clas import Task, Dir
 from shed import executor
 
 import time

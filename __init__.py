@@ -1,5 +1,10 @@
 from clas import *
-from func import *
 from shed import *
 from conf import *
 from base import *
+
+from system import *
+
+from loader import *
+from parus  import *
+from zam_mz import *
