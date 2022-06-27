@@ -24,39 +24,45 @@ def slojit_fr():
     xlrd.xlsx.ensure_elementtree_imported(False, None)
     xlrd.xlsx.Element_has_iter = True
 
-    PATH = Dir.get('robot') + '/_ФР_по_частям'
+    PATH = Dir.get('path_robot') + '/_ФР_по_частям'
     DATE = datetime.now().strftime("%Y_%m_%d")
     nameSheetShablon = "Sheet1"
     
     FILES = glob.glob(PATH + '/Федеральный регистр лиц*.xlsx')
-
     if not len(FILES):
         raise my_except('В папке нет файлов!')
 
-    LIST_ = []
     async def read_file(FILE):
-        df = pd.read_excel(
+        print('начал ' + datetime.now().strftime('%H:%M') )
+        df = await pd.read_excel(
                 FILE,
                 header= 1,
                 usecols=NAMES,
                 engine='xlrd',
                 skipfooter=1 )
-        LIST_.append(df)
+        return df
 
     TASKS = []
     for FILE in FILES:
         task = read_file(FILE)
         TASKS.append(task)
+    
+    #loop = asyncio.new_event_loop()
+    #asyncio.set_event_loop(loop)
+    DATA = asyncio.run(asyncio.gather(*TASKS, loop=False))
+    #loop.close()
 
-    await asyncio.gather( TASKS )
+    print(DATA)
 
+    return 'ok'
+"""
     svod = pd.concat( LIST_ )
 
     svod["п/н"] = range(1, len(svod)+1)
 
     tomorrow = (datetime.now + timedelta(1)).strftime('%Y_%m_%d')
    
-    NEW_FEDREG = Dir.get('robot') +'/'+ tomorrow \
+    NEW_FEDREG = Dir.get('path_robot') +'/'+ tomorrow \
             +'/Федеральный регистр лиц, больных - ' + DATE + '.csv'
 
     svod.to_csv(
@@ -64,4 +70,4 @@ def slojit_fr():
             index=False,
             sep=";",
             encoding='cp1251')
-
+"""
