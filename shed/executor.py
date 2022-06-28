@@ -31,14 +31,16 @@ def executor(TASK : Task ):
         else:
             #Если все хорошо, то получаем список, кому вернуть результат
             USERS = TASK.users()
-            TASK.stop()
             #Возвращаем результат
                 
             if COMMAND.return_file:
+                TASK.stop()
                 for FILE in return_value.split(';'):
                     for USER in USERS:
                         bot_send_file(FILE, USER)
                     os.remove(FILE)
             else:
+                TASK.comment = return_value
+                TASK.stop()
                 for USER in USERS:
                     bot_send_text(return_value, USER)
