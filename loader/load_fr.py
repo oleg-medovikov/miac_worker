@@ -65,7 +65,7 @@ def report_fr(df):
 
 
 def calculate_hash(df):
-    """Считаем хеш срок федерального регистра"""
+    """Считаем хеш строк федерального регистра"""
     df['string']= df['СНИЛС'] + \
              df['ФИО'] + \
              df['Пол'] + \
@@ -169,16 +169,16 @@ def load_fr():
     covid_exec('EXEC dbo.p_hash_md5')
     covid_exec('EXEC dbo.cv_Load_FedReg_new')
 
-    # Отправляем репорт по выздоровевшим
+    # Отправляем числа статистики по выздоровевшим
     report_fr(DF)
-    
+    # Ещё один отчёт
     covid_exec('EXEC [mz].[p_Recalculate_for_50_Report]')
 
-    mess = 'Регистр успешно загружен!\n' \
-            + 'Имя файла: ' + FILE_CSV.rsplit('/',1)[-1] \
-            + 'Всего строк: '  + str(len(DF)) \
-            + 'Удалено строк: ' + str(len(FR_B)) \
-            + 'Добавлено строк: ' + str(len(FR_C))
+    mess = 'Регистр успешно загружен!' \
+            + '\nИмя файла: '       + FILE_CSV.rsplit('/',1)[-1] \
+            + '\nВсего строк: '     + str(len(DF)) \
+            + '\nУдалено строк: '   + str(len(FR_B)) \
+            + '\nДобавлено строк: ' + str(len(FR_C))
 
     return mess
 

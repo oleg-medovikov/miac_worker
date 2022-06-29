@@ -78,7 +78,7 @@ def load_fr_death():
             EXEC   [dbo].[cv_Load_FedReg_d_covid]
             """)
 
-    return "34 отчёт по погибшим успешно загружен"
+    return "34 отчёт по погибшим успешно загружен\n" + 'Файл: ' + FILE_CSV.rsplit('/',1)[-1]
 
 
 
