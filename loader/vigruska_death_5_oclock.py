@@ -38,7 +38,7 @@ def vigruska_death_5_oclock():
     DATE = (datetime.datetime.now() - datetime.timedelta(days=0)).strftime("%Y_%m_%d")
     PATH = Dir.get('covi') + '/' + DATE
 
-    FILE = glob.glob(PATH + r'\*УМСРС*.xlsx')
+    FILE = glob.glob(PATH + r'/*УМСРС*.xlsx')
 
     if len( FILE ) == 0:
         raise my_except('Файлик УМСРС не найден!')
@@ -67,7 +67,7 @@ def vigruska_death_5_oclock():
 
     DATE = (datetime.datetime.today() + datetime.timedelta(days=1)).strftime("%Y.%m.%d")
 
-    FILES = glob.glob( PATH + '\[!Копия]*.xlsx')
+    FILES = glob.glob( PATH + '/[!Копия]*.xlsx')
 
     # Удаляем старые файлы, если они есть
     for file in FILES:
@@ -84,17 +84,19 @@ def vigruska_death_5_oclock():
 
     MOs = SVERKA_3['Наименование МО'].unique()
 
+    string = ''
     for mo in MOs:
-	    otchet = SVERKA_3[ SVERKA_3 ['Наименование МО'] == mo ]
-	    otchet.index = range(len(otchet))
+        otchet = SVERKA_3[ SVERKA_3 ['Наименование МО'] == mo ]
+        otchet.index = range(len(otchet))
+        
         MO_FILE = PATH + '/'+ DATE + '_COVID_Умершие_' + mo.replace('"','') + '.xlsx'
-	    with pd.ExcelWriter( MO_FILE ) as writer:
-		    otchet.to_excel(writer,index=False)
+        
+        with pd.ExcelWriter( MO_FILE ) as writer:
+            otchet.to_excel(writer,index=False)
         
         MO_DIR = Dir.get('УМСРС '+ mo )
-        string = ''
-        if MO_DIR is not None:
-            shutil.move(MO_FILE, MO_DIR + MO_FILE.rsplit('/',1)[-1]
+        if MO_DIR != '':
+            shutil.move(MO_FILE, MO_DIR +'/'+ MO_FILE.rsplit('/',1)[-1])
         else:
             string += '\n' + mo
     

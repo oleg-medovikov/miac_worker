@@ -15,6 +15,17 @@ def svod_40_covid_19():
     sql_09 = open('parus/sql/covid_40_light.sql','r').read()
     sql_10 = open('parus/sql/covid_40_light_old.sql','r').read()
 
+#    sql_01.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
+#    sql_02.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
+#    sql_03.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
+#    sql_04.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
+#    sql_05.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
+#    sql_06.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
+#    sql_07.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
+#    sql_08.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
+#    sql_09.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
+#    sql_10.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
+
     sput         = parus_sql(sql_01)
     sput_old     = parus_sql(sql_02)
     epivak       = parus_sql(sql_03)

@@ -33,7 +33,7 @@ def svod_4_3_covid_19():
 '4.3_7{POK}' pok7,
 '4.3_8{POK}' pok8"""
 
-        SQL = open('func/parus/sql/covid_4.3_svod_stac.sql', 'r')\
+        SQL = open('parus/sql/covid_4.3_svod_stac.sql', 'r')\
                 .read().replace('pokazateli', POKAZATELI)
         DF = parus_sql( SQL )
 

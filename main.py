@@ -23,4 +23,7 @@ def create_threads():
 
 if __name__ == '__main__':
     Task.restart()
-    create_threads()
+    try:
+        create_threads()
+    except KeyboardInterrupt:
+        pass
