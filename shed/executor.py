@@ -13,14 +13,14 @@ from concurrent.futures import ThreadPoolExecutor
 
 def executor(TASK : Task ):
     COMMAND = Command.get(TASK.c_id)
-        
+    
     with ThreadPoolExecutor() as executor:
-        if COMMAND.c_arg == 'no':
+        if TASK.c_arg == 'no':
             future = executor.submit(globals()[COMMAND.c_procedure])
         else:
             future = executor.submit(
                     globals()[COMMAND.c_procedure],
-                    COMMAND.c_arg)
+                    TASK.c_arg)
         try:
             return_value =  future.result()
         except Exception as e:

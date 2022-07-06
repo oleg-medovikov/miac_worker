@@ -6,3 +6,4 @@ from .load_fr                 import load_fr
 from .load_fr_death           import load_fr_death
 from .load_umsrs              import load_umsrs
 from .vigruska_death_5_oclock import vigruska_death_5_oclock
+from .svod_unique_patient     import svod_unique_patient
