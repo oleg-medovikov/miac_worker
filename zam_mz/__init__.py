@@ -13,4 +13,5 @@ from .load_snils_comment   import load_snils_comment
 from .ivl                  import IVL
 from .zamechania           import zamechania
 from .zamechania_file      import zamechania_file
+from .zam_status           import zamechania_stat
 
