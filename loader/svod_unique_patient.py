@@ -49,14 +49,14 @@ def svod_unique_patient(DATE_GLOBAL):
     # Находим пересечение
 
     join = svod_1.merge(rpn_1, how='outer', left_on=['Фио','дата рождения'], right_on=['фио','Дата рождения '])
-
+    
     # Находим дубли и у них добавляем значение в поле 'Дата занесения в базу'
     DUBLI = join.loc[(join['Фио'].notnull()) &  (join['фио'].notnull()) ].index
     SVOD.loc[DUBLI, 'Дата занесения в базу'] = SVOD.loc[DUBLI,'Дата занесения в базу'] + " , " + DATE_GLOBAL
-
+   
     # Находим новые уникальные строчки
     NEW_ROW = join.loc[(join['Фио'].isnull()) &  ~(join['фио'].isnull()), 'Unnamed: 0' ].unique()
-    RPN = RPN.iloc[ NEW_ROW ][['фио','Дата рождения ', 'м/ж', 'Учреждение зарегистрировавшее диагноз']]
+    RPN = RPN.loc[ RPN['Unnamed: 0'].isin(NEW_ROW) ][['фио','Дата рождения ', 'м/ж', 'Учреждение зарегистрировавшее диагноз']]
     RPN.columns = ['Фио', 'дата рождения', 'адрес', 'Направил материал']
     RPN ['Дата занесения в базу'] = DATE_GLOBAL
     RPN ['Роспотребнадзор'] = 'Роспотребнадзор'
