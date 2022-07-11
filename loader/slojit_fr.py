@@ -1,4 +1,4 @@
-import xlrd, glob, shutil, numpy
+import xlrd, glob, shutil, numpy, os
 from multiprocessing import Pool
 import pandas as pd
 from datetime import datetime, timedelta
@@ -154,7 +154,7 @@ def slojit_fr():
     DETI      = df['Возраст'] < 18
     COVID_D   = df['Посмертный диагноз'].isin(['U07.1','U07.2'])
     DEATH     = df['Исход заболевания'].isin(['Смерть'])
-    COVID_D_E = df['Посмертный диагноз'].notin(['U07.1','U07.2'])
+    COVID_D_E = df['Посмертный диагноз'].isin(['U07.1','U07.2']).replace({False: True, True: False})
     ISHOD_NO  = df['Исход заболевания'].isin(['Диагноз не подтвержден',
                                                'Отказ пациента от лечения',
                                                'Перевод пациента в другую МО',
@@ -236,6 +236,38 @@ def slojit_fr():
     Всего на стационарном: {format(count_deti_stach,'n')}
 """
 
+    # Считаю детей с 01.01.2022
+
+
+    DIAGNOZ_DATE = df['Диагноз устан'] >= '2022-01-01'
+
+    count_deti_ill   = df.loc[ COVID   & DETI & (df['Диагноз устан'] >= '2022-01-01')].shape[0]
+    count_deti_rec   = df.loc[ COVID   & DETI & REC   & (df['Диагноз устан'] >= '2022-01-01')].shape[0]
+    count_deti_death = df.loc[ COVID_D & DETI & DEATH & (df['Дата исхода'] >= '2022-01-01')  ].shape[0]
+
+    MESS += f"""
+Отдельно по детям, заболевшим с 01-01-2022
+    Заболевшие дети:       {format(count_deti_ill,'n')} 
+    Выздовевшие дети:      {format(count_deti_rec,'n')}
+    Умершие дети:          {format(count_deti_death,'n')}
+    """
+    
+    # Записываем файлы 
+    
+
+    try:
+        df.to_csv(FEDREG_FILE,index=False,sep=";", encoding='utf-8')
+    except FileNotFoundError:
+        os.mkdir( FEDREG_FILE.rsplit('/',1)[0] )
+        MESS += 'Не нашёл папку для ФР и создал её'
+        df.to_csv(FEDREG_FILE,index=False,sep=";", encoding='utf-8')
+
+    del df['СНИЛС']
+    del df['ФИО']
+
+    #df.to_csv(IACH_FILE,index=False,sep=";",encoding='cp1251')
+
+    MESS += '```'
 
     return MESS
    
