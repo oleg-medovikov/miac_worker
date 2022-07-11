@@ -53,9 +53,9 @@ def slojit_fr():
 
     TOMORROW = (datetime.today() + timedelta(days=1)).strftime("%Y_%m_%d")
 
-    FEDREG_FILE = Dir.get('robot') +'/'+ TOMORROW + '/Федеральный регистр лиц, больных - ' + DATE + '.csv'
+    FEDREG_FILE = Dir.get('path_robot') +'/'+ TOMORROW + '/Федеральный регистр лиц, больных - ' + DATE + '.csv'
     IACH_FILE   = Dir.get('covid_iac2') + '/Федеральный регистр лиц, больных - ' + DATE + '_ИАЦ.csv'
-    OTCHET_9    = glob.glob(Dir.get('robot') +'/'+ TOMORROW +'/9. Отчет по пациентам COVID-центр*.xlsx' )
+    OTCHET_9    = glob.glob(Dir.get('path_robot') +'/'+ TOMORROW +'/9. Отчет по пациентам COVID-центр*.xlsx' )
 
     MESS = '``` \n'
     MESS += f'Успешно сложены {len(FILES)} файлов выгрузки ФР, всего строк: {df.shape[0]}'
@@ -146,6 +146,7 @@ def slojit_fr():
     Старше 60: {format(NumberFor5_3, 'n')}
     Старше 70: {format(NumberFor5_4, 'n')}
 ================================
+```
 """
     # Считаем детей
     count_deti_ill   = df.loc[ COVID & ( df['Возраст'] < 18) ].shape[0]
@@ -184,7 +185,7 @@ def slojit_fr():
                 where id = (select max(id) from [robo].[values] where [value_name] = 'Всего детей умерло от COVID' 
                 and date_rows = (select max(date_rows) from [robo].[values] where [value_name] = 'Всего детей умерло от COVID'
                 and  date_rows != cast(getdate() as date) ) )""").iat[0,0]
-    MESS +=f"""
+    MESS +=f""";mess; ```
 Отдельно по детям, больным COVID-19:
     Заболело:              {format(count_deti_ill,'n')}
     Заболело за день:      {format(count_deti_ill - count_deti_ill_old,'n')}
@@ -196,6 +197,7 @@ def slojit_fr():
     Другой исход:          {format(count_deti_else,'n')}
     Всего на амбулаторном: {format(count_deti_amb,'n')}
     Всего на стационарном: {format(count_deti_stach,'n')}
+```
 """
     # Считаем школьников
     SCHOOL   =  df['Возраст'] > 6
@@ -222,7 +224,7 @@ def slojit_fr():
                 and date_rows = (select max(date_rows) from [robo].[values] where [value_name] = 'Всего школьников умерло от COVID'
                 and  date_rows != cast(getdate() as date) ) )""").iat[0,0]
 
-    MESS +=f"""
+    MESS +=f""";mess; ```
 Отдельно по школьникам, больным COVID-19:
     Заболело:              {format(count_deti_ill,'n')}
     Заболело за день:      {format(count_deti_ill - count_deti_ill_old,'n')}
@@ -234,6 +236,7 @@ def slojit_fr():
     Другой исход:          {format(count_deti_else,'n')}
     Всего на амбулаторном: {format(count_deti_amb,'n')}
     Всего на стационарном: {format(count_deti_stach,'n')}
+```
 """
 
     # Считаю детей с 01.01.2022
@@ -245,7 +248,7 @@ def slojit_fr():
     count_deti_rec   = df.loc[ COVID   & DETI & REC   & (df['Диагноз устан'] >= '2022-01-01')].shape[0]
     count_deti_death = df.loc[ COVID_D & DETI & DEATH & (df['Дата исхода'] >= '2022-01-01')  ].shape[0]
 
-    MESS += f"""
+    MESS += f""";mess; ```
 Отдельно по детям, заболевшим с 01-01-2022
     Заболевшие дети:       {format(count_deti_ill,'n')} 
     Выздовевшие дети:      {format(count_deti_rec,'n')}
@@ -259,13 +262,14 @@ def slojit_fr():
         df.to_csv(FEDREG_FILE,index=False,sep=";", encoding='utf-8')
     except FileNotFoundError:
         os.mkdir( FEDREG_FILE.rsplit('/',1)[0] )
-        MESS += 'Не нашёл папку для ФР и создал её'
+        MESS += '\n================================='
+        MESS += '\nНе нашёл папку для ФР и создал её'
         df.to_csv(FEDREG_FILE,index=False,sep=";", encoding='utf-8')
 
     del df['СНИЛС']
     del df['ФИО']
 
-    #df.to_csv(IACH_FILE,index=False,sep=";",encoding='cp1251')
+    df.to_csv(IACH_FILE,index=False,sep=";",encoding='cp1251')
 
     MESS += '```'
 

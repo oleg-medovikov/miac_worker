@@ -43,4 +43,5 @@ def executor(TASK : Task ):
                 TASK.comment = return_value
                 TASK.stop()
                 for USER in USERS:
-                    bot_send_text(return_value, USER)
+                    for MESS in return_value.split(';mess;'):
+                        bot_send_text(MESS, USER)
