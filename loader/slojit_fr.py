@@ -201,6 +201,9 @@ def slojit_fr():
 """
     # Считаем школьников
     SCHOOL   =  df['Возраст'] > 6
+    
+    count_deti_ill   = df.loc[ COVID & DETI & SCHOOL ].shape[0]
+    count_deti_rec   = df.loc[ COVID & DETI & SCHOOL & REC ].shape[0]
 
     count_deti_death      = df.loc[ COVID_D   & DETI & SCHOOL & DEATH         ].shape[0] 
     count_deti_death_else = df.loc[ COVID_D_E & DETI & SCHOOL & COVID & DEATH ].shape[0]
