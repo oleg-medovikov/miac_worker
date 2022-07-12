@@ -1,5 +1,7 @@
 import shutil,openpyxl
 from base import covid_sql
+from openpyxl.utils.dataframe import dataframe_to_rows
+
 
 SQL_NAMES = [
 ['no_snils.sql', 'Без СНИЛСа'],
@@ -20,7 +22,7 @@ def zamechania_file():
     """
     DATE = covid_sql( SQL ).iat[0,0]
 
-    SQL = open('zam_mz/sql/kolichestvo.sql', 'r')
+    SQL = open('zam_mz/sql/kolichestvo.sql', 'r').read()
 
     DF = covid_sql( SQL )
 

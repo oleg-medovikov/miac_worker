@@ -9,3 +9,4 @@ from .vigruska_death_5_oclock import vigruska_death_5_oclock
 from .svod_unique_patient     import svod_unique_patient
 from .check_fr                import check_fr
 from .slojit_fr               import slojit_fr
+from .patient_amb_stac        import patient_amb_stac

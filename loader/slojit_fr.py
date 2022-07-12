@@ -79,18 +79,17 @@ def slojit_fr():
 
     # Дата выгрузки
     DAY = pd.to_datetime(df['Дата изменения РЗ'], format='%d.%m.%Y').max().date()
+    YESTERDAY = (DAY - timedelta(days=1)).strftime('%Y-%m-%d') 
 
     df['Диагноз устан'] = pd.to_datetime(df['Диагноз установлен']     , format='%d.%m.%Y', errors='ignore')
     df['Дата исхода']   = pd.to_datetime(df['Дата исхода заболевания'], format='%d.%m.%Y', errors='ignore')
     
     # Какое-то sql колдунство - берем нужное число выздоровевших с мах номером и вчерашней датой
-    SQL = """SELECT [value_count] FROM [robo].[values]
+    SQL = f"""SELECT [value_count] FROM [robo].[values]
                 where id = (select max(id) 
                                 from [robo].[values] 
                                     where [value_name] = 'Всего выздоровело от COVID'
-                and date_rows = (select max(date_rows) from [robo].[values] 
-                                        where [value_name] = 'Всего выздоровело от COVID'
-                                            and  date_rows != cast(getdate() as date) ) )"""
+                and date_rows = '{YESTERDAY}'  )"""
 
     count_vizd_old = covid_sql (SQL).iat[0,0]
     count_vizd_new = df[df['Исход заболевания'].isin(['Выздоровление']) & df['Диагноз'].isin(['U07.1']) ].shape[0]
@@ -171,20 +170,17 @@ def slojit_fr():
     count_deti_stach      = df.loc[ COVID     & DETI & STAC & ILL    ].shape[0] 
 
 
-    count_deti_ill_old = covid_sql ("""SELECT [value_count] FROM [robo].[values]
+    count_deti_ill_old = covid_sql (f"""SELECT [value_count] FROM [robo].[values]
                 where id = (select max(id) from [robo].[values] where [value_name] = 'Всего детей заболело от COVID' 
-                and date_rows = (select max(date_rows) from [robo].[values] where [value_name] = 'Всего детей заболело от COVID'
-                and  date_rows != cast(getdate() as date) ) )""").iat[0,0]
+                and date_rows = '{YESTERDAY}' )""").iat[0,0]
     
-    count_deti_rec_old = covid_sql ("""SELECT [value_count] FROM [robo].[values]
+    count_deti_rec_old = covid_sql (f"""SELECT [value_count] FROM [robo].[values]
                 where id = (select max(id) from [robo].[values] where [value_name] = 'Всего детей выздоровело от COVID' 
-                and date_rows = (select max(date_rows) from [robo].[values] where [value_name] = 'Всего детей выздоровело от COVID'
-                and  date_rows != cast(getdate() as date) ) )""").iat[0,0]
+                and date_rows = '{YESTERDAY}' )""").iat[0,0]
 
-    count_deti_death_old = covid_sql ("""SELECT [value_count] FROM [robo].[values]
+    count_deti_death_old = covid_sql (f"""SELECT [value_count] FROM [robo].[values]
                 where id = (select max(id) from [robo].[values] where [value_name] = 'Всего детей умерло от COVID' 
-                and date_rows = (select max(date_rows) from [robo].[values] where [value_name] = 'Всего детей умерло от COVID'
-                and  date_rows != cast(getdate() as date) ) )""").iat[0,0]
+                and date_rows = '{YESTERDAY}') """).iat[0,0]
     MESS +=f""";mess; ```
 Отдельно по детям, больным COVID-19:
     Заболело:              {format(count_deti_ill,'n')}
@@ -212,20 +208,17 @@ def slojit_fr():
     count_deti_amb        = df.loc[ COVID     & DETI & SCHOOL & AMB  & ILL    ].shape[0]
     count_deti_stach      = df.loc[ COVID     & DETI & SCHOOL & STAC & ILL    ].shape[0] 
 
-    count_deti_ill_old = covid_sql ("""SELECT [value_count] FROM [robo].[values]
+    count_deti_ill_old = covid_sql (f"""SELECT [value_count] FROM [robo].[values]
                 where id = (select max(id) from [robo].[values] where [value_name] = 'Всего школьников заболело от COVID' 
-                and date_rows = (select max(date_rows) from [robo].[values] where [value_name] = 'Всего школьников заболело от COVID'
-                and  date_rows != cast(getdate() as date) ) )""").iat[0,0]
+                and date_rows = '{YESTERDAY}' )""").iat[0,0]
     
-    count_deti_rec_old = covid_sql ("""SELECT [value_count] FROM [robo].[values]
+    count_deti_rec_old = covid_sql (f"""SELECT [value_count] FROM [robo].[values]
                 where id = (select max(id) from [robo].[values] where [value_name] = 'Всего школьников выздоровело от COVID' 
-                and date_rows = (select max(date_rows) from [robo].[values] where [value_name] = 'Всего школьников выздоровело от COVID'
-                and  date_rows != cast(getdate() as date) ) )""").iat[0,0]
+                and date_rows = '{YESTERDAY}' )""").iat[0,0]
 
-    count_deti_death_old = covid_sql ("""SELECT [value_count] FROM [robo].[values]
+    count_deti_death_old = covid_sql (f"""SELECT [value_count] FROM [robo].[values]
                 where id = (select max(id) from [robo].[values] where [value_name] = 'Всего школьников умерло от COVID' 
-                and date_rows = (select max(date_rows) from [robo].[values] where [value_name] = 'Всего школьников умерло от COVID'
-                and  date_rows != cast(getdate() as date) ) )""").iat[0,0]
+                and date_rows = '{YESTERDAY}' )""").iat[0,0]
 
     MESS +=f""";mess; ```
 Отдельно по школьникам, больным COVID-19:
@@ -278,5 +271,3 @@ def slojit_fr():
 
     return MESS
    
-
-
