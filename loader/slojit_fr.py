@@ -81,8 +81,6 @@ def slojit_fr():
     DAY = pd.to_datetime(df['Дата изменения РЗ'], format='%d.%m.%Y').max().date()
     YESTERDAY = (DAY - timedelta(days=1)).strftime('%Y-%m-%d') 
 
-    df['Диагноз устан'] = pd.to_datetime(df['Диагноз установлен']     , format='%d.%m.%Y', errors='ignore')
-    df['Дата исхода']   = pd.to_datetime(df['Дата исхода заболевания'], format='%d.%m.%Y', errors='ignore')
     
     # Какое-то sql колдунство - берем нужное число выздоровевших с мах номером и вчерашней датой
     SQL = f"""SELECT [value_count] FROM [robo].[values]
@@ -237,12 +235,13 @@ def slojit_fr():
 
     # Считаю детей с 01.01.2022
 
+    df['Диагноз установлен'] = pd.to_datetime(df['Диагноз установлен']     , format='%d.%m.%Y', errors='ignore')
 
-    DIAGNOZ_DATE = df['Диагноз устан'] >= '2022-01-01'
+    DIAGNOZ_DATE = df['Диагноз установлен'] >= '2022-01-01'
 
-    count_deti_ill   = df.loc[ COVID   & DETI & (df['Диагноз устан'] >= '2022-01-01')].shape[0]
-    count_deti_rec   = df.loc[ COVID   & DETI & REC   & (df['Диагноз устан'] >= '2022-01-01')].shape[0]
-    count_deti_death = df.loc[ COVID_D & DETI & DEATH & (df['Дата исхода'] >= '2022-01-01')  ].shape[0]
+    count_deti_ill   = df.loc[ COVID   & DETI         & (df['Диагноз установлен']      >= '2022-01-01')].shape[0]
+    count_deti_rec   = df.loc[ COVID   & DETI & REC   & (df['Диагноз установлен']      >= '2022-01-01')].shape[0]
+    count_deti_death = df.loc[ COVID_D & DETI & DEATH & (df['Дата исхода заболевания'] >= '2022-01-01')].shape[0]
 
     MESS += f""";mess; ```
 Отдельно по детям, заболевшим с 01-01-2022
@@ -251,6 +250,8 @@ def slojit_fr():
     Умершие дети:          {format(count_deti_death,'n')}
     """
     
+    df['Диагноз установлен']      = df['Диагноз установлен'].dt.strftime('%d.%m.%Y')
+    df['Дата исхода заболевания'] = df['Дата исхода заболевания'].dt.strftime('%d.%m.%Y')
     # Записываем файлы 
     
 
@@ -262,10 +263,10 @@ def slojit_fr():
         MESS += '\nНе нашёл папку для ФР и создал её'
         df.to_csv(FEDREG_FILE,index=False,sep=";", encoding='utf-8')
 
-    del df['СНИЛС']
-    del df['ФИО']
+    #del df['СНИЛС']
+    #del df['ФИО']
 
-    df.to_csv(IACH_FILE,index=False,sep=";",encoding='cp1251')
+    #df.to_csv(IACH_FILE,index=False,sep=";",encoding='cp1251')
 
     MESS += '```'
 

@@ -10,3 +10,4 @@ from .svod_unique_patient     import svod_unique_patient
 from .check_fr                import check_fr
 from .slojit_fr               import slojit_fr
 from .patient_amb_stac        import patient_amb_stac
+from .copy_uach               import copy_uach

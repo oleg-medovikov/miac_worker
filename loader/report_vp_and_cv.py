@@ -38,7 +38,7 @@ class my_except(Exception):
      pass
 
 def report_vp_and_cv():
-    FILES = glob.glob(Dir.get('VP_CV') + '/из_почты/[!~$]*.xls*')
+    FILES = glob.glob(Dir.get('VP_CV') + '/из_почты/[!~$]*.xlsx')
     
 
     if len(FILES) == 0:
@@ -48,21 +48,22 @@ def report_vp_and_cv():
 
     if not os.path.exists(PATH):
         try:
-            os.mkdir(path)
+            os.mkdir(PATH)
         except OSError:
             raise my_except('не смог создать папку')
 
     ERROR = pd.DataFrame()
-    lisr_ = []
+    list_ = []
 
     for FILE in FILES:
         try:
             EXCEL, nameMO = load_file_mo( FILE )
-            if len(EXCEL.dtype.unique) > 1:
+            if len(EXCEL.dtypes.unique() ) > 1:
                 raise my_except(f"В файле {FILE.rsplit('/',1)[1]} неправильные данные")
             else:
                 EXCEL ['nameMO'] = nameMO
-        except:
+        except Exception as e:
+            #raise my_except(str(e))
             ERROR.loc[len(ERROR), 'Не обработаны файлы'] = FILE.rsplit('/',1)[1]
         else:
             list_.append(EXCEL)
