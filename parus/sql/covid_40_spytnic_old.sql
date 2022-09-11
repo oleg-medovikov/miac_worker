@@ -1,4 +1,4 @@
-SELECT day,   ORGANIZATION, 'Пункт вакцинации' type, 
+SELECT  ORGANIZATION, 'Пункт вакцинации' type, 
                 substr(tvsp ,1,INSTR(tvsp , ' ')-1) dist,
                 TRIM(LEADING ' ' from REPLACE(substr(tvsp ,INSTR(tvsp , ' ')+1, length(tvsp)),'район ','') ) tvsp, 
                 CAST(Vaccin_tvsp_03 AS int) Vaccin_tvsp_03 , CAST(Vaccin_tvsp_04 AS int) Vaccin_tvsp_04, 
@@ -13,7 +13,7 @@ SELECT day,   ORGANIZATION, 'Пункт вакцинации' type,
 			to_char(r.BDATE, 'DD.MM.YYYY') day,
                 CAST(revac_20_01 AS int) revac_20_01 
         FROM (
-                SELECT day, 
+                SELECT
 			to_char(r.BDATE, 'DD.MM.YYYY') day,
                         a.AGNNAME organization,
                     i.CODE pokazatel,
@@ -41,8 +41,8 @@ SELECT day,   ORGANIZATION, 'Пункт вакцинации' type,
                 on(rd.PRN = rf.RN)
                 WHERE rf.code = '40 COVID 19'
 			and r.BDATE in ( trunc(SYSDATE) - 2, TO_DATE('30-08-2022','DD-MM-YYYY') )
-                and ro.BLTABLES = (SELECT day,  BLTABLES FROM (
- 								SELECT day,  DISTINCT ro.BLTABLES , ROW_NUMBER () over(ORDER BY ro.BLTABLES desc) AS num
+                and ro.BLTABLES = (SELECT BLTABLES FROM (
+ 								SELECT DISTINCT ro.BLTABLES , ROW_NUMBER () over(ORDER BY ro.BLTABLES desc) AS num
 					                FROM PARUS.BLTBLVALUES v
 					                INNER JOIN PARUS.BLTABLESIND si
 					                on(v.BLTABLESIND = si.RN)
@@ -79,7 +79,7 @@ SELECT day,   ORGANIZATION, 'Пункт вакцинации' type,
                 WHERE tvsp IS NOt NULL
                 and ORGANIZATION NOT LIKE 'Администр%'
         UNION ALL
-                SELECT day,     			ORGANIZATION,	'Медицинская организация' type, 
+                SELECT    			ORGANIZATION,	'Медицинская организация' type, 
                                 REPLACE(dist,' район ','') dist,
                                 case when tvsp is null then organization else tvsp end tvsp, 
                                 CAST(Vaccin_03 AS int) Vaccin_03 , CAST(Vaccin_04 AS int) Vaccin_04, 
@@ -94,7 +94,7 @@ SELECT day,   ORGANIZATION, 'Пункт вакцинации' type,
 			to_char(r.BDATE, 'DD.MM.YYYY') day,
                                 CAST(revac_20_02 AS int) revac_20_02 
                 FROM (
-                SELECT day, 
+                SELECT
                         r.BDATE,
                         a.AGNNAME ORGANIZATION ,
                         rf.CODE  otchet,

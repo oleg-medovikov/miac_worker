@@ -1,4 +1,4 @@
-SELECT day,  ORGANIZATION, 'Пункт вакцинации' type,  substr(KV_TVSP_02 ,1,INSTR(KV_TVSP_02 , ' ')-1) dist, 
+SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(KV_TVSP_02 ,1,INSTR(KV_TVSP_02 , ' ')-1) dist, 
         REPLACE(substr(KV_TVSP_02 ,INSTR(KV_TVSP_02 , ' ')+1, length(KV_TVSP_02)),'район ','') KV_TVSP_02,
         nvl(cast(KV_TVSP_04 as int),0)  KV_TVSP_04,
         nvl(cast(KV_TVSP_05_z as int),0)  KV_TVSP_05_z,nvl(cast(KV_TVSP_06 as int),0)  KV_TVSP_06,
@@ -14,7 +14,7 @@ SELECT day,  ORGANIZATION, 'Пункт вакцинации' type,  substr(KV_TV
         nvl(cast(KV_TVSP_24 as int),0)  KV_TVSP_24,nvl(cast(KV_TVSP_25 as int),0)  KV_TVSP_25,
         nvl(cast(revac_20_01 as int),0)  revac_20_01
                 FROM (
-                SELECT day, 
+                SELECT
 			to_char(r.BDATE, 'DD.MM.YYYY') day,
                         a.AGNNAME organization,
                     i.CODE pokazatel,
@@ -42,8 +42,8 @@ SELECT day,  ORGANIZATION, 'Пункт вакцинации' type,  substr(KV_TV
                 on(rd.PRN = rf.RN)
                 WHERE rf.code = '40 COVID 19'
 			and r.BDATE in ( trunc(SYSDATE) - 1, TO_DATE('31-08-2021','DD-MM-YYYY') )
-                                and ro.BLTABLES = (SELECT day,  BLTABLES FROM (
- 								SELECT day,  DISTINCT ro.BLTABLES , ROW_NUMBER () over(ORDER BY ro.BLTABLES desc) AS num
+                                and ro.BLTABLES = (SELECT BLTABLES FROM (
+ 								SELECT DISTINCT ro.BLTABLES , ROW_NUMBER () over(ORDER BY ro.BLTABLES desc) AS num
 					                FROM PARUS.BLTBLVALUES v
 					                INNER JOIN PARUS.BLTABLESIND si
 					                on(v.BLTABLESIND = si.RN)
@@ -88,7 +88,7 @@ SELECT day,  ORGANIZATION, 'Пункт вакцинации' type,  substr(KV_TV
         )
                 )
         UNION
-        SELECT day,  ORGANIZATION, 'Медицинская организация' TYPE, REPLACE (epy_vak_01,' район ','') dist, epy_vak_02,
+        SELECT ORGANIZATION, 'Медицинская организация' TYPE, REPLACE (epy_vak_01,' район ','') dist, epy_vak_02,
         nvl(cast(epy_vak_04 as int),0)  epy_vak_04,nvl(cast(epy_vak_05_z as int),0)  epy_vak_05_z,
         nvl(cast(epy_vak_06 as int),0)  epy_vak_06,nvl(cast(epy_vak_07_z as int),0)  epy_vak_07_z,
         nvl(cast(epy_vak_08 as int),0)  epy_vak_08,nvl(cast(epy_vak_09_z as int),0)  epy_vak_09_z,
@@ -102,7 +102,7 @@ SELECT day,  ORGANIZATION, 'Пункт вакцинации' type,  substr(KV_TV
         nvl(cast(epy_vak_24 as int),0)  epy_vak_24,nvl(cast(epy_vak_25 as int),0)  epy_vak_25,
         nvl(cast(revac_20_03 as int),0)  revac_20_03
                 FROM (
-                SELECT day, 
+                SELECT
 			to_char(r.BDATE, 'DD.MM.YYYY') day,
                         a.AGNNAME ORGANIZATION ,
                         rf.CODE  otchet,
