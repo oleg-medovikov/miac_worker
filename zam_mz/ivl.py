@@ -65,12 +65,12 @@ def IVL():
     DATE = datetime.datetime.now().strftime('%Y_%m_%d')
     PATH = Dir.get('path_robot')
     
-    FILE_VP = PATH + '/Мониторинг_ВП.xlsx'
+    FILE_VP = PATH +'/' + DATE + '/Мониторинг ВП.xlsx'
     if not os.path.exists( FILE_VP ):
         raise my_except("Нет файла 'Мониторинг_ВП.xlsx'")
 
     try:
-        FILE_FR = glob.glob(PATH + '/[!~]*едеральный*15-00.csv')[0]
+        FILE_FR = glob.glob(PATH + '/' + DATE + '/[!~]*едеральный*15-00.csv')[0]
     except:
         raise my_except('Не найден трёхчасовой федеральный регистр')
 

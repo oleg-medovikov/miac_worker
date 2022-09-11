@@ -42,7 +42,7 @@ SELECT  DAY, pok_01
     INNER JOIN PARUS.BALANCEINDEXES bi 
     on(d.BALANCEINDEX = bi.RN)
     WHERE rf.CODE = '29 COVID 19'
-    and r.BDATE =  trunc(SYSDATE-1)
+    and r.BDATE =  trunc(SYSDATE - 1)
     and bi.CODE LIKE '29_covid_0%'
     order by  d.BALANCEINDEX 
     )
