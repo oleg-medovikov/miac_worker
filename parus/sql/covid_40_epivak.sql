@@ -15,7 +15,7 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(EVC_TVSP_2_
         nvl(cast(revac_20_01 as int),0)  revac_20_01
                 FROM (
                 SELECT
-			to_char(r.BDATE, 'DD.MM.YYYY') day,
+                        r.BDATE day,
                         a.AGNNAME organization,
                     i.CODE pokazatel,
                     ro.NUMB row_index ,
@@ -41,7 +41,7 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(EVC_TVSP_2_
                 INNER JOIN PARUS.BLREPFORM rf
                 on(rd.PRN = rf.RN)
                 WHERE rf.code = '40 COVID 19'
-			and r.BDATE in ( trunc(SYSDATE) - 1, TO_DATE('31-08-2021','DD-MM-YYYY') )
+                and r.BDATE =  trunc(SYSDATE) - 1
                                 and ro.BLTABLES = (SELECT BLTABLES FROM (
  								SELECT DISTINCT ro.BLTABLES , ROW_NUMBER () over(ORDER BY ro.BLTABLES desc) AS num
 					                FROM PARUS.BLTBLVALUES v
@@ -55,7 +55,7 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(EVC_TVSP_2_
 					                on(ro.PRN = s.RN)
 					                INNER JOIN PARUS.BLREPORTS r
 					                on(s.PRN = r.RN)
-			and r.BDATE in ( trunc(SYSDATE) - 1, TO_DATE('31-08-2021','DD-MM-YYYY') )
+					                WHERE  r.BDATE =  trunc(SYSDATE) - 1
 					                and i.CODE in ('EVC_TVSP_2_05_z') 
 										) WHERE num = 1)
                  and i.CODE in ('EVC_TVSP_2_02','EVC_TVSP_2_04','EVC_TVSP_2_05_z',
@@ -103,7 +103,7 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(EVC_TVSP_2_
         nvl(cast(revac_20_04 as int),0)  revac_20_04
                 FROM (
                 SELECT
-			to_char(r.BDATE, 'DD.MM.YYYY') day,
+                to_char(r.BDATE, 'DD.MM.YYYY') day,
                         a.AGNNAME ORGANIZATION ,
                         rf.CODE  otchet,
                         bi.CODE  pokazatel,
@@ -125,7 +125,7 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(EVC_TVSP_2_
                         INNER JOIN PARUS.BALANCEINDEXES bi 
                         on(d.BALANCEINDEX = bi.RN)
                 WHERE rf.code = '40 COVID 19'
-			and r.BDATE in ( trunc(SYSDATE) - 1, TO_DATE('31-08-2021','DD-MM-YYYY') )
+                 and  r.BDATE =  trunc(SYSDATE) - 1
                  and bi.CODE in ('EVC_TVSP_01','EVC_TVSP_02','EVC_TVSP_04','EVC_TVSP_05_z',
                                                 'EVC_TVSP_06','EVC_TVSP_07_z', 'EVC_TVSP_08', 
                                                 'EVC_TVSP_09_z', 'EVC_TVSP_10', 'EVC_TVSP_11_z',

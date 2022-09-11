@@ -3,6 +3,9 @@ import shutil, openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
 from base import parus_sql
 
+class my_except(Exception):
+    pass
+
 def svod_40_covid_19():
     sql_01 = open('parus/sql/covid_40_spytnic.sql','r').read()
     sql_02 = open('parus/sql/covid_40_spytnic_old.sql','r').read()
@@ -15,16 +18,46 @@ def svod_40_covid_19():
     sql_09 = open('parus/sql/covid_40_light.sql','r').read()
     sql_10 = open('parus/sql/covid_40_light_old.sql','r').read()
 
-    sput         = parus_sql(sql_01)
-    sput_old     = parus_sql(sql_02)
-    epivak       = parus_sql(sql_03)
-    epivak_old   = parus_sql(sql_04)
-    covivak      = parus_sql(sql_05)
-    covivak_old  = parus_sql(sql_06)
-    revac        = parus_sql(sql_07)
-    revac_old    = parus_sql(sql_08)
-    light        = parus_sql(sql_09)
-    light_old    = parus_sql(sql_10)
+    try:
+        sput         = parus_sql(sql_01)
+    except:
+        raise my_except('Сломанный запрос sput')
+    try:
+        sput_old     = parus_sql(sql_02)
+    except:
+        raise my_except('Сломанный запрос sput_old')
+    try:
+        epivak       = parus_sql(sql_03)
+    except:
+        raise my_except('Сломанный запрос epivak')
+    try:
+        epivak_old   = parus_sql(sql_04)
+    except:
+        raise my_except('Сломанный запрос epivak_old')
+    try:
+        covivak      = parus_sql(sql_05)
+    except:
+        raise my_except('Сломанный запрос covivak')
+    try:
+        covivak_old  = parus_sql(sql_06)
+    except:
+        raise my_except('Сломанный запрос covivak_old')
+    try:
+        revac        = parus_sql(sql_07)
+    except:
+        raise my_except('Сломанный запрос revac')
+    try:
+        revac_old    = parus_sql(sql_08)
+    except:
+        raise my_except('Сломанный запрос revac_old')
+    try:
+        light        = parus_sql(sql_09)
+    except:
+        raise my_except('Сломанный запрос light')
+    try:
+        light_old    = parus_sql(sql_10)
+    except:
+        raise my_except('Сломанный запрос light_old')
 
     OLD_ORG = ['ООО "Ава-Петер"']
 
