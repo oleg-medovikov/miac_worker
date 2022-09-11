@@ -1,4 +1,4 @@
-SELECT  ORGANIZATION, 'Пункт вакцинации' type, 
+SELECT  ORGANIZATION, DAY, 'Пункт вакцинации' type, 
                 substr(tvsp ,1,INSTR(tvsp , ' ')-1) dist,
                 TRIM(LEADING ' ' from REPLACE(substr(tvsp ,INSTR(tvsp , ' ')+1, length(tvsp)),'район ','') ) tvsp, 
                 CAST(Vaccin_tvsp_03 AS int) Vaccin_tvsp_03 , CAST(Vaccin_tvsp_04 AS int) Vaccin_tvsp_04, 
@@ -14,7 +14,7 @@ SELECT  ORGANIZATION, 'Пункт вакцинации' type,
                 CAST(revac_20_01 AS int) revac_20_01 
         FROM (
                 SELECT
-                        r.BDATE day,
+			to_char(r.BDATE, 'DD.MM.YYYY') day,
                         a.AGNNAME organization,
                     i.CODE pokazatel,
                     ro.NUMB row_index ,
@@ -40,7 +40,7 @@ SELECT  ORGANIZATION, 'Пункт вакцинации' type,
                 INNER JOIN PARUS.BLREPFORM rf
                 on(rd.PRN = rf.RN)
                 WHERE rf.code = '40 COVID 19'
-                and r.BDATE =  trunc(SYSDATE) - 2 
+			and r.BDATE in ( trunc(SYSDATE) - 2, TO_DATE('30-08-2022','DD-MM-YYYY') )
                 and ro.BLTABLES = (SELECT BLTABLES FROM (
  								SELECT DISTINCT ro.BLTABLES , ROW_NUMBER () over(ORDER BY ro.BLTABLES desc) AS num
 					                FROM PARUS.BLTBLVALUES v
@@ -54,7 +54,7 @@ SELECT  ORGANIZATION, 'Пункт вакцинации' type,
 					                on(ro.PRN = s.RN)
 					                INNER JOIN PARUS.BLREPORTS r
 					                on(s.PRN = r.RN)
-					                WHERE  r.BDATE =  trunc(SYSDATE) - 2 
+			and r.BDATE in ( trunc(SYSDATE) - 2, TO_DATE('30-08-2022','DD-MM-YYYY') )
 					                and i.CODE in ('Vaccin_tvsp_05') 
 										) WHERE num = 1)
                 and i.CODE in ('Vaccin_TVSP','Vaccin_tvsp_03','Vaccin_tvsp_04','Vaccin_tvsp_04_day','Vaccin_tvsp_05',
@@ -79,7 +79,7 @@ SELECT  ORGANIZATION, 'Пункт вакцинации' type,
                 WHERE tvsp IS NOt NULL
                 and ORGANIZATION NOT LIKE 'Администр%'
         UNION ALL
-                SELECT    			ORGANIZATION,	'Медицинская организация' type, 
+                SELECT    			ORGANIZATION, DAY,	'Медицинская организация' type, 
                                 REPLACE(dist,' район ','') dist,
                                 case when tvsp is null then organization else tvsp end tvsp, 
                                 CAST(Vaccin_03 AS int) Vaccin_03 , CAST(Vaccin_04 AS int) Vaccin_04, 
@@ -117,7 +117,7 @@ SELECT  ORGANIZATION, 'Пункт вакцинации' type,
                         INNER JOIN PARUS.BALANCEINDEXES bi 
                         on(d.BALANCEINDEX = bi.RN)
                 WHERE rf.code = '40 COVID 19'
-                 and  r.BDATE =  trunc(SYSDATE) - 2
+			and r.BDATE in ( trunc(SYSDATE) - 2, TO_DATE('30-08-2022','DD-MM-YYYY') )
                 and bi.CODE in ('Vaccin_TVSP','Vaccin_DISTR','Vaccin_03','Vaccin_04','Vaccin_04_day','Vaccin_05',
                                                 'Vaccin_06','Vaccin_07','Vaccin_08', 'Vaccin_09', 'Vaccin_10',
                                                 'Vaccin_11', 'Vaccin_12', 'Vaccin_20','Vaccin_20_day',

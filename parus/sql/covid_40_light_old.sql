@@ -1,4 +1,4 @@
-SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(Vaccin_TVSP ,1,INSTR(Vaccin_TVSP , ' ')-1) dist, 
+SELECT ORGANIZATION, DAY, 'Пункт вакцинации' type,  substr(Vaccin_TVSP ,1,INSTR(Vaccin_TVSP , ' ')-1) dist, 
         REPLACE(substr(Vaccin_TVSP ,INSTR(Vaccin_TVSP , ' ')+1, length(Vaccin_TVSP)),'район ','') Vaccin_TVSP,
         nvl(cast(light_03 as int),0)  light_03,
         nvl(cast(light_04 as int),0)  light_04,nvl(cast(light_05 as int),0)  light_05,
@@ -14,7 +14,7 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(Vaccin_TVSP
         nvl(cast(revac_20_01 as int),0)  revac_20_01
                 FROM (
                 SELECT
-                        r.BDATE day,
+			to_char(r.BDATE, 'DD.MM.YYYY') day,
                         a.AGNNAME organization,
                     i.CODE pokazatel,
                     ro.NUMB row_index ,
@@ -40,7 +40,7 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(Vaccin_TVSP
                 INNER JOIN PARUS.BLREPFORM rf
                 on(rd.PRN = rf.RN)
                 WHERE rf.code = '40 COVID 19'
-                and r.BDATE =  trunc(SYSDATE) - 2
+			and r.BDATE in ( trunc(SYSDATE) - 2, TO_DATE('30-08-2022','DD-MM-YYYY') )
                 and ro.BLTABLES = (SELECT BLTABLES FROM (
  								SELECT DISTINCT ro.BLTABLES , ROW_NUMBER () over(ORDER BY ro.BLTABLES DESC) AS num
 					                FROM PARUS.BLTBLVALUES v
@@ -54,7 +54,7 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(Vaccin_TVSP
 					                on(ro.PRN = s.RN)
 					                INNER JOIN PARUS.BLREPORTS r
 					                on(s.PRN = r.RN)
-					                WHERE  r.BDATE =  trunc(SYSDATE) - 2
+			and r.BDATE in ( trunc(SYSDATE) - 2, TO_DATE('30-08-2022','DD-MM-YYYY') )
 					                and i.CODE in ('light_09') 
 										) WHERE num = 1)
                  and i.CODE in ('Vaccin_TVSP','light_03','light_04',
@@ -85,7 +85,7 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(Vaccin_TVSP
                 )
       WHERE Vaccin_TVSP IS NOT null
         UNION
-SELECT ORGANIZATION, 'Медицинская организация' TYPE, REPLACE (Vaccin_MO,' район ','') dist,
+SELECT ORGANIZATION, DAY, 'Медицинская организация' TYPE, REPLACE (Vaccin_MO,' район ','') dist,
 		Vaccin_MO Vaccin_TVSP, 
         nvl(cast(light_03 as int),0)  light_03,
         nvl(cast(light_04 as int),0)  light_04,nvl(cast(light_05 as int),0)  light_05,
@@ -101,7 +101,7 @@ SELECT ORGANIZATION, 'Медицинская организация' TYPE, REPLA
         nvl(cast(revac_20_05 as int),0)  revac_20_05
                 FROM (
                 SELECT
-                to_char(r.BDATE, 'DD.MM.YYYY') day,
+			to_char(r.BDATE, 'DD.MM.YYYY') day,
                         a.AGNNAME ORGANIZATION ,
                         rf.CODE  otchet,
                         bi.CODE  pokazatel,
@@ -123,7 +123,7 @@ SELECT ORGANIZATION, 'Медицинская организация' TYPE, REPLA
                         INNER JOIN PARUS.BALANCEINDEXES bi 
                         on(d.BALANCEINDEX = bi.RN)
                 WHERE rf.code = '40 COVID 19'
-                 and  r.BDATE =  trunc(SYSDATE) - 2
+			and r.BDATE in ( trunc(SYSDATE) - 2, TO_DATE('30-08-2022','DD-MM-YYYY') )
                  and bi.CODE in ('Vaccin_MO','light_03_s','light_04_s','light_05_s',
                                                 'light_06_s','light_07_s', 'light_08_s', 
                                                 'light_09_s', 'light_10_s', 'light_11_s',
