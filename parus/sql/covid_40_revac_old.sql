@@ -1,4 +1,4 @@
-SELECT 1 AS INDX, ORGANIZATION,'Всего' as typevacine, concat(ORGANIZATION, ' Всего') AS scep
+SELECT day,  1 AS INDX, ORGANIZATION,'Всего' as typevacine, concat(ORGANIZATION, ' Всего') AS scep
 		,nvl(cast(cov_02 as int),0) cov_02
 		,nvl(cast(cov_03 as int),0) cov_03,nvl(cast(cov_04 as int),0) cov_04
 		,nvl(cast(cov_05 as int),0) cov_05,nvl(cast(cov_06 as int),0) cov_06
@@ -10,7 +10,7 @@ SELECT 1 AS INDX, ORGANIZATION,'Всего' as typevacine, concat(ORGANIZATION, 
 		,nvl(cast(cov_17 as int),0) cov_17,nvl(cast(cov_18 as int),0) cov_18
 		,nvl(cast(cov_19 as int),0) cov_19
 		FROM (
-		SELECT
+		SELECT day, 
 			to_char(r.BDATE, 'DD.MM.YYYY') day,
 			a.AGNNAME ORGANIZATION ,
 			a.ADDR_DISTRICT_RN dist, 
@@ -49,7 +49,7 @@ SELECT 1 AS INDX, ORGANIZATION,'Всего' as typevacine, concat(ORGANIZATION, 
 					,'revac_16_01_s' cov_16,'revac_17_01_s' cov_17,'revac_18_01_s' cov_18,'revac_19_01_s' cov_19)
 		)
 UNION all
-SELECT 2 AS INDX, ORGANIZATION,'Гам-КОВИД-Вак (Спутник-V)' as  typevacine, concat(ORGANIZATION, ' Гам-КОВИД-Вак (Спутник-V)') AS scep
+SELECT day,  2 AS INDX, ORGANIZATION,'Гам-КОВИД-Вак (Спутник-V)' as  typevacine, concat(ORGANIZATION, ' Гам-КОВИД-Вак (Спутник-V)') AS scep
 		,nvl(cast(cov_02 as int),0) cov_02
 		,nvl(cast(cov_03 as int),0) cov_03,nvl(cast(cov_04 as int),0) cov_04
 		,nvl(cast(cov_05 as int),0) cov_05,nvl(cast(cov_06 as int),0) cov_06
@@ -61,7 +61,7 @@ SELECT 2 AS INDX, ORGANIZATION,'Гам-КОВИД-Вак (Спутник-V)' as 
 		,nvl(cast(cov_17 as int),0) cov_17,nvl(cast(cov_18 as int),0) cov_18
 		,nvl(cast(cov_19 as int),0) cov_19
 		FROM (
-		SELECT
+		SELECT day, 
 			to_char(r.BDATE, 'DD.MM.YYYY') day,
 			a.AGNNAME ORGANIZATION ,
 			rf.CODE  otchet,
@@ -99,7 +99,7 @@ SELECT 2 AS INDX, ORGANIZATION,'Гам-КОВИД-Вак (Спутник-V)' as 
 					,'revac_16_02_s' cov_16,'revac_17_02_s' cov_17,'revac_18_02_s' cov_18,'revac_19_02_s' cov_19)
 		)
 UNION ALL
-SELECT 3 AS INDX,ORGANIZATION,'КовиВак' as typevacine, concat(ORGANIZATION, ' КовиВак') AS scep
+SELECT day,  3 AS INDX,ORGANIZATION,'КовиВак' as typevacine, concat(ORGANIZATION, ' КовиВак') AS scep
 		,nvl(cast(cov_02 as int),0) cov_02
 		,nvl(cast(cov_03 as int),0) cov_03,nvl(cast(cov_04 as int),0) cov_04
 		,nvl(cast(cov_05 as int),0) cov_05,nvl(cast(cov_06 as int),0) cov_06
@@ -111,7 +111,7 @@ SELECT 3 AS INDX,ORGANIZATION,'КовиВак' as typevacine, concat(ORGANIZATIO
 		,nvl(cast(cov_17 as int),0) cov_17,nvl(cast(cov_18 as int),0) cov_18
 		,nvl(cast(cov_19 as int),0) cov_19
 		FROM (
-		SELECT
+		SELECT day, 
 			to_char(r.BDATE, 'DD.MM.YYYY') day,
 			a.AGNNAME ORGANIZATION ,
 			rf.CODE  otchet,
@@ -149,7 +149,7 @@ SELECT 3 AS INDX,ORGANIZATION,'КовиВак' as typevacine, concat(ORGANIZATIO
 					,'revac_16_03_s' cov_16,'revac_17_03_s' cov_17,'revac_18_03_s' cov_18,'revac_19_03_s' cov_19)
 		)
 UNION ALL 
-SELECT 4 AS INDX,ORGANIZATION,'ЭпиВакКорона' as typevacine, concat(ORGANIZATION, ' ЭпиВакКорона') AS scep
+SELECT day,  4 AS INDX,ORGANIZATION,'ЭпиВакКорона' as typevacine, concat(ORGANIZATION, ' ЭпиВакКорона') AS scep
 		,nvl(cast(cov_02 as int),0) cov_02
 		,nvl(cast(cov_03 as int),0) cov_03,nvl(cast(cov_04 as int),0) cov_04
 		,nvl(cast(cov_05 as int),0) cov_05,nvl(cast(cov_06 as int),0) cov_06
@@ -161,7 +161,7 @@ SELECT 4 AS INDX,ORGANIZATION,'ЭпиВакКорона' as typevacine, concat(O
 		,nvl(cast(cov_17 as int),0) cov_17,nvl(cast(cov_18 as int),0) cov_18
 		,nvl(cast(cov_19 as int),0) cov_19
 		FROM (
-		SELECT
+		SELECT day, 
 			to_char(r.BDATE, 'DD.MM.YYYY') day,
 			a.AGNNAME ORGANIZATION ,
 			rf.CODE  otchet,
@@ -199,7 +199,7 @@ SELECT 4 AS INDX,ORGANIZATION,'ЭпиВакКорона' as typevacine, concat(O
 					,'revac_16_04_s' cov_16,'revac_17_04_s' cov_17,'revac_18_04_s' cov_18,'revac_19_04_s' cov_19)
 		)
 UNION ALL 
-SELECT 5 AS INDX, ORGANIZATION,'Спутник Лайт' as typevacine, concat(ORGANIZATION, ' Спутник Лайт') AS scep
+SELECT day,  5 AS INDX, ORGANIZATION,'Спутник Лайт' as typevacine, concat(ORGANIZATION, ' Спутник Лайт') AS scep
 		,nvl(cast(cov_02 as int),0) cov_02
 		,nvl(cast(cov_03 as int),0) cov_03,nvl(cast(cov_04 as int),0) cov_04
 		,nvl(cast(cov_05 as int),0) cov_05,nvl(cast(cov_06 as int),0) cov_06
@@ -210,7 +210,7 @@ SELECT 5 AS INDX, ORGANIZATION,'Спутник Лайт' as typevacine, concat(O
 		,nvl(cast(cov_15 as int),0) cov_15,0 as cov_16, 0 as cov_17
 		,nvl(cast(cov_18 as int),0) cov_18,nvl(cast(cov_19 as int),0) cov_19
 		FROM (
-		SELECT
+		SELECT day, 
 			to_char(r.BDATE, 'DD.MM.YYYY') day,
 			a.AGNNAME ORGANIZATION ,
 			rf.CODE  otchet,
