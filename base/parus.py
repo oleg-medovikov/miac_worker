@@ -9,5 +9,6 @@ def parus_sql(SQL):
         with cx_Oracle.connect(DATABASE_PARUS, encoding='UTF-8') as CON:
             df = pd.read_sql(SQL,CON)
     except Exception as e:
+        print(str(e))
         raise str(e)
     return df

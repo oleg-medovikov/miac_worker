@@ -15,17 +15,6 @@ def svod_40_covid_19():
     sql_09 = open('parus/sql/covid_40_light.sql','r').read()
     sql_10 = open('parus/sql/covid_40_light_old.sql','r').read()
 
-#    sql_01.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
-#    sql_02.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
-#    sql_03.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
-#    sql_04.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
-#    sql_05.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
-#    sql_06.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
-#    sql_07.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
-#    sql_08.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
-#    sql_09.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
-#    sql_10.replace('trunc(SYSDATE)', 'trunc(SYSDATE) - 1')
-
     sput         = parus_sql(sql_01)
     sput_old     = parus_sql(sql_02)
     epivak       = parus_sql(sql_03)
@@ -37,6 +26,10 @@ def svod_40_covid_19():
     light        = parus_sql(sql_09)
     light_old    = parus_sql(sql_10)
 
+    OLD_ORG = ['ООО "Ава-Петер"']
+
+    #sput = sput.loc[ (sput['ORGANIZATION'].isin(OLD_ORG) & sput['DAY']== '31.08.2022') | (~(sput['ORGANIZATION'].isin(OLD_ORG)) & sput['DAY'] != '31.08.2022') ]
+    
     del sput ['ORGANIZATION']
     del sput_old ['ORGANIZATION']
     del epivak ['ORGANIZATION']
@@ -47,6 +40,18 @@ def svod_40_covid_19():
     #del revac_old ['INDX']
     del light ['ORGANIZATION']
     del light_old ['ORGANIZATION']
+
+    #del sput        ['DAY']
+    del sput_old    ['DAY']
+    del epivak      ['DAY']
+    del epivak_old  ['DAY']
+    del covivak     ['DAY']
+    del covivak_old ['DAY']
+    del revac       ['DAY']
+    del revac_old   ['DAY']
+    del light       ['DAY']
+    del light_old   ['DAY']
+
 
     revac = revac.loc[revac['TIP'] == 'Медицинская организация']
     revac_old = revac_old.loc[revac_old['TIP'] == 'Медицинская организация']
