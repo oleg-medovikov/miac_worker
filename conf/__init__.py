@@ -3,5 +3,5 @@ from .config import TELEGRAM_API, URL_870,\
                     DATABASE_PARUS,ORACLE_HOME,\
                     LD_LIBRARY_PATH, \
                     DATABASE_COVID, DATABASE_NSI,\
-                    DATABASE_MIAC_DS
+                    DATABASE_MIAC_DS, REGIZ_AUTH
 

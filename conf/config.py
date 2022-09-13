@@ -15,4 +15,4 @@ DATABASE_MIAC_DS   = config('DATABASE_MIAC_DS',  cast=str)
 DATABASE_NSI       = config('DATABASE_NSI',      cast=str)
 
 URL_870 = config('URL_870', cast=str)
-
+REGIZ_AUTH = config('REGIZ_AUTH', cast=str)
