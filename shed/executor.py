@@ -3,6 +3,7 @@ from clas import Task, Command
 from loader import * 
 from parus  import *
 from zam_mz import *
+from regiz  import *
 
 from system import bot_send_text,bot_send_file
 

@@ -16,3 +16,6 @@ DATABASE_NSI       = config('DATABASE_NSI',      cast=str)
 
 URL_870 = config('URL_870', cast=str)
 REGIZ_AUTH = config('REGIZ_AUTH', cast=str)
+
+DADATA_TOKEN = config('dadata_token', cast=str)
+DADATA_SECRET = config('dadata_secret', cast=str)
