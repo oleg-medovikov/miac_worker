@@ -41,22 +41,6 @@ SELECT  ORGANIZATION, 'Пункт вакцинации' type,
                 on(rd.PRN = rf.RN)
                 WHERE rf.code = '40 COVID 19'
                 and r.BDATE =  trunc(SYSDATE) - 1
-                and ro.BLTABLES = (SELECT BLTABLES FROM (
- 								SELECT DISTINCT ro.BLTABLES , ROW_NUMBER () over(ORDER BY ro.BLTABLES desc) AS num
-					                FROM PARUS.BLTBLVALUES v
-					                INNER JOIN PARUS.BLTABLESIND si
-					                on(v.BLTABLESIND = si.RN)
-					                INNER JOIN PARUS.BALANCEINDEXES i
-					                on(si.BALANCEINDEXES = i.RN)
-					                INNER JOIN PARUS.BLTBLROWS ro
-					                on(v.PRN = ro.RN)
-					                INNER JOIN PARUS.BLSUBREPORTS s
-					                on(ro.PRN = s.RN)
-					                INNER JOIN PARUS.BLREPORTS r
-					                on(s.PRN = r.RN)
-					                WHERE  r.BDATE =  trunc(SYSDATE) - 1
-					                and i.CODE in ('Vaccin_tvsp_05') 
-										) WHERE num = 1)
                 and i.CODE in ('Vaccin_TVSP','Vaccin_tvsp_03','Vaccin_tvsp_04','Vaccin_tvsp_04_day','Vaccin_tvsp_05',
                                                 'Vaccin_tvsp_06','Vaccin_tvsp_07','Vaccin_tvsp_08', 'Vaccin_tvsp_09', 'Vaccin_tvsp_10',
                                                 'Vaccin_tvsp_11', 'Vaccin_tvsp_12', 'Vaccin_tvsp_20','Vaccin_tvsp_20_day',
@@ -117,8 +101,7 @@ SELECT  ORGANIZATION, 'Пункт вакцинации' type,
                         INNER JOIN PARUS.BALANCEINDEXES bi 
                         on(d.BALANCEINDEX = bi.RN)
                 WHERE rf.code = '40 COVID 19'
-				and r.BDATE in ( trunc(SYSDATE) - 1, TO_DATE('31-08-2021','DD-MM-YYYY') )
-                -- and  r.BDATE =  trunc(SYSDATE) - 1
+                 and  r.BDATE =  trunc(SYSDATE) - 1
                 and bi.CODE in ('Vaccin_TVSP','Vaccin_DISTR','Vaccin_03','Vaccin_04','Vaccin_04_day','Vaccin_05',
                                                 'Vaccin_06','Vaccin_07','Vaccin_08', 'Vaccin_09', 'Vaccin_10',
                                                 'Vaccin_11', 'Vaccin_12', 'Vaccin_20','Vaccin_20_day',

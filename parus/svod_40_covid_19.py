@@ -6,63 +6,102 @@ from base import parus_sql
 class my_except(Exception):
     pass
 
+FILES = [
+    'parus/sql/covid_40_exit.sql',
+    'parus/sql/covid_40_spytnic.sql',
+    'parus/sql/covid_40_spytnic_old.sql',
+    'parus/sql/covid_40_epivak.sql',
+    'parus/sql/covid_40_epivak_old.sql',
+    'parus/sql/covid_40_covivak.sql',
+    'parus/sql/covid_40_covivak_old.sql',
+    'parus/sql/covid_40_revac.sql',
+    'parus/sql/covid_40_revac_old_new.sql',
+    'parus/sql/covid_40_light.sql',
+    'parus/sql/covid_40_light_old.sql'
+        ]
+
 def svod_40_covid_19():
-    sql_01 = open('parus/sql/covid_40_spytnic.sql','r').read()
-    sql_02 = open('parus/sql/covid_40_spytnic_old.sql','r').read()
-    sql_03 = open('parus/sql/covid_40_epivak.sql','r').read()
-    sql_04 = open('parus/sql/covid_40_epivak_old.sql','r').read()
-    sql_05 = open('parus/sql/covid_40_covivak.sql','r').read()
-    sql_06 = open('parus/sql/covid_40_covivak_old.sql','r').read()
-    sql_07 = open('parus/sql/covid_40_revac.sql','r').read()
-    sql_08 = open('parus/sql/covid_40_revac_old_new.sql','r').read()
-    sql_09 = open('parus/sql/covid_40_light.sql','r').read()
-    sql_10 = open('parus/sql/covid_40_light_old.sql','r').read()
+    sql = open(FILES[0],'r').read()
+    MO = parus_sql(sql)
+
+    def change_sql(FILE : str, MO ):
+        """Меняем запрос, добавляя в него выбывшие организации"""
+        sql = open(FILE, 'r').read()
+        if len(MO) == 0:
+            return sql
+         
+        if 'old' in FILE:
+            string = '\t\t\tand r.BDATE = trunc(SYSDATE) - 2'
+            for i in range(len(MO)):
+                string += f"\n\t\t\tOR(r.BDATE = TO_DATE('{MO.at[i,'DAY']}','DD.MM.YYYY') - 1  and a.AGNNAME = '{MO.at[i,'ORG']}' ) "
+        else:
+            string = '\t\t\tand r.BDATE = trunc(SYSDATE) - 1'
+            for i in range(len(MO)):
+                string += f"\n\t\t\tOR(r.BDATE = TO_DATE('{MO.at[i,'DAY']}','DD.MM.YYYY') and a.AGNNAME = '{MO.at[i,'ORG']}' ) "
+        
+        for  line in sql.split('\n'):
+            if 'trunc' in line:
+                sql = sql.replace(line, string)
+        
+        with open('temp/' + FILE.rsplit('/')[-1], 'w') as f:
+            f.write(sql)
+
+        return sql
+    
 
     try:
-        sput         = parus_sql(sql_01)
-    except:
-        raise my_except('Сломанный запрос sput')
+        sput = parus_sql( change_sql( FILES[1], MO )) 
+    except Exception as e:
+        raise my_except('Сломанный запрос sput' + '\n' + str(e))
     try:
-        sput_old     = parus_sql(sql_02)
+        sput_old = parus_sql( change_sql( FILES[2], MO ))
     except:
         raise my_except('Сломанный запрос sput_old')
     try:
-        epivak       = parus_sql(sql_03)
+        epivak = parus_sql( change_sql ( FILES[3], MO))
     except:
         raise my_except('Сломанный запрос epivak')
     try:
-        epivak_old   = parus_sql(sql_04)
+        epivak_old = parus_sql( change_sql( FILES[4], MO))
     except:
         raise my_except('Сломанный запрос epivak_old')
     try:
-        covivak      = parus_sql(sql_05)
+        covivak = parus_sql( change_sql( FILES[5], MO))
     except:
         raise my_except('Сломанный запрос covivak')
     try:
-        covivak_old  = parus_sql(sql_06)
+        covivak_old  = parus_sql( change_sql( FILES[6], MO))
     except:
         raise my_except('Сломанный запрос covivak_old')
     try:
-        revac        = parus_sql(sql_07)
+        revac = parus_sql( change_sql( FILES[7], MO))
     except:
         raise my_except('Сломанный запрос revac')
     try:
-        revac_old    = parus_sql(sql_08)
+        revac_old = parus_sql( change_sql( FILES[8], MO ))
     except:
         raise my_except('Сломанный запрос revac_old')
     try:
-        light        = parus_sql(sql_09)
+        light = parus_sql( change_sql( FILES[9], MO ))
     except:
         raise my_except('Сломанный запрос light')
     try:
-        light_old    = parus_sql(sql_10)
+        light_old = parus_sql( change_sql( FILES[10], MO ))
     except:
         raise my_except('Сломанный запрос light_old')
-
-    OLD_ORG = ['ООО "Ава-Петер"']
-
-    #sput = sput.loc[ (sput['ORGANIZATION'].isin(OLD_ORG) & sput['DAY']== '31.08.2022') | (~(sput['ORGANIZATION'].isin(OLD_ORG)) & sput['DAY'] != '31.08.2022') ]
     
+    sput        = sput.loc[~sput[sput.columns[4]].isnull()]
+    sput_old    = sput_old.loc[~sput_old[sput_old.columns[4]].isnull()]
+    epivak      = epivak.loc[~epivak[epivak.columns[4]].isnull()]
+    epivak_old  = epivak_old.loc[~epivak_old[epivak_old.columns[4]].isnull()]
+    covivak     = covivak.loc[~covivak[covivak.columns[4]].isnull()]
+    covivak_old = covivak_old.loc[~covivak_old[covivak_old.columns[4]].isnull()]
+    revac       = revac.loc[~revac[revac.columns[5]].isnull()]
+    revac_old   = revac_old.loc[~revac_old[revac_old.columns[5]].isnull()]
+    light       = light.loc[~light[light.columns[4]].isnull()]
+    light_old   = light_old.loc[~light_old[light_old.columns[4]].isnull()]
+    
+
     del sput ['ORGANIZATION']
     del sput_old ['ORGANIZATION']
     del epivak ['ORGANIZATION']
@@ -74,17 +113,16 @@ def svod_40_covid_19():
     del light ['ORGANIZATION']
     del light_old ['ORGANIZATION']
 
-    #del sput        ['DAY']
-    del sput_old    ['DAY']
-    del epivak      ['DAY']
-    del epivak_old  ['DAY']
-    del covivak     ['DAY']
-    del covivak_old ['DAY']
-    del revac       ['DAY']
-    del revac_old   ['DAY']
-    del light       ['DAY']
-    del light_old   ['DAY']
-
+    sput.drop_duplicates(keep='first', inplace=True)
+    sput_old.drop_duplicates(keep='first', inplace=True)
+    epivak.drop_duplicates(keep='first', inplace=True)
+    epivak_old.drop_duplicates(keep='first', inplace=True)
+    covivak.drop_duplicates(keep='first', inplace=True)
+    covivak_old.drop_duplicates(keep='first', inplace=True)
+    revac.drop_duplicates(keep='first', inplace=True)
+    revac_old.drop_duplicates(keep='first', inplace=True)
+    light.drop_duplicates(keep='first', inplace=True)
+    light_old.drop_duplicates(keep='first', inplace=True)
 
     revac = revac.loc[revac['TIP'] == 'Медицинская организация']
     revac_old = revac_old.loc[revac_old['TIP'] == 'Медицинская организация']
@@ -206,6 +244,7 @@ def svod_40_covid_19():
             ws.cell(row=r_idx, column=c_idx, value=value)
 
     del revac['SCEP']
+
     ws = wb['Ревакцинация']
     rows = dataframe_to_rows(revac,index=False, header=False)
     for r_idx, row in enumerate(rows,9):  
