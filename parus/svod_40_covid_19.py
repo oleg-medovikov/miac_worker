@@ -90,16 +90,16 @@ def svod_40_covid_19():
     except:
         raise my_except('Сломанный запрос light_old')
     
-    sput        = sput.loc[~sput[sput.columns[4]].isnull()]
-    sput_old    = sput_old.loc[~sput_old[sput_old.columns[4]].isnull()]
-    epivak      = epivak.loc[~epivak[epivak.columns[4]].isnull()]
-    epivak_old  = epivak_old.loc[~epivak_old[epivak_old.columns[4]].isnull()]
-    covivak     = covivak.loc[~covivak[covivak.columns[4]].isnull()]
-    covivak_old = covivak_old.loc[~covivak_old[covivak_old.columns[4]].isnull()]
-    revac       = revac.loc[~revac[revac.columns[5]].isnull()]
-    revac_old   = revac_old.loc[~revac_old[revac_old.columns[5]].isnull()]
-    light       = light.loc[~light[light.columns[4]].isnull()]
-    light_old   = light_old.loc[~light_old[light_old.columns[4]].isnull()]
+    sput        = sput.loc[~sput[sput.columns[5]].isnull()]
+    sput_old    = sput_old.loc[~sput_old[sput_old.columns[5]].isnull()]
+    epivak      = epivak.loc[~epivak[epivak.columns[5]].isnull()]
+    epivak_old  = epivak_old.loc[~epivak_old[epivak_old.columns[5]].isnull()]
+    covivak     = covivak.loc[~covivak[covivak.columns[5]].isnull()]
+    covivak_old = covivak_old.loc[~covivak_old[covivak_old.columns[5]].isnull()]
+    revac       = revac.loc[~revac[revac.columns[6]].isnull()]
+    revac_old   = revac_old.loc[~revac_old[revac_old.columns[6]].isnull()]
+    light       = light.loc[~light[light.columns[5]].isnull()]
+    light_old   = light_old.loc[~light_old[light_old.columns[5]].isnull()]
     
 
     del sput ['ORGANIZATION']

@@ -360,3 +360,69 @@ Dict_MKB = {
     'K71.8' : '640710900',
     'K71.9' : '640719900',
 }
+
+XML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+ <package>
+  <info>
+   <GUID>{A4F6D1E0-909A-11D5-B08F-000021EF6307}</GUID>
+   <versionStat>404072</versionStat>
+   <version>404072</version>
+  </info>
+  <dataset id="CaptionDB">
+   <fields>
+    <f id="1" name="id" t="Integer"></f>
+    <f id="2" name="NUMNOTICE" t="String" s="50"></f>
+    <f id="3" name="NAME" t="String" s="50" r="True"></f>
+    <f id="4" name="C_Gender" t="Integer"></f>
+    <f id="5" name="Age" t="Integer"></f>
+    <f id="6" name="C_Social" t="Integer"></f>
+    <f id="7" name="C_Region" t="Integer"></f>
+    <f id="8" name="Note" t="String" s="255"></f>
+    <f id="9" name="C_PlaceIncident" t="Integer"></f>
+    <f id="10" name="Note3" t="String" s="255"></f>
+    <f id="11" name="DatePoison" t="Integer"></f>
+    <f id="12" name="DateFirstRecourse" t="Integer"></f>
+    <f id="13" name="DateAffFirst" t="Integer"></f>
+    <f id="14" name="C_Diagnosis" t="Integer"></f>
+    <f id="15" name="C_BooleanAlc" t="Integer"></f>
+    <f id="16" name="C_SetDiagnosis" t="Integer"></f>
+    <f id="17" name="C_MedicalHelp" t="Integer"></f>
+    <f id="18" name="C_PlaceMortality" t="Integer"></f>
+    <f id="19" name="Note5" t="String" s="255"></f>
+    <f id="20" name="C_TypePoison" t="Integer"></f>
+    <f id="21" name="ValPoison" t="Float"></f>
+    <f id="22" name="C_AimPoison" t="Integer"></f>
+    <f id="23" name="Note7" t="String" s="255"></f>
+    <f id="24" name="C_PlacePoison" t="Integer"></f>
+    <f id="25" name="Note8" t="String" s="255"></f>
+    <f id="26" name="DateDocument" t="Integer"></f>
+    <f id="27" name="NAMEPEOPLEGET" t="String" s="50"></f>
+    <f id="28" name="CREATEUSER" t="String" s="50"></f>
+    <f id="29" name="CREATEDATE" t="DateTime"></f>
+    <f id="30" name="UPDATEUSER" t="String" s="50"></f>
+    <f id="31" name="UPDATEDATE" t="DateTime"></f>
+    <f id="32" name="FlagColor" t="Integer"></f>
+    <f id="33" name="C_GSEN" t="Integer"></f>
+    <f id="34" name="S_OBJECTMESS" t="Integer"></f>
+    <f id="35" name="S_OBJECTMESSNAME" t="String" s="255"></f>
+    <f id="36" name="S_STREET" t="Integer"></f>
+    <f id="37" name="S_STREETNAME" t="String" s="255"></f>
+    <f id="38" name="HOUSE" t="String" s="50"></f>
+    <f id="39" name="FLAT" t="String" s="50"></f>
+    <f id="40" name="DateLock" t="Integer"></f>
+    <f id="41" name="S_ObjectMedicalHelp" t="Integer"></f>
+    <f id="42" name="S_ObjectMedicalHelpName" t="String" s="50"></f>
+    <f id="43" name="errorfontcolor" t="Integer"></f>
+    <f id="44" name="errorfontstyle" t="Integer"></f>
+    <f id="45" name="errorcolor" t="Integer"></f>
+    <f id="46" name="errorcolfontcolor" t="Integer"></f>
+    <f id="47" name="errorcolfontstyle" t="Integer"></f>
+    <f id="48" name="errorcolcolor" t="Integer"></f>
+    <f id="48" name="errortext" t="String" s="254"></f>
+    <f id="50" name="errorcolumns" t="String" s="254"></f>
+    <f id="51" name="CANREADONLY" t="SmallInt"></f>
+    <f id="52" name="CANEDITONLY" t="SmallInt"></f>
+    <f id="53" name="CANDELETEONLY" t="SmallInt"></f>
+   </fields>
+   <data>
+"""
