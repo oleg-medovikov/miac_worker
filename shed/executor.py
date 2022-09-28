@@ -7,7 +7,7 @@ from regiz  import *
 
 from system import bot_send_text,bot_send_file
 
-import os, warnings
+import sys,os, warnings
 warnings.filterwarnings("ignore")
 from concurrent.futures import ThreadPoolExecutor
 
@@ -26,9 +26,13 @@ def executor(TASK : Task ):
             return_value =  future.result()
         except Exception as e:
             # если функция сломалась
-            TASK.comment = str(e)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            ERROR = e, fname, exc_tb.tb_lineno
+
+            TASK.comment = str(ERROR)
             TASK.stop()
-            bot_send_text( str(e), TASK.client )
+            bot_send_text( str(ERROR), TASK.client )
         else:
             #Если все хорошо, то получаем список, кому вернуть результат
             USERS = TASK.users()

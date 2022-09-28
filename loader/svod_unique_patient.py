@@ -23,14 +23,20 @@ def svod_unique_patient(DATE_GLOBAL):
 
     FILE_RPN = Dir.get('COVID_RPN') + '/Заболевшие covid в ФС за ' + DATE_GLOBAL + '.xlsx'
     try:
-        RPN = pd.read_excel(FILE_RPN,dtype = str)
+        df = pd.read_excel(FILE_RPN,dtype = str)
     except:
         try:
-            RPN = pd.read_excel(FILE_RPN[:-1],dtype = str)
+            df = pd.read_excel(FILE_RPN[:-1],dtype = str)
         except:
             raise my_except('Не найден файлик РПН')
-
-    RPN.index = RPN ['Unnamed: 0']
+    
+    
+    RPN = pd.DataFrame() 
+    RPN['Unnamed: 0'] = df.index +1
+    RPN['фио'] = df ['фио']
+    RPN['Дата рождения '] = df ['Дата рождения ']
+    RPN['м/ж'] = df ['м/ж']
+    RPN['Учреждение зарегистрировавшее диагноз'] = df ['Учреждение зарегистрировавшее диагноз']
 
     # Подготавливаем ФИО и ДР для сравнения
     # Используем отдельные датафреймы
