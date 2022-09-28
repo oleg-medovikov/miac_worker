@@ -120,6 +120,8 @@ def load_fr():
 
     del DF ['Ведомственная принадлежность']
     del DF ['Осложнение основного диагноза']
+    
+    DF.drop_duplicates(subset=['УНРЗ'], keep='last', inplace=True)
 
     # Считаем хеш суммы строк
     DF ['md5'] = calculate_hash(DF)

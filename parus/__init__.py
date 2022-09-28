@@ -21,4 +21,5 @@ from .svod_54_covid_19       import svod_54_covid_19
 from .extra_izv              import extra_izv
 from .distant_consult        import distant_consult
 from .evulshed               import evulshed
+from .mp_travm_v_hode_co     import mp_travm_v_hode_co
 

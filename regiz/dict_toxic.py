@@ -424,5 +424,4 @@ XML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <f id="52" name="CANEDITONLY" t="SmallInt"></f>
     <f id="53" name="CANDELETEONLY" t="SmallInt"></f>
    </fields>
-   <data>
-"""
+   <data>"""

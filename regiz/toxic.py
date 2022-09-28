@@ -136,10 +136,11 @@ def get_observation(START, END, DF):
             
     return DF
 
-def generate_xml(DF):
-    global XML
+def generate_xml(DF, XML):
+    STRING = XML
     for i in range(len (DF)):
-        part = f"""     <r>
+        part = f"""
+    <r>
      <v f="2">{DF.at[i, 'history_number']}</v>
      <v f="3">***</v>
      <v f="4">{DF.at[i, 'gender'].replace('female','200').replace('male', '100')}</v>
@@ -164,14 +165,14 @@ def generate_xml(DF):
      <v f="39">{DF.at[i, 'flat']}</v>
      <v f="42">{DF.at[i, 'medical_help_name'].replace('НИИ СП', 'НИИ СП Джанелидзе')}</v>
     </r>"""
-        XML += part
+        STRING += part
         
-    XML +="""
+    STRING +="""
     </data>
     </dataset>
     </package>"""
     
-    return XML
+    return STRING
 
 
 def toxic_genarate_xml(DATE_GLOBAL):
@@ -201,11 +202,11 @@ def toxic_genarate_xml(DATE_GLOBAL):
     df['date_first_recourse'].loc[~df['date_first_recourse'].isnull()] = df['date_first_recourse'].loc[~df['date_first_recourse'].isnull()].dt.strftime('%Y%m%d')
     df = df.fillna('')
 
-    XML = generate_xml(df)
+    string = generate_xml(df, XML)
 
     NAME = f'/tmp/toxic_{DATE_START}_{DATE_END}.xml'
 
     with open(NAME, 'w') as f:
-        f.write(XML)
+        f.write(string)
 
     return NAME

@@ -41,7 +41,10 @@ def slojit_fr():
     DATE = datetime.now().strftime("%Y_%m_%d")
     nameSheetShablon = "Sheet1"
     
-    FILES = glob.glob(PATH + '/Федеральный регистр лиц*.xlsx')
+    FILES =  glob.glob(PATH + '/Федеральный регистр лиц*.xlsx')
+    FILES += glob.glob(PATH + '/Static/Федеральный регистр лиц*.xlsx' )
+    
+    
     if not len(FILES):
         raise my_except('В папке нет файлов!')
 

@@ -6,6 +6,8 @@ from clas import Dir
 class my_except(Exception):
     pass
 
+#NAMES_RPN = ['фио', 'м/ж','Дата рождения', 'ЭПИДНОМЕР']
+
 def svod_unique_patient(DATE_GLOBAL):
     DATE_SVOD = (datetime.strptime(DATE_GLOBAL, '%d-%m-%Y') - timedelta(days=1)).strftime("%Y-%m-%d")
     DATE_GLOBAL = datetime.strptime(DATE_GLOBAL, '%d-%m-%Y').strftime('%d.%m.%Y')
@@ -85,5 +87,3 @@ def svod_unique_patient(DATE_GLOBAL):
             + '\nВсего уникальных пациентов: ' + str(len(SVOD))
     
     return mess
-
-
