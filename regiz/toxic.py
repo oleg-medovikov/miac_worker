@@ -2,139 +2,70 @@ import pandas as pd
 import requests
 from datetime import datetime, timedelta
 
-from conf import REGIZ_AUTH, DADATA_TOKEN, DADATA_SECRET
+from conf import REGIZ_AUTH
 
 from .dict_toxic import Dict_Aim_Poison, Dict_Boolean_Alc, \
                         Dict_Place_Incident, Dict_Place_Poison, \
                         Dict_MKB, Dict_Type_Poison, Dict_Medical_Help, \
-                        Dict_Set_Diagnosis, XML
+                        Dict_Set_Diagnosis, district, XML
 
 
 class my_except(Exception):
     pass
 
 
-
-def get_cases(START,END):
+def get_cases(START, END):
     """Получаем начальную выборку"""
+    URL = f" https://regiz.gorzdrav.spb.ru/N3.BI/getDData?id=1127&args={START},{END}&auth={REGIZ_AUTH}"
+    
+    try:
+        df = pd.DataFrame( data = requests.get(URL).json() )
+    except:
+        raise my_except(URL)
 
-    URL = f" https://regiz.gorzdrav.spb.ru/N3.BI/getDData?id=1078&args={START},{END}&auth={REGIZ_AUTH}"
+    df['date_aff_first'] = pd.to_datetime(df['date_aff_first'], format='%Y-%m-%d')
+    df.sort_values(by=['date_aff_first'], inplace=True )
+    df.drop_duplicates(subset=df.columns.drop('date_aff_first'), keep='last', inplace=True )
+    df.index = range(len(df))
+    
+    obs = df.pivot_table(index=['luid'], columns=['s.observation_code'],values=['s.observation_value'],aggfunc='first').stack(0)
+    DF = df.copy()
+    
+    del DF ['s.observation_code']
+    del DF ['s.observation_value']
 
-    DF = pd.DataFrame( data = requests.get(URL).json() )
-
-    if len(DF) == 0:
-        raise my_except(f'Нет случаев отравления за период c {START} по {END}')
-
-    DF['date_aff_first'] = pd.to_datetime(DF['date_aff_first'], format='%Y-%m-%d')
-    DF.sort_values(by=['date_aff_first'], inplace=True )
-    DF.drop_duplicates(subset=DF.columns.drop('date_aff_first'), keep='last', inplace=True )
+    DF = DF.drop_duplicates()
+    DF = DF.merge(obs, how='left', on=['luid'])
     DF.index = range(len(DF))
+
     return DF
 
+def find_district(STRING):
+    for key,value in district.items():
+        if key in STRING.lower():
+            return value
+    return district['не указан район']
 
-def get_address_multi(DF):
-    """Получение адреса в много потоков"""
-    def func(x):
-        URL = f"https://regiz.gorzdrav.spb.ru/N3.BI/getDData?id=1079&args={x}&auth={REGIZ_AUTH}"
+def find_street(STRING):
+    for part in STRING.split(','):
+        for key in ['проспект', 'пр.', 'бульвар','аллея','улица','переулок','дорога','шоссе','набережная','наб.','пер.','ул.','ал.','бул.' ]:
+            if key in part.lower():
+                return part
+    return ''
 
-        try:
-            s = requests.get(URL).json()[0]['address']
-        except:
-            s = ''
+def find_dom(STRING):
+    for part in STRING.split(','):
+        for key in ['д.', 'дом']:
+            if key in part.lower():
+                return part
+    return ''
 
-        if s is None:
-            s = ''
-
-        return s
-    
-    import hashlib
-    from multiprocesspandas import applyparallel
-    return DF['luid'].apply_parallel(func, num_processes=10 )
-
-
-def parsing_address(DF):
-    """Парсинг адреса на составные части"""
-    print ( 'tokens', DADATA_TOKEN, DADATA_SECRET)
-
-    from dadata import Dadata
-    for i in range(len(DF)):
-        with Dadata(DADATA_TOKEN, DADATA_SECRET) as dadata:
-            s = dadata.clean(name="address", source=DF.at[i, 'address'])
-        
-        DF.loc[i, 'region']  = s['region']
-        DF.loc[i, 'area']    = s['area']
-        DF.loc[i, 'street']  = s['street']
-        DF.loc[i, 'house']   = s['house']
-        DF.loc[i, 'flat']    = s['flat']
-    
-    return DF
-
-
-def get_observation(START, END, DF):  
-    for i in range(len(DF)):
-        URL = f"http://10.128.66.207/N3.BI/getDData?id=1118&args={START},{END},{DF.at[i,'luid']},{DF.at[i,'history_number']}&auth=9f9208b9-f7e1-4e17-8cfc-a6832e03a12f"
-        req = requests.get(URL).json()
-        
-        try:
-            DF.loc[i, 'diagnosis'] = Dict_MKB.get(DF.loc[i, 'diagnosis'] ) + ';' + DF.loc[i, 'diagnosis']
-        except:
-            pass
-        
-        DF['date_first_recourse'] = ''
-        DF['data_poison'] = ''
-        DF['place_incident'] = ''
-        DF['place_incident_name'] = ''
-        DF['date_first_recourse'] = ''
-        DF['boolean_alc'] = ''
-        DF['set_diagnosis'] = ''
-        DF['medical_help'] = ''
-        DF['type_poison'] = ''
-        DF['aim_poison'] = ''
-        DF['place_poison'] = ''
-
-        for part in req:
-            if   part['observation_code'] == '1101':
-                "место происшествия Place_Incident"
-                DF.loc[i, 'place_incident'] = Dict_Place_Incident.get(part['observation_value'])
-            
-            elif part['observation_code'] == '1102':
-                "наименование места происшествия  Place_Incident_Name"
-                DF.loc[i, 'place_incident_name'] = part['observation_value']
-            
-            elif part['observation_code'] == '1104':
-                "Дата отравления DataPoison"
-                DF.loc[i, 'data_poison'] = part['observation_value']
-            
-            elif part['observation_code'] == '1105':
-                "Дата первичного обращения DateFirstRecourse"
-                DF.loc[i, 'date_first_recourse'] = part['observation_value']
-            
-            elif part['observation_code'] == '1108':
-                "Сочетание с алкоголем BooleanAlc"
-                DF.loc[i, 'boolean_alc'] = Dict_Boolean_Alc.get(part['observation_value']) 
-            
-            elif part['observation_code'] == '1109':
-                "Лицо установившее диагноз SetDiagnosis"
-                DF.loc[i, 'set_diagnosis'] = Dict_Set_Diagnosis.get(part['observation_value']) 
-        
-            elif part['observation_code'] == '1110':
-                "Оказана медицинская помощь MedicalHelp"
-                DF.loc[i, 'medical_help'] =  Dict_Medical_Help.get(part['observation_value']) 
-            
-            elif part['observation_code'] == '1113':
-                "характер отравления TypePoison"
-                DF.loc[i, 'type_poison'] =  Dict_Type_Poison.get(part['observation_value'])
-                
-            elif part['observation_code'] == '1115':
-                "Обстоятельство отравления AimPoison"
-                DF.loc[i, 'aim_poison'] =  Dict_Aim_Poison.get(part['observation_value'])
-            
-            elif part['observation_code'] == '1117':
-                "Место приобретения яда PlacePoison"
-                DF.loc[i, 'place_poison'] =  Dict_Place_Poison .get(part['observation_value'])            
-            
-            
-    return DF
+def find_kv(STRING):
+    for part in STRING.split(','):
+        for key in ['кв.', 'квартира']:
+            if key in part.lower():
+                return part
+    return ''
 
 def generate_xml(DF, XML):
     STRING = XML
@@ -145,8 +76,9 @@ def generate_xml(DF, XML):
      <v f="3">***</v>
      <v f="4">{DF.at[i, 'gender'].replace('female','200').replace('male', '100')}</v>
      <v f="5">{DF.at[i,'age'] + '0000'}</v>
+     <v f="7">{DF.at[i,'district']}</v>
      <v f="8"></v>
-     <v f="9">{DF.at[i, 'place_incident'].split(';')[0]}</v>
+     <v f="9">{DF.at[i,  'place_incident'].split(';')[0]}</v>
      <v f="10">{DF.at[i, 'place_incident_name']}</v>
      <v f="11">{DF.at[i, 'data_poison']}</v>
      <v f="12">{DF.at[i, 'date_first_recourse']}</v>
@@ -183,13 +115,59 @@ def toxic_genarate_xml(DATE_GLOBAL):
 
     df = get_cases(DATE_START, DATE_END)
     
+    if len(df) == 0:
+        raise my_except(f'Нет случаев отравления за период с {DATE_START} по {DATE_END}')
+
     df.to_excel('temp/toxic.xlsx')
 
-    df ['address'] = get_address_multi(df)
+    # дербаним адрес на составляющие
 
-    df = parsing_address(df)
+    for i in range(len(df)):
+        df.loc[i,'district'] = find_district(df.at[i,'adress'])
+        df.loc[i,'street']   = find_street(df.at[i,'adress'])
+        df.loc[i,'house']    = find_dom(df.at[i,'adress'])
+        df.loc[i,'flat']     = find_kv(df.at[i,'adress'])
 
-    df = get_observation(DATE_START, DATE_END, df)
+    
+    # исправляем значения кейжев на коды аис гз 
+    
+    CASE_CODES = ['1101','1102','1104', '1105','1108', '1109', '1110','1113','1115','1117']
+
+    for CASE in CASE_CODES:
+        if CASE not in df.columns:
+            df[CASE] = ''
+    
+    for i in range(len(df)):
+        "место происшествия Place_Incident"
+        df.loc[i, 'place_incident'] = Dict_Place_Incident.get( df.at[i,'1101'] )
+        
+        "наименование места происшествия  Place_Incident_Name"
+        df.loc[i, 'place_incident_name'] = df.at[i,'1102']
+
+        "Дата отравления DataPoison"
+        df.loc[i, 'data_poison'] = df.at[i, '1104']
+
+        "Дата первичного обращения DateFirstRecourse"
+        df.loc[i, 'date_first_recourse'] = df.at[i, '1105']
+
+        "Сочетание с алкоголем BooleanAlc"
+        df.loc[i, 'boolean_alc'] = Dict_Boolean_Alc.get(df.at[i, '1108'] )
+
+        "Лицо установившее диагноз SetDiagnosis"
+        df.loc[i, 'set_diagnosis'] = Dict_Set_Diagnosis.get( df.at[i, '1109'] )
+
+        "Оказана медицинская помощь MedicalHelp"
+        df.loc[i, 'medical_help'] =  Dict_Medical_Help.get(  df.at[i, '1110'] )
+
+        "характер отравления TypePoison"
+        df.loc[i, 'type_poison'] =  Dict_Type_Poison.get( df.at[i, '1113'] )
+
+        "Обстоятельство отравления AimPoison"
+        df.loc[i, 'aim_poison'] =  Dict_Aim_Poison.get( df.at[i, '1115'] )
+
+        "Место приобретения яда PlacePoison"
+        df.loc[i, 'place_poison'] =  Dict_Place_Poison .get( df.at[i, '1117'] )
+
 
     df['date_aff_first'] = pd.to_datetime(df['date_aff_first'], format = '%Y-%m-%d', errors='coerce')
     df['data_poison'] = pd.to_datetime(df['data_poison'], format = '%d.%m.%Y', errors='coerce')
