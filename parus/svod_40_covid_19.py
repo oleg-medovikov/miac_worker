@@ -29,15 +29,25 @@ def svod_40_covid_19():
         sql = open(FILE, 'r').read()
         if len(MO) == 0:
             return sql
-         
+        
+        MO_str = ''
+
+        for _ in MO['ORG'].unique():
+            MO_str += "'" + _ + "',"
+
+        MO_str = MO_str[:-1]
+
+
         if 'old' in FILE:
-            string = '\t\t\tand r.BDATE = trunc(SYSDATE) - 2'
+            string = f"\t\t\tand ( ( r.BDATE = trunc(SYSDATE) - 2  and a.AGNNAME not in ( {MO_str} ) )"
             for i in range(len(MO)):
                 string += f"\n\t\t\tOR(r.BDATE = TO_DATE('{MO.at[i,'DAY']}','DD.MM.YYYY') - 1  and a.AGNNAME = '{MO.at[i,'ORG']}' ) "
+            string += ')'
         else:
-            string = '\t\t\tand r.BDATE = trunc(SYSDATE) - 1'
+            string = f"\t\t\tand (( r.BDATE = trunc(SYSDATE) - 1 and a.AGNNAME not in ({MO_str} ) )"
             for i in range(len(MO)):
                 string += f"\n\t\t\tOR(r.BDATE = TO_DATE('{MO.at[i,'DAY']}','DD.MM.YYYY') and a.AGNNAME = '{MO.at[i,'ORG']}' ) "
+            string += ')'
         
         for  line in sql.split('\n'):
             if 'trunc' in line:

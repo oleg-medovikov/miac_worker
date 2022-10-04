@@ -22,6 +22,9 @@ def get_cases(START, END):
         df = pd.DataFrame( data = requests.get(URL).json() )
     except:
         raise my_except(URL)
+    
+    if len(df) == 0:
+        raise my_except('нет случаев!')
 
     df['date_aff_first'] = pd.to_datetime(df['date_aff_first'], format='%Y-%m-%d')
     df.sort_values(by=['date_aff_first'], inplace=True )
@@ -76,7 +79,7 @@ def generate_xml(DF, XML):
      <v f="3">***</v>
      <v f="4">{DF.at[i, 'gender'].replace('female','200').replace('male', '100')}</v>
      <v f="5">{DF.at[i,'age'] + '0000'}</v>
-     <v f="7">{DF.at[i,'district']}</v>
+     <v f="7">{round(DF.at[i,'district'])}</v>
      <v f="8"></v>
      <v f="9">{DF.at[i,  'place_incident'].split(';')[0]}</v>
      <v f="10">{DF.at[i, 'place_incident_name']}</v>
@@ -138,6 +141,10 @@ def toxic_genarate_xml(DATE_GLOBAL):
             df[CASE] = ''
     
     for i in range(len(df)):
+
+        "Диагноз"
+        df.loc[i, 'diagnosis'] = Dict_MKB.get(df.at[i, 'diagnosis'] ) + ';' + df.at[i, 'diagnosis']
+
         "место происшествия Place_Incident"
         df.loc[i, 'place_incident'] = Dict_Place_Incident.get( df.at[i,'1101'] )
         

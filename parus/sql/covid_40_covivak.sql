@@ -71,6 +71,7 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(KV_TVSP_02 
         'KV_TVSP_24'  KV_TVSP_24,'KV_TVSP_25_z'  KV_TVSP_25,'revac_20_01'  revac_20_01
         )
                 )
+				where KV_TVSP_02 IS NOT null
         UNION
         SELECT ORGANIZATION, 'Медицинская организация' TYPE, REPLACE (epy_vak_01,' район ','') dist, epy_vak_02,
         nvl(cast(epy_vak_04 as int),0)  epy_vak_04,nvl(cast(epy_vak_05_z as int),0)  epy_vak_05_z,
@@ -132,4 +133,5 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(KV_TVSP_02 
         'epy_vak_25_z'  epy_vak_25,'revac_20_03_s'  revac_20_03
         )
                 )
+				WHERE epy_vak_02 IS NOT null
         ORDER BY ORGANIZATION,TYPE
