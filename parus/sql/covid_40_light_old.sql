@@ -1,5 +1,5 @@
 SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(Vaccin_TVSP ,1,INSTR(Vaccin_TVSP , ' ')-1) dist, 
-        REPLACE(substr(Vaccin_TVSP ,INSTR(Vaccin_TVSP , ' ')+1, length(Vaccin_TVSP)),'район ','') Vaccin_TVSP,
+        REPLACE(substr(ii.Vaccin_TVSP ,INSTR(ii.Vaccin_TVSP , ' ')+1, length(ii.Vaccin_TVSP)),'район ','') Vaccin_TVSP,
         nvl(cast(light_03 as int),0)  light_03,
         nvl(cast(light_04 as int),0)  light_04,nvl(cast(light_05 as int),0)  light_05,
         nvl(cast(light_06 as int),0)  light_06,nvl(cast(light_07 as int),0)  light_07,
@@ -11,17 +11,18 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(Vaccin_TVSP
         nvl(cast(light_18 as int),0)  light_18,nvl(cast(light_19 as int),0)  light_19,
         nvl(cast(light_20 as int),0)  light_20,nvl(cast(light_21 as int),0)  light_21,
         nvl(cast(light_24 as int),0)  light_24, nvl(cast(light_26 as int),0) light_26,
-        nvl(cast(revac_20_01 as int),0)  revac_20_01
+        nvl(cast(ii.revac_20_01 as int),0)  revac_20_01
                 FROM (
                 SELECT
-                        r.BDATE day,
-                        a.AGNNAME organization,
+                    to_char(r.BDATE, 'DD.MM.YYYY') day,
+                    a.AGNNAME organization,
                     i.CODE pokazatel,
                     ro.NUMB row_index ,
-                        CASE WHEN STRVAL  IS NOT NULL THEN STRVAL
-                                 WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
-                                 WHEN DATEVAL IS NOT NULL THEN CAST(DATEVAL AS varchar(30))
-                                ELSE NULL END value
+                    ro.RN TABLICHA,
+                    CASE WHEN STRVAL  IS NOT NULL THEN STRVAL
+                       WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
+                       WHEN DATEVAL IS NOT NULL THEN CAST(DATEVAL AS varchar(30))
+                    ELSE NULL END value
                 FROM PARUS.BLTBLVALUES v
                 INNER JOIN PARUS.BLTABLESIND si
                 on(v.BLTABLESIND = si.RN)
@@ -41,19 +42,18 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(Vaccin_TVSP
                 on(rd.PRN = rf.RN)
                 WHERE rf.code = '40 COVID 19'
                 and r.BDATE =  trunc(SYSDATE) - 2
-                and i.CODE in ('Vaccin_TVSP','light_03','light_04',
+                and i.CODE in ('light_03','light_04',
                                                 'light_05','light_06', 'light_07', 
                                                 'light_08', 'light_09', 'light_10',
                                                 'light_11','light_12', 'light_13', 
                                                 'light_14', 'light_15','light_16', 'light_17'
                                                 , 'light_18', 'light_19', 'light_20', 'light_21'
-                                                , 'light_24', 'light_26', 'revac_20_01')
+                                                , 'light_24', 'light_26')
                 )
                 pivot
                 (
                 max(value)
-                FOR POKAZATEL IN ('Vaccin_TVSP'  Vaccin_TVSP,
-        'light_03'  light_03,
+                FOR POKAZATEL IN ('light_03'  light_03,
         'light_04'  light_04,'light_05'  light_05,
         'light_06'  light_06,'light_07'  light_07,
         'light_08'  light_08,'light_09'  light_09,
@@ -63,12 +63,34 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(Vaccin_TVSP
         'light_16'  light_16,'light_17'  light_17,
         'light_18'  light_18,'light_19'  light_19,
         'light_20'  light_20,'light_21'  light_21,
-        'light_24'  light_24,'light_26'  light_26,
-        'revac_20_01' revac_20_01
-        )
-                )
-      WHERE Vaccin_TVSP IS NOT null
-        UNION
+        'light_24'  light_24,'light_26'  light_26)
+                ) it LEFT JOIN (SELECT TABLICHA, Vaccin_TVSP,revac_20_01
+        		FROM (
+        		SELECT
+                    i.CODE pokazatel,
+                    ro.NUMB row_index ,
+                    ro.RN TABLICHA,
+                        CASE WHEN STRVAL  IS NOT NULL THEN STRVAL
+                                 WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
+                                 WHEN DATEVAL IS NOT NULL THEN CAST(DATEVAL AS varchar(30))
+                                ELSE NULL END value
+                FROM PARUS.BLTBLVALUES v
+                INNER JOIN PARUS.BLTABLESIND si
+                on(v.BLTABLESIND = si.RN)
+                INNER JOIN PARUS.BALANCEINDEXES i
+                on(si.BALANCEINDEXES = i.RN)
+                INNER JOIN PARUS.BLTBLROWS ro
+                on(v.PRN = ro.RN) 
+                WHERE  i.CODE IN ('Vaccin_TVSP','revac_20_01' ) ) 
+                    pivot
+                (
+                max(value)
+                FOR POKAZATEL IN ('Vaccin_TVSP' Vaccin_TVSP , 'revac_20_01' revac_20_01)
+ 				)
+        ) ii
+        ON (ii.TABLICHA = it.TABLICHA)
+		WHERE ii.Vaccin_TVSP IS NOT NULL
+UNION
 SELECT ORGANIZATION, 'Медицинская организация' TYPE, REPLACE (Vaccin_MO,' район ','') dist,
 		Vaccin_MO Vaccin_TVSP, 
         nvl(cast(light_03 as int),0)  light_03,
@@ -126,7 +148,6 @@ SELECT ORGANIZATION, 'Медицинская организация' TYPE, REPLA
         'light_13_s'  light_13,'light_14_s'  light_14,'light_15_s'  light_15,
         'light_16_s'  light_16,'light_17_s'  light_17,'light_18_s'  light_18,
         'light_19_s'  light_19,'light_20_s'  light_20, 'light_21_s'  light_21,
-        'light_24_s'  light_24,'light_26_s'  light_26,'revac_20_05_s'  revac_20_05
-        )
-                ) 
+        'light_24_s'  light_24,'light_26_s'  light_26,'revac_20_05_s'  revac_20_05))
+		 WHERE Vaccin_MO IS NOT NULL
 ORDER BY ORGANIZATION,TYPE
