@@ -84,7 +84,7 @@ SELECT  ORGANIZATION, 'Пункт вакцинации' type,
  				)
         ) ii
         ON (ii.TABLICHA = it.TABLICHA)
-        WHERE ii.Vaccin_TVSP IS NOT NULL  AND  Vaccin_tvsp_03  IS NOT NULL
+        WHERE ii.Vaccin_TVSP IS NOT NULL  AND  Vaccin_tvsp_04  IS NOT NULL
         UNION 
 SELECT  ORGANIZATION,	'Медицинская организация' type, 
                                 REPLACE(dist,' район ','') dist,

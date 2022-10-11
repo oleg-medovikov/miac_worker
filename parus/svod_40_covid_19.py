@@ -265,20 +265,3 @@ def svod_40_covid_19():
 
     return new_name_pred + ';' + new_name_osn
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            

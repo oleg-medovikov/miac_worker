@@ -40,10 +40,17 @@ COLS = {
         '_30' : '21',
 }
 
+class my_exception(Exception):
+    pass
+
 def mp_travm_v_hode_co():
     sql = open('parus/sql/mp_travm_v_hode_co.sql', 'r').read()
 
     DF = parus_sql(sql)
+
+    #DF.to_csv('temp/svo.csv')
+    if len(DF) == 0:
+        raise my_exception('Нет данных')
 
     DATE = DF['DAY'].unique()[0]
 
@@ -60,8 +67,13 @@ def mp_travm_v_hode_co():
     
     O.reset_index(inplace=True)  
 
-    del O [' 1']
-    del O ['level_2']
+    try:
+        del O [' 1']
+    except: pass
+    
+    try:
+        del O ['level_2']
+    except: pass
 
     for org in O['ORGANIZATION'].unique():
         district = O.loc[(~(O[' 2'].isnull()) & (O['ORGANIZATION'] == org)), ' 2'].iat[0]
@@ -95,6 +107,7 @@ def mp_travm_v_hode_co():
         for c_idx, value in enumerate(row, 2):
             ws.cell(row=r_idx, column=c_idx, value=value)
  
+    
     
     wb.save( NEW_NAME )
 
