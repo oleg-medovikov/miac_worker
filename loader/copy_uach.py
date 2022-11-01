@@ -19,8 +19,8 @@ class my_except(Exception):
     pass
 
 def copy_uach():
-    DATE = datetime.now().strftime("%Y_%m_%d")
     
+    DATE     = (datetime.today() + timedelta(days=0)).strftime("%Y_%m_%d")
     TOMORROW = (datetime.today() + timedelta(days=1)).strftime("%Y_%m_%d")
     
 
@@ -45,7 +45,10 @@ def copy_uach():
     del DF ['СНИЛС']
     del DF ['ФИО']
 
-    DF.to_csv(IACH_FILE,index=False,sep=";",encoding='cp1251')
+    try:
+        DF.to_csv(IACH_FILE,index=False,sep=";",encoding='cp1251')
+    except Exception as e:
+        return f'Ошибка!  {IACH_FILE} Не удалось скопировать!'
 
     return 'Файл скопирован!'
     

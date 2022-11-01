@@ -87,6 +87,7 @@ def mp_travm_v_hode_co():
         S[col] = pd.to_numeric( S[col] )
 
     S = S.groupby([' 2', 'ROWS' ], as_index=False).sum()
+    G = S.groupby(['ROWS' ], as_index=False).sum()
 
 
     NEW_NAME = 'temp/' + DATE + '_МП_травм_в_ходе_СО.xlsx'
@@ -94,6 +95,8 @@ def mp_travm_v_hode_co():
     shutil.copyfile('help/mp_travm_v_hode_co.xlsx', NEW_NAME )
 
     wb= openpyxl.load_workbook( NEW_NAME )
+    
+    #del wb ['Обзор экспорта']
 
     ws = wb['свод']
     rows = dataframe_to_rows(O,index=False, header=False)
@@ -107,6 +110,11 @@ def mp_travm_v_hode_co():
         for c_idx, value in enumerate(row, 2):
             ws.cell(row=r_idx, column=c_idx, value=value)
  
+    ws = wb['город']
+    rows = dataframe_to_rows(G,index=False, header=False)
+    for r_idx, row in enumerate(rows,12):  
+        for c_idx, value in enumerate(row, 3):
+            ws.cell(row=r_idx, column=c_idx, value=value)
     
     
     wb.save( NEW_NAME )
