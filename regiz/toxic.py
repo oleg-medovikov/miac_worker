@@ -7,7 +7,7 @@ from conf import REGIZ_AUTH
 from .dict_toxic import Dict_Aim_Poison, Dict_Boolean_Alc, \
                         Dict_Place_Incident, Dict_Place_Poison, \
                         Dict_MKB, Dict_Type_Poison, Dict_Medical_Help, \
-                        Dict_Set_Diagnosis, district, XML
+                        Dict_Set_Diagnosis, district, XML, Dict_soch_polojenie
 
 
 class my_except(Exception):
@@ -79,6 +79,7 @@ def generate_xml(DF, XML):
      <v f="3">***</v>
      <v f="4">{DF.at[i, 'gender'].replace('female','200').replace('male', '100')}</v>
      <v f="5">{DF.at[i,'age'] + '0000'}</v>
+     <v f="6">{DF.at[i,'soch_polojenie'].split(';')[0]}</v>
      <v f="7">{round(DF.at[i,'district'])}</v>
      <v f="8"></v>
      <v f="9">{DF.at[i,  'place_incident'].split(';')[0]}</v>
@@ -134,7 +135,7 @@ def toxic_genarate_xml(DATE_GLOBAL):
     
     # исправляем значения кейжев на коды аис гз 
     
-    CASE_CODES = ['1101','1102','1104', '1105','1108', '1109', '1110','1113','1115','1117']
+    CASE_CODES = ['1101','1102','1104', '1105','1108', '1109', '1110','1113','1115','1117','1119' ]
 
     for CASE in CASE_CODES:
         if CASE not in df.columns:
@@ -173,8 +174,10 @@ def toxic_genarate_xml(DATE_GLOBAL):
         df.loc[i, 'aim_poison'] =  Dict_Aim_Poison.get( df.at[i, '1115'] )
 
         "Место приобретения яда PlacePoison"
-        df.loc[i, 'place_poison'] =  Dict_Place_Poison .get( df.at[i, '1117'] )
-
+        df.loc[i, 'place_poison'] =  Dict_Place_Poison.get( df.at[i, '1117'] )
+        
+        "Социальное положение"
+        df.loc[i, 'soch_polojenie'] =  Dict_soch_polojenie.get( df.at[i, '1119'] )
 
     df['date_aff_first'] = pd.to_datetime(df['date_aff_first'], format = '%Y-%m-%d', errors='coerce')
     df['data_poison'] = pd.to_datetime(df['data_poison'], format = '%d.%m.%Y', errors='coerce')
