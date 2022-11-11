@@ -188,13 +188,19 @@ def toxic_genarate_xml(DATE_GLOBAL):
 
     df['data_poison'].loc[~df['data_poison'].isnull()] = df['data_poison'].loc[~df['data_poison'].isnull()].dt.strftime('%Y%m%d')
     df['date_first_recourse'].loc[~df['date_first_recourse'].isnull()] = df['date_first_recourse'].loc[~df['date_first_recourse'].isnull()].dt.strftime('%Y%m%d')
+    
+    # место приобретения яда пустые - приравниваем к другое
+    df = df.fillna({'place_poison' : '50000;Другое', 'place_incident' : '70000;Другое'})
     df = df.fillna('')
 
     string = generate_xml(df, XML)
 
-    NAME = f'/tmp/toxic_{DATE_START}_{DATE_END}.xml'
+    NAME_1 = f'/tmp/toxic_{DATE_START}_{DATE_END}.xml'
+    NAME_2 = f'/tmp/toxic_{DATE_START}_{DATE_END}.xlsx'
 
-    with open(NAME, 'w') as f:
+    with open(NAME_1, 'w') as f:
         f.write(string)
+    
+    df.to_excel(NAME_2)
 
-    return NAME
+    return NAME_1 +';'+ NAME_2
