@@ -7,7 +7,7 @@ from conf import REGIZ_AUTH
 from .dict_toxic import Dict_Aim_Poison, Dict_Boolean_Alc, \
                         Dict_Place_Incident, Dict_Place_Poison, \
                         Dict_MKB, Dict_Type_Poison, Dict_Medical_Help, \
-                        Dict_Set_Diagnosis, district, XML, Dict_soch_polojenie
+                        Dict_Set_Diagnosis, Dict_district, XML, Dict_soch_polojenie
 
 
 class my_except(Exception):
@@ -15,7 +15,7 @@ class my_except(Exception):
 
 NAME_3 = 'temp/initial_data.xlsx'
 
-def get_cases(START, END):
+def get_cases(START : str, END : str) -> 'pd.DataFrame':
     """Получаем начальную выборку"""
     URL = f" https://regiz.gorzdrav.spb.ru/N3.BI/getDData?id=1127&args={START},{END}&auth={REGIZ_AUTH}"
     
@@ -47,34 +47,35 @@ def get_cases(START, END):
     DF.to_excel(NAME_3)
     return DF
 
-def find_district(STRING):
-    for key,value in district.items():
-        if key in STRING.lower():
-            return value
-    return district['не указан район']
+#def find_district(STRING):
+#    for key,value in district.items():
+#        if key in STRING.lower():
+#            return value
+#    return district['не указан район']
 
-def find_street(STRING):
+def find_street(STRING : str) -> str:
     for part in STRING.split(','):
         for key in ['проспект', 'пр.', 'бульвар','аллея','улица','переулок','дорога','шоссе','набережная','наб.','пер.','ул.','ал.','бул.' ]:
             if key in part.lower():
                 return part
     return ''
 
-def find_dom(STRING):
+def find_dom(STRING : str) -> str:
     for part in STRING.split(','):
         for key in ['д.', 'дом']:
             if key in part.lower():
                 return part
     return ''
 
-def find_kv(STRING):
+def find_kv(STRING : str ) -> str:
     for part in STRING.split(','):
         for key in ['кв.', 'квартира']:
             if key in part.lower():
                 return part
     return ''
 
-def generate_xml(DF, XML):
+def generate_xml(DF : 'pd.DataFrame', XML : str ) -> tuple[str, 'pd.DataFrame']:
+    "генерация выходного шаблона для импорта в АИС ГЗ"
     STRING = XML
     for i in range(len (DF)):
         part = f"""
@@ -84,7 +85,7 @@ def generate_xml(DF, XML):
      <v f="4">{DF.at[i, 'gender'].replace('female','200').replace('male', '100')}</v>
      <v f="5">{DF.at[i,'age'] + '0000'}</v>
      <v f="6">{DF.at[i,'soch_polojenie'].split(';')[0]}</v>
-     <v f="7">{round(DF.at[i,'district'])}</v>
+     <v f="7">{DF.at[i,'c_district'].split(';')[0]}</v>
      <v f="8"></v>
      <v f="9">{DF.at[i,  'place_incident'].split(';')[0]}</v>
      <v f="10">{DF.at[i, 'place_incident_name']}</v>
@@ -106,14 +107,17 @@ def generate_xml(DF, XML):
      <v f="39">{DF.at[i, 'flat']}</v>
      <v f="42">{DF.at[i, 'medical_help_name'].replace('НИИ СП', 'НИИ СП Джанелидзе')}</v>
     </r>"""
-        STRING += part
+        try:
+            STRING += part
+        except Exception as e:
+            DF.loc[i,'comment'] = f'не попало в xml  {str(e)}'
         
     STRING +="""
     </data>
     </dataset>
     </package>"""
     
-    return STRING
+    return STRING, DF
 
 
 def toxic_genarate_xml(DATE_GLOBAL):
@@ -131,7 +135,7 @@ def toxic_genarate_xml(DATE_GLOBAL):
     # дербаним адрес на составляющие
 
     for i in range(len(df)):
-        df.loc[i,'district'] = find_district(df.at[i,'adress'])
+        #df.loc[i,'district'] = find_district(df.at[i,'adress'])
         df.loc[i,'street']   = find_street(df.at[i,'adress'])
         df.loc[i,'house']    = find_dom(df.at[i,'adress'])
         df.loc[i,'flat']     = find_kv(df.at[i,'adress'])
@@ -139,7 +143,7 @@ def toxic_genarate_xml(DATE_GLOBAL):
     
     # исправляем значения кейжев на коды аис гз 
     
-    CASE_CODES = ['303','1101','1102','1103','1104', '1105','1108', '1109', '1110','1113','1115','1117','1119' ]
+    CASE_CODES = ['303','1101','1102','1103','1104', '1105','1108', '1109', '1110','1113','1115','1117','1119','1123' ]
 
     for CASE in CASE_CODES:
         if CASE not in df.columns:
@@ -148,7 +152,7 @@ def toxic_genarate_xml(DATE_GLOBAL):
     for i in range(len(df)):
 
         "Диагноз"
-        df.loc[i, 'diagnosis'] = Dict_MKB.get(df.at[i, 'diagnosis'] ) + ';' + df.at[i, 'diagnosis']
+        df.loc[i, 'diagnosis'] = str( Dict_MKB.get(df.at[i, 'diagnosis'] ) ) + ';' + df.at[i, 'diagnosis']
 
         "место происшествия Place_Incident"
         df.loc[i, 'place_incident'] = Dict_Place_Incident.get( df.at[i,'1101'] )
@@ -183,6 +187,10 @@ def toxic_genarate_xml(DATE_GLOBAL):
         "Социальное положение"
         df.loc[i, 'soch_polojenie'] =  Dict_soch_polojenie.get( df.at[i, '1119'] )
 
+        "Район места отравления"
+        df.loc[i, 'c_district'] = Dict_district.get( df.at[i, '1123'] )
+
+
     #df['date_aff_first'] = pd.to_datetime(df['date_aff_first'], format = '%Y-%m-%d', errors='coerce')
     
     df['data_poison'] = pd.to_datetime(df['data_poison'], format = '%d.%m.%Y', errors='coerce')
@@ -196,19 +204,21 @@ def toxic_genarate_xml(DATE_GLOBAL):
     df['s.meddoc_creation_date'].loc[~df['s.meddoc_creation_date'].isnull()] = df['s.meddoc_creation_date'].loc[~df['s.meddoc_creation_date'].isnull()].dt.strftime('%Y%m%d')
 
 
-    #df.to_excel('temp/toxic.xlsx')
     # место приобретения яда пустые - приравниваем к другое
-    df = df.fillna({'place_poison' : '50000;Другое', 'place_incident' : '70000;Другое'})
-    df = df.fillna('')
+    df = df.fillna({
+        'place_poison'   : '50000;Другое',
+        'place_incident' : '70000;Другое',
+        'c_district'     : '0;Не указан район'})
 
-    string = generate_xml(df, XML)
+    df = df.fillna('')
 
     NAME_1 = f'temp/toxic_{DATE_START}_{DATE_END}.xml'
     NAME_2 = f'temp/toxic_{DATE_START}_{DATE_END}.xlsx'
 
+    string, df = generate_xml(df, XML)
+
+    df.to_excel(NAME_2)
     with open(NAME_1, 'w') as f:
         f.write(string)
     
-    df.to_excel(NAME_2)
-
     return NAME_1 + ';' + NAME_2 + ';' + NAME_3
