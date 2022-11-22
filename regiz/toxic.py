@@ -33,11 +33,11 @@ def get_cases(START : str, END : str) -> 'pd.DataFrame':
     df.drop_duplicates(subset=df.columns.drop('date_aff_first'), keep='last', inplace=True )
     df.index = range(len(df))
     
-    obs = df.pivot_table(index=['luid'], columns=['s.observation_code'],values=['s.observation_value'],aggfunc='first').stack(0)
+    obs = df.pivot_table(index=['luid'], columns=['observation_code'],values=['observation_value'],aggfunc='first').stack(0)
     DF = df.copy()
     
-    del DF ['s.observation_code']
-    del DF ['s.observation_value']
+    del DF ['observation_code']
+    del DF ['observation_value']
 
 
     DF = DF.drop_duplicates()
@@ -101,7 +101,7 @@ def generate_xml(DF : 'pd.DataFrame', XML : str ) -> tuple[str, 'pd.DataFrame']:
      <v f="21">1</v>
      <v f="22">{DF.at[i, 'aim_poison'].split(';')[0]}</v>
      <v f="24">{DF.at[i, 'place_poison'].split(';')[0]}</v>
-     <v f="26">{DF.at[i, 's.meddoc_creation_date']}</v>
+     <v f="26">{DF.at[i, 'meddoc_creation_date']}</v>
      <v f="37">{DF.at[i, 'street']}</v>
      <v f="38">{DF.at[i, 'house']}</v>
      <v f="39">{DF.at[i, 'flat']}</v>
@@ -124,7 +124,7 @@ def toxic_genarate_xml(DATE_GLOBAL):
     """Для ЦГиЭ случаи отравления"""
 
     DATE_END   =  datetime.strptime(DATE_GLOBAL, '%d-%m-%Y').strftime('%Y-%m-%d')
-    DATE_START = (datetime.strptime(DATE_GLOBAL, '%d-%m-%Y') - timedelta(days=30)).strftime("%Y-%m-%d")
+    DATE_START = (datetime.strptime(DATE_GLOBAL, '%d-%m-%Y') - timedelta(days=3)).strftime("%Y-%m-%d")
 
     df = get_cases(DATE_START, DATE_END)
     
@@ -132,16 +132,7 @@ def toxic_genarate_xml(DATE_GLOBAL):
         raise my_except(f'Нет случаев отравления за период с {DATE_START} по {DATE_END}')
 
 
-    # дербаним адрес на составляющие
-
-    for i in range(len(df)):
-        #df.loc[i,'district'] = find_district(df.at[i,'adress'])
-        df.loc[i,'street']   = find_street(df.at[i,'adress'])
-        df.loc[i,'house']    = find_dom(df.at[i,'adress'])
-        df.loc[i,'flat']     = find_kv(df.at[i,'adress'])
-
-    
-    # исправляем значения кейжев на коды аис гз 
+   # исправляем значения кейжев на коды аис гз 
     
     CASE_CODES = ['303','1101','1102','1103','1104', '1105','1108', '1109', '1110','1113','1115','1117','1119','1123' ]
 
@@ -149,6 +140,16 @@ def toxic_genarate_xml(DATE_GLOBAL):
         if CASE not in df.columns:
             df[CASE] = ''
     
+    # дербаним адрес на составляющие
+    df['adress'] = df['1102']
+    df = df.fillna({'adress' : ''})
+
+    for i in range(len(df)):
+        df.loc[i,'street']   = find_street(df.at[i,'adress'])
+        df.loc[i,'house']    = find_dom(df.at[i,'adress'])
+        df.loc[i,'flat']     = find_kv(df.at[i,'adress'])
+        #df.loc[i,'district'] = find_district(df.at[i,'adress'])
+
     for i in range(len(df)):
 
         "Диагноз"
@@ -158,7 +159,7 @@ def toxic_genarate_xml(DATE_GLOBAL):
         df.loc[i, 'place_incident'] = Dict_Place_Incident.get( df.at[i,'1101'] )
         
         "наименование места происшествия  Place_Incident_Name"
-        df.loc[i, 'place_incident_name'] = df.at[i,'1102']
+        df.loc[i, 'place_incident_name'] = df.at[i,'1103']
 
         "Дата отравления DataPoison"
         df.loc[i, 'data_poison'] = df.at[i, '1104']
@@ -200,8 +201,8 @@ def toxic_genarate_xml(DATE_GLOBAL):
     df['data_poison'].loc[~df['data_poison'].isnull()] = df['data_poison'].loc[~df['data_poison'].isnull()].dt.strftime('%Y%m%d')
     df['date_first_recourse'].loc[~df['date_first_recourse'].isnull()] = df['date_first_recourse'].loc[~df['date_first_recourse'].isnull()].dt.strftime('%Y%m%d')
     
-    df['s.meddoc_creation_date'] = pd.to_datetime(df['s.meddoc_creation_date'], errors='coerce')
-    df['s.meddoc_creation_date'].loc[~df['s.meddoc_creation_date'].isnull()] = df['s.meddoc_creation_date'].loc[~df['s.meddoc_creation_date'].isnull()].dt.strftime('%Y%m%d')
+    df['meddoc_creation_date'] = pd.to_datetime(df['meddoc_creation_date'], errors='coerce')
+    df['meddoc_creation_date'].loc[~df['meddoc_creation_date'].isnull()] = df['meddoc_creation_date'].loc[~df['meddoc_creation_date'].isnull()].dt.strftime('%Y%m%d')
 
 
     # место приобретения яда пустые - приравниваем к другое
