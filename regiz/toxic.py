@@ -55,7 +55,7 @@ def get_cases(START : str, END : str) -> 'pd.DataFrame':
 
 def find_street(STRING : str) -> str:
     for part in STRING.split(','):
-        for key in ['проспект', 'пр.', 'бульвар','аллея','улица','переулок','дорога','шоссе','набережная','наб.','пер.','ул.','ал.','бул.' ]:
+        for key in ['проспект', 'пр.', 'бульвар','аллея','улица','переулок','дорога','шоссе','набережная','наб.','пер.','ул.','ал.','бул.','площадь' ]:
             if key in part.lower():
                 return part
     return ''

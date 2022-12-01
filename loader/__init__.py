@@ -12,3 +12,4 @@ from .slojit_fr               import slojit_fr
 from .patient_amb_stac        import patient_amb_stac
 from .copy_uach               import copy_uach
 from .hodpitalized_in_fr      import hospitalised_in_fr
+from .svod_death              import svod_death

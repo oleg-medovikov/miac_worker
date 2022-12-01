@@ -7,16 +7,17 @@ from clas import Dir
 from base import covid_sql
 
 NAMES = [
-    'п/н','Дата создания РЗ','УНРЗ','Дата изменения РЗ',
-    'СНИЛС','ФИО','Пол','Дата рождения',
-    'Диагноз','Диагноз установлен',
-    'Осложнение основного диагноза','Субъект РФ',
-    'Медицинская организация','Ведомственная принадлежность',
-    'Вид лечения','Дата госпитализации',
-    'Дата исхода заболевания','Исход заболевания',
-    'Степень тяжести','Посмертный диагноз','ИВЛ','ОРИТ',
-    'МО прикрепления','Медицинский работник'
+    'п/н', 'Дата создания РЗ', 'УНРЗ', 'Дата изменения РЗ',
+    'СНИЛС', 'ФИО', 'Пол', 'Дата рождения',
+    'Диагноз', 'Диагноз установлен',
+    'Осложнение основного диагноза', 'Субъект РФ',
+    'Медицинская организация', 'Ведомственная принадлежность',
+    'Вид лечения', 'Дата госпитализации',
+    'Дата исхода заболевания', 'Исход заболевания',
+    'Степень тяжести', 'Посмертный диагноз', 'ИВЛ', 'ОРИТ',
+    'МО прикрепления', 'Медицинский работник'
     ]
+
 
 class my_except(Exception):
     pass
@@ -25,10 +26,10 @@ class my_except(Exception):
 def read_file(FILE):
     df = pd.read_excel(
                 FILE,
-                header= 1,
+                header=1,
                 usecols=NAMES,
                 engine='xlrd',
-                skipfooter=1 )
+                skipfooter=1)
     return df
 
 
@@ -39,26 +40,30 @@ def slojit_fr():
 
     PATH = Dir.get('path_robot') + '/_ФР_по_частям'
     DATE = datetime.now().strftime("%Y_%m_%d")
-    nameSheetShablon = "Sheet1"
-    
-    FILES =  glob.glob(PATH + '/Федеральный регистр лиц*.xlsx')
-    FILES += glob.glob(PATH + '/Static/Федеральный регистр лиц*.xlsx' )
-    
-    
+    # nameSheetShablon = "Sheet1"
+
+    FILES = glob.glob(PATH + '/Федеральный регистр лиц*.xlsx')
+    FILES += glob.glob(PATH + '/Static/Федеральный регистр лиц*.xlsx')
+
     if not len(FILES):
         raise my_except('В папке нет файлов!')
 
     pool = Pool()
-    df_list = pool.map(read_file, FILES )
+    df_list = pool.map(read_file, FILES)
     df = pd.concat(df_list, ignore_index=True)
 
     df["п/н"] = range(1, len(df)+1)
 
     TOMORROW = (datetime.today() + timedelta(days=1)).strftime("%Y_%m_%d")
 
-    FEDREG_FILE = Dir.get('path_robot') +'/'+ TOMORROW + '/Федеральный регистр лиц, больных - ' + DATE + '.csv'
-    IACH_FILE   = Dir.get('covid_iac2') + '/Федеральный регистр лиц, больных - ' + DATE + '_ИАЦ.csv'
-    OTCHET_9    = glob.glob(Dir.get('path_robot') +'/'+ TOMORROW +'/9. Отчет по пациентам COVID-центр*.xlsx' )
+    ROOT = Dir.get('path_robot') + '/' + TOMORROW
+
+    FEDREG_FILE = ROOT + '/Федеральный регистр лиц, больных - ' + DATE + '.csv'
+
+    # IACH_FILE = Dir.get('covid_iac2') + '/Федеральный регистр лиц, больных - '\
+    #    + DATE + '_ИАЦ.csv'
+
+    OTCHET_9 = glob.glob(ROOT + '/9. Отчет по пациентам COVID-центр*.xlsx')
 
     MESS = '``` \n'
     MESS += f'Успешно сложены {len(FILES)} файлов выгрузки ФР, всего строк: {df.shape[0]}'

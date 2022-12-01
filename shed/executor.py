@@ -1,20 +1,20 @@
+from concurrent.futures import ThreadPoolExecutor
 from clas import Task, Command
 
-from loader import * 
-from parus  import *
+from loader import *
+from parus import *
 from zam_mz import *
-from regiz  import *
+from regiz import *
 
-from system import bot_send_text,bot_send_file
+from system import bot_send_text, bot_send_file
 
-import sys,os, warnings
+import sys, os, warnings
 warnings.filterwarnings("ignore")
-from concurrent.futures import ThreadPoolExecutor
 
 
-def executor(TASK : Task ):
+def executor(TASK: Task):
     COMMAND = Command.get(TASK.c_id)
-    
+
     with ThreadPoolExecutor() as executor:
         if TASK.c_arg == 'no':
             future = executor.submit(globals()[COMMAND.c_procedure])
@@ -23,7 +23,7 @@ def executor(TASK : Task ):
                     globals()[COMMAND.c_procedure],
                     TASK.c_arg)
         try:
-            return_value =  future.result()
+            return_value = future.result()
         except Exception as e:
             # если функция сломалась
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -32,12 +32,12 @@ def executor(TASK : Task ):
 
             TASK.comment = str(ERROR)
             TASK.stop()
-            bot_send_text( str(e), TASK.client )
+            bot_send_text(str(e), TASK.client)
         else:
-            #Если все хорошо, то получаем список, кому вернуть результат
+            # Если все хорошо, то получаем список, кому вернуть результат
             USERS = TASK.users()
-            #Возвращаем результат
-                
+            # Возвращаем результат
+
             if COMMAND.return_file:
                 TASK.stop()
                 for FILE in return_value.split(';'):
