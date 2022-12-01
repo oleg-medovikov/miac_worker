@@ -5,20 +5,20 @@ from system import send_mail_with_excel
 from base import covid_sql
 
 
-def send_otchet_deti():
-    "отчёт по детям почтой в четверг"
+def otchet_po_ymershim():
+    "отчёт по умершим почтой в понедельник"
 
-    SQL = "exec [dbo].[Proc_Report_Children_with_Covid]"
+    SQL = "select * from [dbo].[View_Count_Dead_In_MO]"
 
     DF = covid_sql(SQL)
 
-    filename = 'temp/Дети.xlsx'
+    filename = 'temp/Умершие.xlsx'
 
     DF.to_excel(filename, index=False)
 
     send_mail_with_excel(
             Dir.get('svetlichnay_mail'),
-            'Отчёт по детям',
+            'Отчёт по умершим',
             'Добрый день! Это отчёт от Олега',
             filename)
 
@@ -29,4 +29,4 @@ def send_otchet_deti():
     except FileExistsError:
         pass
 
-    return 'Письмо с отчётом по детям отправлено!'
+    return 'Письмо с отчётом по умершим отправлено!'
