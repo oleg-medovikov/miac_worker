@@ -34,7 +34,7 @@ def svod_death():
 
     DF['time'] = DF['files'].apply(get_time_change)
 
-    DF = DF.sort_values['time'].drop_duplicates(['name'], keep='last')
+    DF = DF.sort_values('time').drop_duplicates(['name'], keep='last')
 
     # создаем сводный файл
     list_ = []
@@ -51,7 +51,7 @@ def svod_death():
     SVOD.index = range(len(SVOD))
 
     # формируем имя файла
-    NAME = (PATH_OTCH + '\\' + 'Свод по умершим за ' + DATE_OTCH + '.xlsx')
+    NAME = (PATH_OTCH + '/Свод по умершим за ' + DATE_OTCH + '.xlsx')
     with pd.ExcelWriter(NAME) as writer:
         SVOD.to_excel(writer, sheet_name='свод')
         DF['files'].to_excel(writer, sheet_name='список файлов')
