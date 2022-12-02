@@ -101,7 +101,7 @@ def load_fr():
     FILE_CSV = glob.glob(PATH + '/Федеральный регистр лиц, больных *[!ИАЦ].csv')
 
     if len (FILE_CSV) == 0:
-        raise my_except('Не найден файл Федерального регистра! Директория:\n' + PATH )
+        raise my_except('Не найден файл Федерального регистра! Директория:\n' + PATH)
 
     FILE_CSV = FILE_CSV[0]
 
@@ -110,11 +110,12 @@ def load_fr():
                 FILE_CSV,
                 header=0,
                 usecols=NAMES,
-                na_filter = False,
-                dtype = str,
+                na_filter=False,
+                dtype=str,
                 delimiter=';',
                 engine='python',
-                encoding = 'utf-8')
+                encoding='utf-8'
+                )
     except Exception as e:
         raise my_except(str(e))
 

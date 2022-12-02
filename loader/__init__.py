@@ -15,3 +15,4 @@ from .hodpitalized_in_fr      import hospitalised_in_fr
 from .svod_death              import svod_death
 from .otchet_deti             import send_otchet_deti
 from .otchet_po_ymershim      import otchet_po_ymershim
+from .sbor_zabolevshix        import sbor_zabolevshix
