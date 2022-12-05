@@ -65,6 +65,7 @@ class my_except(Exception):
 
 
 def IVL():
+    "это трехчасовое сравнение"
     DATE = datetime.datetime.now().strftime('%Y_%m_%d')
     PATH = Dir.get('path_robot')
 
@@ -102,7 +103,8 @@ def IVL():
             FILE_VP,
             usecols="A,I,L,Y,AB",
             header=7,
-            names=NAMES)
+            names=NAMES
+            ).dropna()
 
     # Считаем числа в в федеральном регистре
     zan1 = FR.loc[FR['Исход заболевания'].isnull()
@@ -154,19 +156,15 @@ def IVL():
     ivl = pd.concat([ivl1, ivl2], ignore_index=True)
 
     df = zan.merge(ivl, how='outer')
-
     df = df.fillna(0)
 
     vp = vp.fillna(0)
     # Меняем названия МО и сумируем строки
-    zamena = 'произошла замена строки '
-    for i in range(len(vp)):
-        vp.loc[i, 'zan'] = vp.at[i, 'vp_zan'] + vp.at[i, 'cov_zan']
-        vp.loc[i, 'ivl'] = vp.at[i, 'vp_ivl'] + vp.at[i, 'cov_ivl']
-        for key, value in CHANGE_MO:
-            if vp.loc[i, 'mo'] == key:
-                vp.loc[i, 'mo'] = value
-                zamena += '\n ' + key + ' на ' + value
+    vp['zan'] = vp['vp_zan'] + vp['con_zan']
+    vp['ivl'] = vp['vp_ivl'] + vp['cov_ivl']
+
+    vp['mo'] = vp['mo'].apply(lambda x: CHANGE_MO.get(x)
+                              if CHANGE_MO.get(x) is not None else x)
 
     vp = vp.groupby('mo', as_index=False)['zan', 'ivl'].sum()
     vp.index = range(len(vp))
@@ -182,9 +180,7 @@ def IVL():
     del ivl_otchet['zan']
     ivl_otchet = ivl_otchet.fillna(0)
 
-    for i in range(len(ivl_otchet)):
-        ivl_otchet.loc[i, 'Разница'] = ivl_otchet.at[i, 'ИВЛ'] \
-                - ivl_otchet.at[i, 'ivl']
+    ivl_otchet['Разница'] = ivl_otchet['ИВЛ'] - ivl_otchet['ivl']
 
     ivl_otchet.rename(
             columns={
@@ -217,9 +213,7 @@ def IVL():
     del zan_otchet['ivl']
     zan_otchet = zan_otchet.fillna(0)
 
-    for i in range(len(zan_otchet)):
-        zan_otchet.loc[i, 'Разница'] = zan_otchet.at[i, 'Занятые койки'] \
-                - zan_otchet.at[i, 'zan']
+    zan_otchet['Разница'] = zan_otchet['Занятые койки'] - zan_otchet['zan']
 
     zan_otchet.rename(
             columns={
