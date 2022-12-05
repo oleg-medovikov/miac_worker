@@ -39,6 +39,9 @@ def sbor_zabolevshix():
             df['использованный файл'] = file
             list_.append(df)
 
+    if len(list_) == 0:
+        return 'Хотел собрать заболевших врачей, но нет новых файлов'
+
     df = pd.concat(list_)
     df = df[columnsTitles]
     df.columns = new_name
