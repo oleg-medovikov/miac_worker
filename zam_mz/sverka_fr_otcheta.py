@@ -1,9 +1,9 @@
 import glob
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from base import covid_insert
 from clas import Dir
+from .put_excel_for_mo import put_excel_for_mo_2
 
 # замена названий
 CHANGE_MO = {
@@ -124,13 +124,12 @@ def sverka_fr_otcheta():
            & FR['Вид лечения'].isin(['Стационарное лечение', 'Карантин'])
            ].index)
 
+    # считаем болеющих и выздоровевших в федеральном регистре
     DIAGNOZ = {
             'ФР диагноз U07.1': 'U07.1',
             'ФР диагноз U07.2': 'U07.2',
             'ФР диагноз Z22.8': 'Z22.8',
             }
-
-    FR[list(DIAGNOZ.keys())] = None
 
     for key, value in DIAGNOZ.items():
         FR.loc[FR['Диагноз'].isin([value])
@@ -142,7 +141,12 @@ def sverka_fr_otcheta():
         as_index=False
         )[list(DIAGNOZ.keys())].sum()
 
-    FR[list(DIAGNOZ.keys())] = None
+    DIAGNOZ = {
+            'ФР выздоровело от U07.1': 'U07.1',
+            'ФР выздоровело от U07.2': 'U07.2',
+            'ФР выздоровело от Z22.8': 'Z22.8',
+            }
+
     for key, value in DIAGNOZ.items():
         FR.loc[FR['Диагноз'].isin([value])
                & FR['Исход заболевания'].str.contains('Выздоровление'),
@@ -153,6 +157,114 @@ def sverka_fr_otcheta():
         as_index=False
         )[list(DIAGNOZ.keys())].sum()
 
+    # сверяем названия МО в отчёте и в регистре
+    FRS = pd.DataFrame(
+            data=FR['Медицинская организация'].unique(),
+            columns=['Медицинская организация']
+            )
+    MO_TEST = VP.merge(
+            FRS,
+            left_on='mo',
+            right_on='Медицинская организация',
+            how='outer'
+            )
 
+    MO_TEST = MO_TEST[
+            MO_TEST['mo'].isnull() |
+            MO_TEST['Медицинская организация'].isnull()
+            ]
 
+    MO_TEST.index = range(1, len(MO_TEST) + 1)
 
+    # сравниваем заболевших
+    IL = VP_IL.merge(
+            FR_IL,
+            left_on='mo',
+            right_on='Медицинская организация',
+            how='outer'
+            )
+    # Дополнительные организации, которые нужно показать
+    # просто записываю в пустые значения mo значения из Медицинская организация
+    DOP_ORG = [
+        'ЧУЗ «КБ «РЖД-МЕДИЦИНА» Г. С-ПЕТЕРБУРГ"',
+        'ООО Ава-Петер',
+        'ООО «Медицентр ЮЗ»',
+        'ООО "ЦСМ "21 ВЕК"',
+        'ООО "УЧАСТКОВЫЕ ВРАЧИ"',
+        'АНО "Медицинский центр "Двадцать первый век"'
+               ]
+    IL.loc[
+            IL['Медицинская организация'].isin(DOP_ORG),
+            'mo'
+            ] = IL.loc[
+                    IL['Медицинская организация'].isin(DOP_ORG),
+                    'Медицинская организация'
+                    ]
+
+    IL = IL.loc[IL['mo'].notnull()].fillna(0)
+    del IL['Медицинская организация']
+
+    IL['Разница'] = IL[2] - IL[1]
+
+    # отчёт изменился - попросили это удалить
+    del IL['ФР диагноз U07.2']
+    del IL['ФР диагноз Z22.8']
+    IL.rename(columns={
+        'mo': 'Медицинская организация',
+        'cov_il': 'болеют ковид из ежедневного отчета',
+        }, inplace=True)
+
+    IL.index = range(1, len(IL) + 1)
+
+    # Сравниваем выздоровевших
+    REC = VP_REC.merge(
+            FR_REC,
+            left_on='mo',
+            right_on='Медицинская организация',
+            how='outer'
+            )
+
+    REC.loc[
+            REC['Медицинская организация'].isin(DOP_ORG),
+            'mo'
+            ] = REC.loc[
+                    REC['Медицинская организация'].isin(DOP_ORG),
+                    'Медицинская организация'
+                    ]
+    REC = REC.loc[REC['mo'].notnull()].fillna(0)
+    del REC['Медицинская организация']
+
+    REC['Разница'] = REC[2] - REC[1]
+
+    # отчёт изменился - попросили это удалить
+    del REC['ФР выздоровело от U07.2']
+    del REC['ФР выздоровело от Z22.8']
+
+    REC.rename(columns={
+        'mo': 'Медицинская организация',
+        'cov_rec': 'выздоровело от ковида из ежедневного отчета'
+        }, inplace=True)
+
+    REC.index = range(1, len(REC) + 1)
+
+    PATH = Dir.get('sverka_fr_and_otcheta')
+
+    FILE = PATH + '/' + DATE_OTCH + ' Поликлинники COVID.xlsx'
+    with pd.ExcelWriter(FILE) as writer:
+        IL.to_excel(writer, sheet_name='болеющие')
+        REC.to_excel(writer, sheet_name='выздоровевшие')
+
+    FILE = PATH + '/' + DATE_OTCH + ' мо для сверки.xlsx'
+    with pd.ExcelWriter(FILE) as writer:
+        MO_TEST.to_excel(writer, sheet_name='не джойнятся')
+        FRS.to_excel(writer, sheet_name='в фр')
+
+    STAT_FILE = put_excel_for_mo_2(
+        IL,
+        REC,
+        'Сверка ФР и ежедневного отчёта',
+        'болеющие',
+        'выздоровевшие',
+        None
+            )
+    return STAT_FILE
