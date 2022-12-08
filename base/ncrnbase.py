@@ -2,20 +2,20 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 
-from conf import DATABASE_COVID
+from conf import DATABASE_NCRN
 
 
-def covid_sql(sql):
-    "Делаем запросы к базу ковид"
+def ncrn_sql(sql):
+    "Делаем запросы к базу для записи номеров истории болезни"
     with sqlalchemy.create_engine(
-            DATABASE_COVID,
+            DATABASE_NCRN,
             pool_pre_ping=True).connect() as con:
         return pd.read_sql(sql, con)
 
 
-def covid_exec(sql):
+def ncrn_exec(sql):
     with sqlalchemy.create_engine(
-                DATABASE_COVID,
+                DATABASE_NCRN,
                 pool_pre_ping=True).connect() as con:
         Session = sessionmaker(bind=con)
         session = Session()
@@ -24,10 +24,10 @@ def covid_exec(sql):
         session.close()
 
 
-def covid_insert(DF, TABLE, SCHEMA, INDEX, IF_EXISTS):
+def ncrn_insert(DF, TABLE, SCHEMA, INDEX, IF_EXISTS):
     "Загружаем данные в таблицу COVID"
     with sqlalchemy.create_engine(
-                DATABASE_COVID,
+                DATABASE_NCRN,
                 pool_pre_ping=True).connect() as con:
         DF.to_sql(
             TABLE,
