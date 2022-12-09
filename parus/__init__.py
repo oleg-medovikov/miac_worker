@@ -18,8 +18,10 @@ from .svod_51_covid_19       import svod_51_covid_19
 from .svod_52_covid_19       import svod_52_covid_19
 from .svod_53_covid_19       import svod_53_covid_19
 from .svod_54_covid_19       import svod_54_covid_19
+from .svod_54_covid_new2     import svod_54_covid_new2
 from .extra_izv              import extra_izv
 from .distant_consult        import distant_consult
 from .evulshed               import evulshed
 from .mp_travm_v_hode_co     import mp_travm_v_hode_co
 from .laboratory             import laboratory
+
