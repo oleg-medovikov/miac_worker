@@ -1,4 +1,4 @@
-SELECT otchet.date_otch,
+SELECT itog.day,
 itog.organization, itog.ogrn, itog.pok_3, itog.pok_4,
 itog.pok_5_itog,
 otchet.pok_5,
@@ -7,6 +7,7 @@ otchet.pok_6,
 otchet.pok_7
 from
 (SELECT  ORGANIZATION, pok_3,pok_4, ogrn,
+	to_char(max(day), 'DD.MM.YYYY') day,
 	sum(CAST(pok_5 AS int) )  pok_5_itog,
 	sum(CAST(pok_6 AS int) )  pok_6_itog
         FROM (
@@ -40,6 +41,7 @@ from
                 INNER JOIN PARUS.BLREPFORM rf
                 on(rd.PRN = rf.RN)
                 WHERE rf.code = '54 COVID 19 NEW2'
+                and a.AGNNAME <> 'Наименование Контаргент используется для сводных отчетов'
                 --and r.BDATE =  trunc(SYSDATE) 
                 and i.CODE in ('etest_03', 'etest_04', 'etest_05', 'etest_06', 'etest_07')
                 )
@@ -53,7 +55,7 @@ from
                 )
     where pok_3 is not null
     group by ORGANIZATION, pok_3, pok_4, ogrn ) itog
-    inner join (
+    left join (
     SELECT  ORGANIZATION, pok_3,pok_4,date_otch,
 	CAST(pok_5 AS int)   pok_5,
 	CAST(pok_6 AS int)  pok_6,

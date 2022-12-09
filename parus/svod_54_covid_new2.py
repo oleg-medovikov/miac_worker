@@ -10,9 +10,9 @@ def svod_54_covid_new2():
 
     DF = parus_sql(SQL)
 
-    DATE = DF.at[0, 'DATE_OTCH']
+    DATE = DF.at[0, 'DAY']
 
-    del DF['DATE_OTCH']
+    del DF['DAY']
 
     NEW_NAME = f'temp/{DATE}_54_COVID_19_new2.xlsx'
 
