@@ -4,4 +4,4 @@ from .config import TELEGRAM_API, URL_870,\
                     LD_LIBRARY_PATH, \
                     DATABASE_COVID, DATABASE_NSI,\
                     DATABASE_MIAC_DS, REGIZ_AUTH,\
-                    DATABASE_NCRN
+                    DATABASE_NCRN, DATABASE_DN122
