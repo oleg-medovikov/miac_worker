@@ -24,4 +24,3 @@ from .distant_consult        import distant_consult
 from .evulshed               import evulshed
 from .mp_travm_v_hode_co     import mp_travm_v_hode_co
 from .laboratory             import laboratory
-
