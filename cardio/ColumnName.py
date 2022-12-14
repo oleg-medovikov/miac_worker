@@ -11,6 +11,7 @@ class ColumnName:
         list_ = []
         for NAME in NAMES:
             list_.append(NAME.name)
+        list_.append('Пол')
         return set(list_)
 
 

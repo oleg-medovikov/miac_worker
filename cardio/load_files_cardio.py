@@ -165,8 +165,17 @@ def load_files_cardio():
                 'Oid'].iat[0]
         except IndexError:
             pass
+        # очистка данных
+        for COL in DF.columns:
+            DF[COL] = DF[COL].astype(str)
+            DF[COL] = DF[COL].str.replace('\n', '')
+            DF[COL] = DF[COL].str.replace('\t', ' ')
+            DF[COL] = DF[COL].str.replace(' {2,}', ' ', regex=True)
+            DF[COL] = DF[COL].str.strip()
+        # ================
 
         list_.append(DF.drop_duplicates())
+        STAT.loc[k, 'Всего строк'] = len(DF.drop_duplicates())
 
         NAME = FILE.rsplit('/', 1)[0] + '/Архив'
         try:
@@ -175,9 +184,10 @@ def load_files_cardio():
             pass
         NAME += '/' + FILE.rsplit('/', 1)[1]
 
-        #os.replace(FILE, NAME)
-
-        break
+        try:
+            os.replace(FILE, NAME)
+        except:
+            STAT.loc[k, 'mess'] = 'прочитал файл, но не смог перенести в архив'
 
     DF = pd.concat(list_, ignore_index=True)
     DF.fillna('', inplace=True)
@@ -206,6 +216,7 @@ def load_files_cardio():
         PART = Error_Phone[Error_Phone['file'] == FILE]
         del PART[CON_1 + '_']
         del PART[CON_2 + '_']
+        STAT.loc[STAT['file'].str.contains(FILE), 'Строки без телефонов'] = len(PART)
 
         PART.to_excel(NAME, index=False)
 
@@ -250,14 +261,20 @@ def load_files_cardio():
     NEW.rename(columns=Dict_columns, inplace=True)
     NEW = NEW[Dict_columns.values()]
 
+    NEW['DatePriem'] = NEW['DatePriem'].astype(str)
+    NEW.to_excel('temp/new_test.xlsx', index=False)
+    NEW.fillna('', inplace=True)
+    NEW.drop_duplicates(subset=['md5_hash'], inplace=True)
+
     try:
         dn122_insert(NEW, 'Patient', 'oleg', False, 'append')
     except Exception as e:
         print(str(e))
         raise my_except(str(e)[:150])
 
-    STAT.loc[0, 'Всего прочёл строк'] = len(DF)
-    STAT.loc[0, 'Из них залил в базу'] = len(NEW)
+    for i in STAT.index:
+        FILE = STAT.at[i, 'file'].split('CARDIO/')[1]
+        STAT.loc[i, 'загружено'] = len(NEW.loc[NEW['file'] == FILE])
 
     STAT_FILE = 'temp/cardio_loads_files.xlsx'
     STAT.to_excel(STAT_FILE)
