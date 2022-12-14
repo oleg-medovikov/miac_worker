@@ -12,6 +12,7 @@ def check_header(FILE: str) -> str:
     ws = wb.active
     STR = ''
     COLUMNS = ColumnName.all_names(NAMES)
+    COLUMNS.remove('Пол')
 
     for NAME in NAMES:
         for cell in ws[1]:
@@ -40,6 +41,8 @@ def check_header(FILE: str) -> str:
 
     if STR == '':
         STR = 'Файл соответствует шаблону'
+
+    wb.save(FILE)
 
     return STR
 

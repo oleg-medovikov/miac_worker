@@ -22,7 +22,8 @@ def clear_number(STR: str) -> str:
         '.0' in STR: ''.join(re.findall(r'[\d.]', STR)).split('.0'),
         '\\' in STR: ''.join(re.findall(r'[\d\\]', STR)).split('\\'),
         '/' in STR: ''.join(re.findall(r'[\d/]', STR)).split('/'),
-        ' ' in STR: ''.join(re.findall(r'[\d ]', STR)).split(' '),
+        ' ' in STR and len(re.findall(r'[\d]', STR)) > 11:
+            ''.join(re.findall(r'[\d ]', STR)).split(' '),
     }.get(True, [''.join(re.findall(r'[\d/]', STR))])
 
     for i, PART in enumerate(TEL):
