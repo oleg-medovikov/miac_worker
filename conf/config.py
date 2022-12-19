@@ -21,3 +21,5 @@ REGIZ_AUTH = config('REGIZ_AUTH', cast=str)
 
 DADATA_TOKEN = config('dadata_token', cast=str)
 DADATA_SECRET = config('dadata_secret', cast=str)
+
+MASTER = config('MASTER', cast=int)

@@ -9,7 +9,9 @@ from cardio import *
 
 from system import bot_send_text, bot_send_file
 
-import sys, os, warnings
+import sys
+import os
+import warnings
 warnings.filterwarnings("ignore")
 
 

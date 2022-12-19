@@ -8,6 +8,10 @@ from clas import Dir
 from base import dn122_sql, dn122_insert
 
 
+PATH = Dir.get('CARDIO')
+COLUMS = ColumnName.all_names(NAMES)
+
+
 class my_except(Exception):
     pass
 
@@ -18,7 +22,7 @@ def clear_number(STR: str) -> str:
         pd.isnull(STR): [''],
         ',' in STR: ''.join(re.findall(r'[\d,]', STR)).split(','),
         ';' in STR: ''.join(re.findall(r'[\d;]', STR)).split(';'),
-        '()' in STR: ''.join(re.findall(r'[\d()]', STR)).split('()'),
+        '()' in STR: ''.join(re.findall(r'[\d\(\)]', STR)).split('()'),
         '.0' in STR: ''.join(re.findall(r'[\d.]', STR)).split('.0'),
         '\\' in STR: ''.join(re.findall(r'[\d\\]', STR)).split('\\'),
         '/' in STR: ''.join(re.findall(r'[\d/]', STR)).split('/'),
@@ -101,6 +105,72 @@ def calculate_hash(df):
     return df['string'].apply_parallel(func, num_processes=10)
 
 
+def clear_df(DF: 'pd.DataFrame') -> 'pd.DataFrame':
+    "очистка от пустых колонок, лишних пробелов и подобного"
+
+    DF.fillna('', inplace=True)
+
+    for COL in DF.columns:
+        DF[COL] = DF[COL].astype(str)
+        DF[COL] = DF[COL].str.replace('\n', '')
+        DF[COL] = DF[COL].str.replace('\t', ' ')
+        DF[COL] = DF[COL].str.replace(' {2,}', ' ', regex=True)
+        DF[COL] = DF[COL].str.strip()
+        DF[COL] = DF[COL].str.replace('nan', '')
+        DF[COL] = DF[COL].str.replace('None', '')
+
+    return DF.drop_duplicates()
+
+
+def check_phones(DF: 'pd.DataFrame') -> tuple['pd.DataFrame', int]:
+    "Переделываем номера и отправляем ошибки обратно"
+    CON_1 = 'Телефон пациента (мобильный)'
+    CON_2 = 'Телефон пациента (домашний)'
+
+    DF[CON_1 + '_'] = DF[CON_1].apply(clear_number)
+    DF[CON_2 + '_'] = DF[CON_2].apply(clear_number)
+    Error_Phone = DF[(DF[CON_1 + '_'] == '') & (DF[CON_2 + '_'] == '')]
+
+    FILE = DF['file'].unique()[0]
+
+    if len(Error_Phone):
+        NAME = PATH + '/' \
+                + FILE.rsplit('/', 1)[0] + '/Error_Phone'
+        try:
+            os.mkdir(NAME)
+        except FileExistsError:
+            pass
+
+        NAME += '/' + FILE.rsplit('/', 1)[1]
+        Error_Phone.to_excel(NAME, index=False)
+
+    DF[CON_1] = DF[CON_1 + '_']
+    DF[CON_2] = DF[CON_2 + '_']
+    del DF[CON_1 + '_']
+    del DF[CON_2 + '_']
+
+    DF = DF[(DF[CON_1] != '') | (DF[CON_2] != '')]
+
+    return DF, len(Error_Phone)
+
+
+def clear_birthday(DF: 'pd.DataFrame') -> 'pd.DataFrame':
+    DF['Дата рождения'] = pd.to_datetime(
+        DF['Дата рождения'],
+        errors='coerce'
+        ).dt.strftime('%d.%m.%Y')
+    return DF.fillna('', inplace=True)
+
+
+def check_sex(DF: 'pd.DataFrame') -> 'pd.DataFrame':
+    try:
+        DF['Пол'] = DF['Пол'].apply(clear_sex)
+    except KeyError:
+        DF['Пол'] = ''
+
+    return DF
+
+
 Dict_columns = {
     'md5': 'md5_hash',
     'file': 'file',
@@ -127,155 +197,184 @@ Dict_columns = {
     'Идентификатор врача, осуществляющего ДН': 'DoctorId',
     'Наименование специальности врача, осуществляющего ДН': 'SpecialName',
     'Идентификация специальности врача, осуществляющего ДН': 'SpecialId',
-    'GUID структурного подразделения врача, осуществляющего ДН': 'GUIDDepartSpecial',
+    'GUID структурного подразделения врача, осуществляющего ДН':
+        'GUIDDepartSpecial',
     'Дата необходимой записи на приём (месяц и год)': 'DatePriem',
     }
 
 
-def load_files_cardio():
-    PATH = Dir.get('CARDIO')
-    MASK = PATH + '/ori.cardio.*/*_122/*.xls*'
+def load_file(FILE: str, MO: 'pd.DataFrame') -> dict:
+    "функция обработки и загрузки файла"
+    Dict = {
+        'mess': 'файл прочитан',  # сообщение
+        'res': False,  # удалось ли загрузить
+        'all': 0,  # сколько строк в файле
+        'error_phone': 0,  # сколько строк без телефонов
+        'clear': 0,  # сколько хороших строк
+        'load': 0,  # сколько загрузилось
+        }
 
-    COLUMS = ColumnName.all_names(NAMES)
-    list_ = []
+    # читаем файл
+    try:
+        DF = pd.read_excel(FILE, usecols=COLUMS, dtype=str)
+    except Exception as e:
+        Dict['mess'] = 'ошибка прочтения' + str(e)
+        return Dict
+    else:
+        Dict['all'] = len(DF)
 
-    STAT = pd.DataFrame()
-    MO = pd.read_excel('help/MO_cardio.xlsx')
+    # записываем путь файла и узнаем юзера организации
+    DF['file'] = FILE.split('CARDIO/')[-1]
+    ACCOUNT = FILE.split('/')[5].split('.')[2]
 
-    for FILE in glob.glob(MASK):
-        k = len(STAT)
-        STAT.loc[k, 'file'] = FILE
-
-        try:
-            DF = pd.read_excel(FILE, usecols=COLUMS, dtype=str)
-        except Exception as e:
-            STAT.loc[k, 'mess'] = 'ошибка ' + str(e)
-            continue
-        else:
-            STAT.loc[k, 'mess'] = 'файл прочитан'
-
-        DF['file'] = FILE.split('CARDIO/')[-1]
-        ACCOUNT = FILE.split('/')[5].split('.')[2]
-
-        try:
-            DF['MO'] = MO.loc[
-                MO['Account'].str.contains(ACCOUNT),
-                'Name'].iat[0]
-            DF['OID'] = MO.loc[
-                MO['Account'].str.contains(ACCOUNT),
-                'Oid'].iat[0]
-        except IndexError:
-            pass
-        # очистка данных
-        for COL in DF.columns:
-            DF[COL] = DF[COL].astype(str)
-            DF[COL] = DF[COL].str.replace('\n', '')
-            DF[COL] = DF[COL].str.replace('\t', ' ')
-            DF[COL] = DF[COL].str.replace(' {2,}', ' ', regex=True)
-            DF[COL] = DF[COL].str.strip()
-        # ================
-
-        list_.append(DF.drop_duplicates())
-        STAT.loc[k, 'Всего строк'] = len(DF.drop_duplicates())
-
-        NAME = FILE.rsplit('/', 1)[0] + '/Архив'
-        try:
-            os.mkdir(NAME)
-        except FileExistsError:
-            pass
-        NAME += '/' + FILE.rsplit('/', 1)[1]
-
-        try:
-            os.replace(FILE, NAME)
-        except:
-            STAT.loc[k, 'mess'] = 'прочитал файл, но не смог перенести в архив'
-
-    DF = pd.concat(list_, ignore_index=True)
-    DF.fillna('', inplace=True)
-
-    if len(DF) == 0:
-        raise my_except('Загрузка файлов кардио - нет новых файлов')
-
-    # чистим номера телефонов
-    CON_1 = 'Телефон пациента (мобильный)'
-    CON_2 = 'Телефон пациента (домашний)'
-
-    DF[CON_1 + '_'] = DF[CON_1].apply(clear_number)
-    DF[CON_2 + '_'] = DF[CON_2].apply(clear_number)
-
-    # возвращаем МО неправильные номера телефонов
-    Error_Phone = DF[(DF[CON_1 + '_'] == '') & (DF[CON_2 + '_'] == '')]
-    for FILE in Error_Phone['file'].unique():
-        NAME = PATH + '/' + FILE.rsplit('/', 1)[0] + '/Error_Phone'
-
-        try:
-            os.mkdir(NAME)
-        except FileExistsError:
-            pass
-
-        NAME += '/' + FILE.rsplit('/', 1)[1]
-        PART = Error_Phone[Error_Phone['file'] == FILE]
-        del PART[CON_1 + '_']
-        del PART[CON_2 + '_']
-        STAT.loc[STAT['file'].str.contains(FILE), 'Строки без телефонов'] = len(PART)
-
-        PART.to_excel(NAME, index=False)
-
-    # после разложения удаляем колонки
-    DF[CON_1] = DF[CON_1 + '_']
-    DF[CON_2] = DF[CON_2 + '_']
-    del DF[CON_1 + '_']
-    del DF[CON_2 + '_']
-
-    # удаляем строчки те, где нет телефонов
-    DF = DF[(DF[CON_1] != '') | (DF[CON_2] != '')]
-
+    try:
+        DF['MO'] = MO.loc[
+            MO['Account'].str.contains(ACCOUNT),
+            'Name'
+            ].iat[0]
+        DF['OID'] = MO.loc[
+            MO['Account'].str.contains(ACCOUNT),
+            'Oid'
+            ].iat[0]
+    except IndexError:
+        Dict['mess'] = 'директория не найдена в списке МО'
+        return Dict
+    # очистка данных
+    try:
+        DF = clear_df(DF)
+    except Exception as e:
+        Dict['mess'] = 'ошибка при обработке данных \n' + str(e)
+        return Dict
+    # переделываем телефоны
+    try:
+        DF, Error_count = check_phones(DF)
+    except Exception as e:
+        Dict['mess'] = 'ошибка при проверке телефонов \n' + str(e)
+        return Dict
+    else:
+        Dict['error_phone'] = Error_count
     # Чистим день рождения
-    DF['Дата рождения'] = pd.to_datetime(
-        DF['Дата рождения'],
-        errors='coerce'
-        ).dt.strftime('%d.%m.%Y')
-    DF.fillna('', inplace=True)
+    try:
+        DF = clear_birthday(DF)
+    except Exception as e:
+        Dict['mess'] = 'ошибка при очистке дня рождения \n' + str(e)
+        return Dict
     # чистим пол
     try:
-        DF['Пол'] = DF['Пол'].apply(clear_sex)
-    except KeyError:
-        DF['Пол'] = ''
-
+        DF = check_sex(DF)
+    except Exception as e:
+        Dict['mess'] = 'ошибка при очистке пола \n' + str(e)
+        return Dict
     # чистим СНИЛС
-    DF['Номер СНИЛС'] = DF['Номер СНИЛС'].apply(clear_snils)
-
+    try:
+        DF['Номер СНИЛС'] = DF['Номер СНИЛС'].apply(clear_snils)
+    except Exception as e:
+        Dict['mess'] = 'ошибка при очистке СНИЛС \n' + str(e)
+        return Dict
     # считаем хеши строк
-    DF['md5'] = calculate_hash(DF)
+    try:
+        DF['md5'] = calculate_hash(DF)
+    except Exception as e:
+        Dict['mess'] = 'ошибка при расчете хеша \n' + str(e)
+        return Dict
+
+    # считаем количество оставшихся строк
+    Dict['clear'] = len(DF)
+    if Dict['clear'] == 0:
+        Dict['mess'] = 'Нет строк для загрузки'
+        return Dict
+
+    """
+    Поехали сравнивать хеши файла с базой
+    просто ищем разность
+
+    OLD - это хеши которые есть в базе
+    DF  - все хеши из файла
+    NEW - новые хеши - разность, которую нужно добавить в базу
+    """
 
     OLD = dn122_sql('SELECT md5_hash from oleg.Patient')
-
-    """
-    OLD - это хеши которые есть в базе
-    DF  - все хеши которые прочитал из файликов
-    NEW - новые хеши, которые нужно добавить в базу
-          просто ищем разность
-    """
-
     NEW = DF[~DF['md5'].isin(OLD['md5_hash'].unique())]
 
     NEW.rename(columns=Dict_columns, inplace=True)
     NEW = NEW[Dict_columns.values()]
 
     NEW['DatePriem'] = NEW['DatePriem'].astype(str)
-    NEW.to_excel('temp/new_test.xlsx', index=False)
+
     NEW.fillna('', inplace=True)
     NEW.drop_duplicates(subset=['md5_hash'], inplace=True)
 
     try:
         dn122_insert(NEW, 'Patient', 'oleg', False, 'append')
     except Exception as e:
-        print(str(e))
-        raise my_except(str(e)[:150])
+        Dict['mess'] = 'ошибка загрузки в базу \n' + str(e)[:200]
+        return Dict
+    else:
+        Dict['mess'] = 'файл загружен'
+        Dict['res'] = True
+        Dict['load'] = len(NEW)
+        return Dict
 
-    for i in STAT.index:
-        FILE = STAT.at[i, 'file'].split('CARDIO/')[1]
-        STAT.loc[i, 'загружено'] = len(NEW.loc[NEW['file'] == FILE])
+
+def replace_file(FILE: str) -> str:
+    "Переносим файл в архив после удачной загрузки"
+
+    NAME = FILE.rsplit('/', 1)[0] + '/Архив'
+    try:
+        os.mkdir(NAME)
+    except FileExistsError:
+        pass
+    NAME += '/' + FILE.rsplit('/', 1)[1]
+
+    try:
+        os.replace(FILE, NAME)
+    except Exception as e:
+        return f'прочитал файл, но не смог перенести в архив \n{str(e)}'
+    else:
+        return 'файл перенесён в архив'
+
+
+def load_files_cardio():
+    MASK = PATH + '/ori.cardio.[!1]*/*_122/*.xls*'
+
+    STAT = pd.DataFrame()
+    MO = pd.read_excel('help/MO_cardio.xlsx')
+
+    for FILE in glob.iglob(MASK):
+        k = len(STAT)
+        STAT.loc[k, 'file'] = FILE
+        try:
+            DICT = load_file(FILE, MO)
+        except Exception as e:
+            RES = False
+            STAT.loc[k, 'mess2'] = str(e)
+            continue
+        else:
+            RES = DICT['res']
+            STAT.loc[k, 'mess'] = DICT['mess']
+            STAT.loc[k, 'all'] = DICT['all']
+            STAT.loc[k, 'error_phone'] = DICT['error_phone']
+            STAT.loc[k, 'clear'] = DICT['clear']
+            STAT.loc[k, 'load'] = DICT['load']
+
+        if RES:
+            STAT.loc[k, 'mess2'] = replace_file(FILE)
+
+    # приведём в порядок файл статистики
+    STAT = STAT[[
+        'file', 'all', 'error_phone',
+        'clear', 'load', 'mess', 'mess2'
+        ]]
+
+    STAT.rename(columns={
+        'file': 'Файл',
+        'all': 'Всего строк в файле',
+        'error_phone': 'строк без телефонов',
+        'clear': 'строк после проверки',
+        'load': 'строк загружено',
+        'mess': 'статус загрузки',
+        'mess2': 'статус файла',
+        }, inplace=True)
 
     STAT_FILE = 'temp/cardio_loads_files.xlsx'
     STAT.to_excel(STAT_FILE)
