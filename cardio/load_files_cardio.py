@@ -159,15 +159,7 @@ def clear_birthday(DF: 'pd.DataFrame') -> 'pd.DataFrame':
         DF['Дата рождения'],
         errors='coerce'
         ).dt.strftime('%d.%m.%Y')
-    return DF.fillna('', inplace=True)
-
-
-def check_sex(DF: 'pd.DataFrame') -> 'pd.DataFrame':
-    try:
-        DF['Пол'] = DF['Пол'].apply(clear_sex)
-    except KeyError:
-        DF['Пол'] = ''
-
+    DF.fillna('', inplace=True)
     return DF
 
 
@@ -218,7 +210,11 @@ def load_file(FILE: str, MO: 'pd.DataFrame') -> dict:
     try:
         DF = pd.read_excel(FILE, usecols=COLUMS, dtype=str)
     except Exception as e:
-        Dict['mess'] = 'ошибка прочтения' + str(e)
+        Dict['mess'] = 'ошибка прочтения \n' + str(e)
+        Dict['mess'].replace(
+            'Usecols do not match columns, columns expected but not found',
+            'Не найдены колонки: '
+                )
         return Dict
     else:
         Dict['all'] = len(DF)
@@ -261,9 +257,9 @@ def load_file(FILE: str, MO: 'pd.DataFrame') -> dict:
         return Dict
     # чистим пол
     try:
-        DF = check_sex(DF)
+        DF['Пол'] = DF['Пол'].apply(clear_sex)
     except Exception as e:
-        Dict['mess'] = 'ошибка при очистке пола \n' + str(e)
+        Dict['mess'] = 'ошибка при очистке пола \n' + str(e) + str(DF.columns)
         return Dict
     # чистим СНИЛС
     try:
@@ -335,7 +331,7 @@ def replace_file(FILE: str) -> str:
 
 
 def load_files_cardio():
-    MASK = PATH + '/ori.cardio.[!1]*/*_122/*.xls*'
+    MASK = PATH + '/ori.cardio.[!1]*/*_122/[!~]*.xls*'
 
     STAT = pd.DataFrame()
     MO = pd.read_excel('help/MO_cardio.xlsx')
@@ -359,6 +355,8 @@ def load_files_cardio():
 
         if RES:
             STAT.loc[k, 'mess2'] = replace_file(FILE)
+        else:
+            STAT.loc[k, 'mess2'] = 'файл оставлен на месте'
 
     # приведём в порядок файл статистики
     STAT = STAT[[
