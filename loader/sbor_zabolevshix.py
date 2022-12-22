@@ -28,7 +28,7 @@ def sbor_zabolevshix():
     list_ = []
     delta = datetime.now() - timedelta(days=1)
 
-    for file in glob.glob(MASK):
+    for file in glob.iglob(MASK):
         time = datetime.utcfromtimestamp(os.stat(file).st_ctime)
         if time > delta:
             df = pd.read_excel(file).dropna(how='all')
