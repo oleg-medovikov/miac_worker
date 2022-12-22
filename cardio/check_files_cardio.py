@@ -51,10 +51,10 @@ def check_files_cardio():
     "Функция проверяет шапки внутри файлов кардио"
 
     PATH = Dir.get('CARDIO')
-    MASK = PATH + '/ori.cardio.*/*_122/*.xls*'
+    MASK = PATH + '/ori.cardio.[!1]*/*_122/[!~]*.xls*'
     DF = DataFrame()
 
-    for FILE in glob.glob(MASK):
+    for FILE in glob.iglob(MASK):
         k = len(DF)
         DF.loc[k, 'file'] = FILE
         try:
