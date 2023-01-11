@@ -82,6 +82,7 @@ def load_feed_back_auto():
     dn122_exec('TRUNCATE TABLE oleg.feedback_122')
 
     STAT = "Пробую загрузить новые файлы от 122 службы \n\n"
+    COUNT = 0
 
     for FILE in glob.iglob(MASK):
         time = datetime.utcfromtimestamp(os.stat(FILE).st_ctime)
@@ -104,8 +105,12 @@ def load_feed_back_auto():
             continue
 
         load_table_feedback(DF, DATE)
+        COUNT += 1
         STAT += "загрузил файл"
 
-    update_patient()
+    if COUNT:
+        update_patient()
+    else:
+        STAT += "Нечего загружать!"
 
     return STAT

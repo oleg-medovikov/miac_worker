@@ -1,6 +1,5 @@
 SELECT  DAY, pok_01
-	,nvl(cast(pok_02 as int),0) pok_02,nvl(cast(pok_03 as int),0) pok_03,nvl(cast(pok_04 as int),0) pok_04,nvl(cast(pok_05 as int),0) pok_05
-	,nvl(cast(pok_06 as int),0) pok_06,nvl(cast(pok_07 as int),0) pok_07,nvl(cast(pok_08 as int),0) pok_08,nvl(cast(pok_09 as int),0) pok_09
+	,nvl(cast(pok_02 as int),0) pok_02,nvl(cast(pok_03 as int),0) pok_03,nvl(cast(pok_09 as int),0) pok_09
 	,nvl(cast(pok_10 as int),0) pok_10,nvl(cast(pok_11 as int),0) pok_11,nvl(cast(pok_12 as int),0) pok_12,nvl(cast(pok_13 as int),0) pok_13
 	,nvl(cast(pok_14 as int),0) pok_14,nvl(cast(pok_15 as int),0) pok_15,nvl(cast(pok_16 as int),0) pok_16,nvl(cast(pok_17 as int),0) pok_17
 	,nvl(cast(pok_18 as int),0) pok_18,nvl(cast(pok_19 as int),0) pok_19,nvl(cast(pok_20 as int),0) pok_20,nvl(cast(pok_21 as int),0) pok_21
@@ -17,7 +16,9 @@ SELECT  DAY, pok_01
 	,nvl(cast(pok_60 as float),0) pok_60,nvl(cast(pok_61 as float),0) pok_61,nvl(cast(pok_62 as float),0) pok_62,nvl(cast(pok_63 as float),0) pok_63
 	,nvl(cast(pok_64 as float),0) pok_64,nvl(cast(pok_65 as float),0) pok_65,nvl(cast(pok_66 as float),0) pok_66,nvl(cast(pok_67 as float),0) pok_67
 	,nvl(cast(pok_68 as float),0) pok_68,nvl(cast(pok_69 as float),0) pok_69,nvl(cast(pok_70 as float),0) pok_70,nvl(cast(pok_71 as float),0) pok_71
-	,nvl(cast(pok_72 as float),0) pok_72,nvl(cast(pok_73 as float),0) pok_73,nvl(cast(pok_74 as float),0) pok_74,nvl(cast(pok_75 as float),0) pok_75  
+	,nvl(cast(pok_72 as float),0) pok_72,nvl(cast(pok_73 as float),0) pok_73,nvl(cast(pok_74 as float),0) pok_74,nvl(cast(pok_75 as float),0) pok_75 
+	,nvl(cast(pok_76 as float),0) pok_76,nvl(cast(pok_77 as float),0) pok_77,nvl(cast(pok_78 as float),0) pok_78,nvl(cast(pok_79 as float),0) pok_79
+	,nvl(cast(pok_80 as float),0) pok_80,nvl(cast(pok_81 as float),0) pok_81
     FROM (
     SELECT 
             to_char(r.BDATE, 'DD.MM.YYYY')  day,
@@ -50,8 +51,7 @@ SELECT  DAY, pok_01
     (
     MIN(value)
     FOR POKAZATEL IN ('29_covid_001' pok_01,'29_covid_002' pok_02,'29_covid_003' pok_03
-	,'29_covid_004' pok_04,'29_covid_005' pok_05,'29_covid_006' pok_06,'29_covid_007' pok_07
-	,'29_covid_008' pok_08,'29_covid_009' pok_09,'29_covid_010' pok_10,'29_covid_011' pok_11	
+	,'29_covid_009' pok_09,'29_covid_010' pok_10,'29_covid_011' pok_11	
 	,'29_covid_012' pok_12,'29_covid_013' pok_13,'29_covid_014' pok_14,'29_covid_015' pok_15
 	,'29_covid_016' pok_16,'29_covid_017' pok_17,'29_covid_018' pok_18,'29_covid_019' pok_19
 	,'29_covid_020' pok_20,'29_covid_021' pok_21,'29_covid_022' pok_22,'29_covid_023' pok_23
@@ -68,6 +68,8 @@ SELECT  DAY, pok_01
 	,'29_covid_064' pok_64,'29_covid_065' pok_65,'29_covid_066' pok_66,'29_covid_067' pok_67
 	,'29_covid_068' pok_68,'29_covid_069' pok_69,'29_covid_070' pok_70,'29_covid_071' pok_71
 	,'29_covid_072' pok_72,'29_covid_073' pok_73,'29_covid_074' pok_74,'29_covid_075' pok_75
+	,'29_covid_076' pok_76,'29_covid_077' pok_77,'29_covid_078' pok_78,'29_covid_079' pok_79
+	,'29_covid_080' pok_80,'29_covid_081' pok_81
     )
     )
     WHERE POK_01 IS NOT NULL 

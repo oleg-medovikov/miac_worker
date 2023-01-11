@@ -315,15 +315,15 @@ def load_file(FILE: str, MO: 'pd.DataFrame') -> dict:
 def replace_file(FILE: str) -> str:
     "Переносим файл в архив после удачной загрузки"
 
-    NAME = FILE.rsplit('/', 1)[0] + '/Архив'
-    try:
-        os.mkdir(NAME)
-    except FileExistsError:
-        pass
-    NAME += '/' + FILE.rsplit('/', 1)[1]
+    FILE_A = FILE[:20] + 'arhive/' + FILE[20:]
 
     try:
-        os.replace(FILE, NAME)
+        os.mkdir(FILE_A.rsplit('/', 1)[0])
+    except FileExistsError:
+        pass
+
+    try:
+        os.replace(FILE, FILE_A)
     except Exception as e:
         return f'прочитал файл, но не смог перенести в архив \n{str(e)}'
     else:

@@ -33,7 +33,9 @@ FROM (
         pivot
         (
         max(value)
-        FOR POKAZATEL IN ('texp_test_202' pok02, 'texp_test_303' pok03, 'texp_test_404' pok04,
-						  'texp_test_505' pok05, 'texp_test_606' pok06, 'texp_test_707' pok07)
+        FOR POKAZATEL IN (
+            'texp_test_202' pok02, 'texp_test_303' pok03, 'texp_test_404' pok04,
+            'texp_test_505' pok05, 'texp_test_606' pok06, 'texp_test_707' pok07
+            )
         )
         WHERE pok02 IS NOT null  

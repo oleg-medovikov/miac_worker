@@ -33,5 +33,5 @@ SELECT
 					INNER JOIN PARUS.BLREPFORM rf 
 					on(pf.PRN = rf.RN)
 					WHERE rf.code = 'Laboratory'
-					AND r.BDATE  < SYSDATE + 2
+					AND r.BDATE  < SYSDATE + 5
 					)

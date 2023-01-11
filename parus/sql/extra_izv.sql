@@ -35,7 +35,7 @@ FROM (
 				on(r.BLREPFORMED = rd.RN)
 				INNER JOIN PARUS.BLREPFORM rf
 				on(rd.PRN = rf.RN)
-				WHERE rf.code = 'ЭкстренныеИзвещения' AND r.BDATE < trunc(SYSDATE) + 1  )
+				WHERE rf.code = 'ЭкстренныеИзвещения' AND r.BDATE < trunc(SYSDATE) + 4  )
         and bi.CODE in  ('extra_izv_01', 'extra_izv_02','extra_izv_03')
                 )
         pivot

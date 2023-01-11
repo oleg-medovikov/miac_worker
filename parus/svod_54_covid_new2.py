@@ -1,4 +1,5 @@
 import shutil
+from datetime import datetime
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 
@@ -30,7 +31,7 @@ def svod_54_covid_new2():
 
     DF = parus_sql(SQL)
 
-    DATE = DF.at[0, 'DAY']
+    DATE = datetime.today().strftime('%d.%m.%Y')  # DF.at[0, 'DAY']
 
     del DF['DAY']
 
