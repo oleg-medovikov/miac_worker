@@ -2,12 +2,17 @@ import pandas as pd
 import glob
 import os
 from datetime import datetime
+from xlrd import XLRDError
 
 from base import ncrn_sql, ncrn_exec, ncrn_insert
 from clas import Dir
 
 
-def org_mis() -> 'pd.DateFrame':
+class my_except(Exception):
+    pass
+
+
+def org_mis() -> 'pd.DataFrame':
     "узнать МИСы организаций"
     SQL = """
         SELECT org.ftp_user, ISNULL(ftp.NameMIS, '') AS 'NameMIS'
@@ -27,7 +32,7 @@ def org_mis() -> 'pd.DateFrame':
     return ncrn_sql(SQL)
 
 
-def update_mo_directory(DF: pd.DateFrame):
+def update_mo_directory(DF: 'pd.DataFrame'):
     "Если что-то изменилось в файлике - меняем в базе"
     DF.rename(columns={
         'ftp_user':   'ftp_user',
@@ -54,31 +59,11 @@ NAMES_NEW = [
     ]
 
 
-def read_file(FILE: int, MO: 'pd.DateFrame', MIS: 'pd.DateFrame') -> dict:
-    # Узнаем параметры файла
-    USER = FILE.split('/')[5]
-
-    if len(MO.loc[MO.ftp_user == USER, 'MO']):
-        ORGANIZATION = MO.loc[MO.ftp_user == USER, 'MO'].values[0]
-    else:
-        ORGANIZATION = 'Не определена'
-
-    # файлы рядом в той же директории
-    OTHER_FILES = str(glob.glob(file.rsplit('/', 1)[0] + '/*'))
-
-    # узнаем МИС
-    if len(MIS.loc[MIS.ftp_user == USER]):
-        NAME_MIS = MIS.loc[MIS.ftp_user == USER, 'NameMIS'].values[0]
-    else:
-        NAME_MIS = 'Не определена'
-
+def read_file(FILE: str) -> dict:
     Dict = {
-        'MOName':        ORGANIZATION,
         'NameFile':      FILE,
         'CountRows':     0,
         'TextError':     '',
-        'OtherFiles':    OTHER_FILES,
-        'mis':           NAME_MIS,
         'DateLoadFile':  datetime.now(),
         'InOrOut':       'IN'
     }
@@ -102,14 +87,14 @@ def read_file(FILE: int, MO: 'pd.DateFrame', MIS: 'pd.DateFrame') -> dict:
             return Dict
         else:
             DF = pd.concat(DF)
-            DF = DF[names].applymap(str)
+            DF = DF[NAMES].applymap(str)
             DF.columns = NAMES_NEW
             Dict['CountRows'] = len(DF)
             Dict['TextError'] = 'Файл HTMl удачно распарсен'
     except ValueError as e:  # Если не найдены колонки
         if str(e) == 'File is not a recognized excel file':
             try:
-                DF = pd.read_html(file)
+                DF = pd.read_html(FILE)
             except ValueError:
                 Dict['TextError'] \
                     = 'Файл является листом html, но не удалось распарсить'
@@ -117,7 +102,7 @@ def read_file(FILE: int, MO: 'pd.DateFrame', MIS: 'pd.DateFrame') -> dict:
             else:
                 if len(DF):
                     DF = pd.concat(DF)
-                    DF = DF[names].applymap(str)
+                    DF = DF[NAMES].applymap(str)
                     DF.columns = NAMES_NEW
                     Dict['CountRows'] = len(DF)
                     Dict['TextError'] = 'Файл HTMl удачно распарсен'
@@ -186,31 +171,88 @@ def regiz_load_to_base():
     update_mo_directory(MO)
     ncrn_exec('TRUNCATE TABLE dbo.TempTableFromMO')
 
-    MASK = Dir.get('regiz') + '/ori.regiz*/_Входящие/[!~]*.xls*'
+    MASK = Dir.get('regiz') + '/ori.regiz.*/_Входящие/[!~]*.xls*'
 
     REMOVE_FILE = []
-    STAT = pd.DateFrame()
+    LIST_DF = []
+    STAT = pd.DataFrame()
 
     for FILE in glob.iglob(MASK):
         k = len(STAT)
         STAT.loc[k, 'NameFile'] = FILE
+
+        # Узнаем параметры файла
+        USER = FILE.split('/')[5]
+
+        if len(MO.loc[MO.ftp_user == USER]):
+            ORGANIZATION = MO.loc[MO.ftp_user == USER, 'MOName'].values[0]
+        else:
+            ORGANIZATION = 'Не определена'
+
+        if len(MO.loc[MO['ftp_user'] == USER, 'level1_key']):
+            KEY = MO.loc[MO['ftp_user'] == USER, 'level1_key'].values[0]
+
+        # файлы рядом в той же директории
+        OTHER_FILES = str(glob.glob(FILE.rsplit('/', 1)[0] + '/*'))
+
+        # узнаем МИС
+        if len(MIS.loc[MIS.ftp_user == USER]):
+            NAME_MIS = MIS.loc[MIS.ftp_user == USER, 'NameMIS'].values[0]
+        else:
+            NAME_MIS = 'Не определена'
+
         try:
-            Dict = read_file(FILE, MO, MIS)
+            Dict = read_file(FILE)
         except Exception as e:
-            STAT['TextError'] = str(e)
+            STAT.loc[k, 'TextError'] = str(e)
             continue
         else:
             STAT.loc[k, 'CountRows'] = Dict['CountRows']
             STAT.loc[k, 'DateLoadFile'] = Dict['DateLoadFile']
             STAT.loc[k, 'InOrOut'] = 'IN'
-            STAT.loc[k, 'MOName'] = Dict['MOName']
-            STAT.loc[k, 'OtherFiles'] = Dict['OtherFiles']
+            STAT.loc[k, 'MOName'] = ORGANIZATION
+            STAT.loc[k, 'OtherFiles'] = OTHER_FILES
             STAT.loc[k, 'TextError'] = Dict['TextError']
-            STAT.loc[k, 'mis'] = Dict['mis']
+            STAT.loc[k, 'mis'] = NAME_MIS
 
+            DF = Dict['df']
+            DF['LPU_level1_key'] = KEY
+
+            LIST_DF.append(DF)
             REMOVE_FILE.append(FILE)
 
+    if len(LIST_DF) == 0:
+        STAT.to_excel('temp/stat.xlsx')
+        return 'temp/stat.xlsx'
+        #raise my_except('Нет файлов!\n' + MASK)
+    SVOD = pd.concat(LIST_DF)
 
+    SVOD = SVOD.drop_duplicates()
+    SVOD.index = range(1, len(SVOD) + 1)
+    SVOD = SVOD.apply(lambda x: x.loc[::].str[:255])
 
+    ncrn_insert(SVOD, 'TempTableFromMO', 'dbo', False, 'append')
 
+    ncrn_exec('EXEC [dbo].[Insert_Table_FileMO]')
 
+    TIME = datetime.now().strftime('%d.%m.%Y_%H-%M')
+    SVOD_FILE = Dir.get('regiz_svod') \
+        + f'/{TIME} свод номеров для проверки.xlsx'
+
+    with pd.ExcelWriter(SVOD_FILE) as writer:
+        SVOD.loc[SVOD.index < 1048576].to_excel(
+            writer,
+            sheet_name='номера',
+            index=False
+                )
+        STAT.to_excel(writer, sheet_name='статистика', index=False)
+
+    for FILE in REMOVE_FILE:
+        FILE_NEW = FILE.rsplit('/', 2)[0] \
+            + f'/Архив/время_{TIME}_' + FILE.rsplit('/', 1)[1]
+        try:
+            os.replace(FILE, FILE_NEW)
+        except:
+            continue
+
+    return SVOD_FILE

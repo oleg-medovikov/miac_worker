@@ -29,8 +29,10 @@ def regiz_decomposition():
             'Error': 'Ошибка, выявленная в РЕГИЗ',
             }, inplace=True)
 
-        PATH = ROOT + '/' + FTP \
-            + f'/Ответы/_{DATE} {LPU_NAME}.xlsx'.replace('"', '')
+        PATH = ROOT + '/' + f'{FTP}/Ответы/_{DATE} {LPU_NAME}.xlsx'
+
+        PATH = PATH.replace('"', '')
+
         with ExcelWriter(PATH) as writer:
             try:
                 PART.to_excel(
@@ -48,7 +50,7 @@ def regiz_decomposition():
                     'OtherFiles':   '',
                     'DateLoadFile': datetime.now(),
                     'InOrOut':      'Out',
-                    })
+                    }, ignore_index=True)
             else:
                 STATISTIC = STATISTIC.append({
                     'MOName':       LPU_NAME,
@@ -58,7 +60,7 @@ def regiz_decomposition():
                     'OtherFiles':   '',
                     'DateLoadFile': datetime.now(),
                     'InOrOut':      'Out',
-                    })
+                    }, ignore_index=True)
     DATE = datetime.now().strftime('%d.%m.%Y_%H-%M')
     PATH = Dir.get('regiz_svod') + f'/{DATE}_лог_разложения.xlsx'
     with ExcelWriter(PATH) as writer:
