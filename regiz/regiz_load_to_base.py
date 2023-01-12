@@ -224,7 +224,7 @@ def regiz_load_to_base():
     if len(LIST_DF) == 0:
         STAT.to_excel('temp/stat.xlsx')
         return 'temp/stat.xlsx'
-        #raise my_except('Нет файлов!\n' + MASK)
+
     SVOD = pd.concat(LIST_DF)
 
     SVOD = SVOD.drop_duplicates()
@@ -236,10 +236,20 @@ def regiz_load_to_base():
     ncrn_exec('EXEC [dbo].[Insert_Table_FileMO]')
 
     TIME = datetime.now().strftime('%d.%m.%Y_%H-%M')
+
+    SVOD_TEMP = f'temp/{TIME} свод номеров для проверки.xlsx'
     SVOD_FILE = Dir.get('regiz_svod') \
         + f'/{TIME} свод номеров для проверки.xlsx'
 
-    with pd.ExcelWriter(SVOD_FILE) as writer:
+    with pd.excelwriter(SVOD_TEMP) as writer:
+        SVOD.loc[SVOD.index < 1048576].to_excel(
+            writer,
+            sheet_name='номера',
+            index=False
+                )
+        STAT.to_excel(writer, sheet_name='статистика', index=False)
+
+    with pd.excelwriter(SVOD_FILE) as writer:
         SVOD.loc[SVOD.index < 1048576].to_excel(
             writer,
             sheet_name='номера',
@@ -255,4 +265,4 @@ def regiz_load_to_base():
         except:
             continue
 
-    return SVOD_FILE
+    return SVOD_TEMP
