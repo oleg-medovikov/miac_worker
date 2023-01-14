@@ -222,8 +222,9 @@ def regiz_load_to_base():
             REMOVE_FILE.append(FILE)
 
     if len(LIST_DF) == 0:
-        STAT.to_excel('temp/stat.xlsx')
-        return 'temp/stat.xlsx'
+        file_stat = 'temp/REGIZ_no_load_stat.xlsx'
+        STAT.to_excel(file_stat)
+        return file_stat
 
     SVOD = pd.concat(LIST_DF)
 
@@ -241,7 +242,7 @@ def regiz_load_to_base():
     SVOD_FILE = Dir.get('regiz_svod') \
         + f'/{TIME} свод номеров для проверки.xlsx'
 
-    with pd.excelwriter(SVOD_TEMP) as writer:
+    with pd.ExcelWriter(SVOD_TEMP) as writer:
         SVOD.loc[SVOD.index < 1048576].to_excel(
             writer,
             sheet_name='номера',
@@ -249,7 +250,7 @@ def regiz_load_to_base():
                 )
         STAT.to_excel(writer, sheet_name='статистика', index=False)
 
-    with pd.excelwriter(SVOD_FILE) as writer:
+    with pd.ExcelWriter(SVOD_FILE) as writer:
         SVOD.loc[SVOD.index < 1048576].to_excel(
             writer,
             sheet_name='номера',
