@@ -143,14 +143,8 @@ def generate_xml(DF: 'pd.DataFrame', XML: str) -> tuple[str, 'pd.DataFrame']:
     return STRING, DF
 
 
-def toxic_genarate_xml(DATE_GLOBAL):
+def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
     """Для ЦГиЭ случаи отравления"""
-
-    DATE_END = datetime.strptime(DATE_GLOBAL, '%d-%m-%Y').strftime('%Y-%m-%d')
-    DATE_START = (
-            datetime.strptime(DATE_GLOBAL, '%d-%m-%Y')
-            - timedelta(days=10)
-            ).strftime("%Y-%m-%d")
 
     df = get_cases(DATE_START, DATE_END)
 
@@ -278,3 +272,41 @@ def toxic_genarate_xml(DATE_GLOBAL):
         f.write(string)
 
     return NAME_1 + ';' + NAME_2 + ';' + NAME_3 + ';' + NAME_4
+
+
+def toxic_genarate_xml_mounth(DATE_GLOBAL):
+    "сгенерировать за месяц"
+    DATE_END = datetime.strptime(DATE_GLOBAL, '%d-%m-%Y').strftime('%Y-%m-%d')
+    DATE_START = (
+            datetime.strptime(DATE_GLOBAL, '%d-%m-%Y')
+            - timedelta(days=30)
+            ).strftime("%Y-%m-%d")
+
+    return toxic_genarate_xml(DATE_START, DATE_END)
+
+
+def toxic_genarate_xml_week(DATE_GLOBAL):
+    "сгенерировать за месяц"
+    DATE_END = datetime.strptime(DATE_GLOBAL, '%d-%m-%Y').strftime('%Y-%m-%d')
+    DATE_START = (
+            datetime.strptime(DATE_GLOBAL, '%d-%m-%Y')
+            - timedelta(days=7)
+            ).strftime("%Y-%m-%d")
+
+    return toxic_genarate_xml(DATE_START, DATE_END)
+
+
+def toxic_genarate_xml_day(DATE_GLOBAL):
+    "сгенерировать за месяц"
+    DATE_END = datetime.strptime(DATE_GLOBAL, '%d-%m-%Y').strftime('%Y-%m-%d')
+    DATE_START = (
+            datetime.strptime(DATE_GLOBAL, '%d-%m-%Y')
+            - timedelta(days=1)
+            ).strftime("%Y-%m-%d")
+
+    return toxic_genarate_xml(DATE_START, DATE_END)
+
+
+
+
+
