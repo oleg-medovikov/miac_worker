@@ -37,7 +37,9 @@ def razlojit_death_week():
         select
             dbo.get_Gid(idPatient) as 'Gid',
             [Медицинская организация], [ФИО], [Дата рождения]
-            ,dbo.[f_calculation_age]([Дата рождения], [Дата исхода заболевания]) as 'Возраст'
+            ,dbo.[f_calculation_age](
+                    [Дата рождения],
+                    [Дата исхода заболевания]) as 'Возраст'
             ,[Посмертный диагноз]
         from robo.v_FedReg
         where [Исход заболевания] = 'Смерть'
