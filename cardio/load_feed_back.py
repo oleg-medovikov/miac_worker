@@ -14,12 +14,20 @@ class my_except(Exception):
 def load_table_feedback(DF: 'pd.DataFrame', DATE: str):
     "загрузка фидбека"
     DF.columns = ['md5_hash', 'FeedBackComment']
+    IDs = ('0', '1', '2', '4', '5', '6')
+    DF = DF.loc[DF['FeedBackComment'].str.startswith(IDs)]
 
     DF['FeedBackId'] = DF['FeedBackComment'].str.replace(
         r"[^\d]",
         "",
         regex=True).astype(int)
-    DF['FeedBackDate'] = datetime.strptime(DATE, '%Y_%m_%d')
+
+    try:
+        DATE = datetime.strptime(DATE, '%Y_%m_%d')
+    except:
+        DATE = datetime.strptime(DATE, '%Y-%m-%d')
+
+    DF['FeedBackDate'] = DATE
 
     dn122_insert(
         DF,
@@ -48,7 +56,7 @@ def load_feed_back(DATE):
     "загрузка ответа от 122 службы, кому они дозвонились"
 
     P = DATE.split('-')
-    DATE = f"{P[2]}_{P[1]}_{P[0]}"
+    DATE = f"{P[2]}-{P[1]}-{P[0]}"
     MASK = Dir.get('CARDIO') + f'/ori.cardio.122/feedback_122/{DATE}*.xlsx'
 
     try:
@@ -66,7 +74,9 @@ def load_feed_back(DATE):
         raise my_except(f'Не смог прочесть файл {str(e)}')
 
     dn122_exec('TRUNCATE TABLE oleg.feedback_122')
+
     load_table_feedback(DF, DATE)
+
     update_patient()
 
     return 'Готово!'
@@ -78,7 +88,7 @@ def load_feed_back_auto():
     delta = datetime.now() - timedelta(days=1)
     MASK = Dir.get('CARDIO') \
         + '/ori.cardio.122/feedback_122/' \
-        + '[0-2]0[0-3][0-9]_[0-9][0-9]_[0-9][0-9]*.xlsx'
+        + '[0-2]0[0-3][0-9]*[0-9][0-9]*[0-9][0-9]*.xlsx'
     dn122_exec('TRUNCATE TABLE oleg.feedback_122')
 
     STAT = "Пробую загрузить новые файлы от 122 службы \n\n"
@@ -104,7 +114,10 @@ def load_feed_back_auto():
             STAT += "не смог прочесть файл, не нашёл колонки"
             continue
 
-        load_table_feedback(DF, DATE)
+        try:
+            load_table_feedback(DF, DATE)
+        except Exception as e:
+            STAT += f'не смог загрузить файл \n {str(e)}'
         COUNT += 1
         STAT += "загрузил файл"
 
