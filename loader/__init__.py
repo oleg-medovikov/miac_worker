@@ -17,6 +17,8 @@ from .otchet_po_ymershim import otchet_po_ymershim
 from .sbor_zabolevshix import sbor_zabolevshix
 from .medical_personal_sick import medical_personal_sick
 from .razlojit_death_week import razlojit_death_week
+from .sbor_death_week_files import sbor_death_week_files
+from .sbor_death_week_svod import sbor_death_week_svod
 
 __all__ = [
     'check_robot',
@@ -38,4 +40,6 @@ __all__ = [
     'sbor_zabolevshix',
     'medical_personal_sick',
     'razlojit_death_week',
+    'sbor_death_week_files',
+    'sbor_death_week_svod',
         ]
