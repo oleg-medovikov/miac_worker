@@ -10,3 +10,19 @@ from .miac_ds import miac_ds_sql, miac_ds_insert
 from .ncrnbase import ncrn_sql, ncrn_exec, ncrn_insert
 # Работа с Dn_122
 from .dn122base import dn122_sql, dn122_exec, dn122_insert
+
+__all__ = [
+    'parus_sql',
+    'covid_sql',
+    'covid_exec',
+    'covid_insert',
+    'nsi_sql',
+    'miac_ds_sql',
+    'miac_ds_insert',
+    'ncrn_sql',
+    'ncrn_exec',
+    'ncrn_insert',
+    'dn122_sql',
+    'dn122_exec',
+    'dn122_insert',
+    ]

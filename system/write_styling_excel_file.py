@@ -1,11 +1,16 @@
 from styleframe import StyleFrame, Styler, utils
-import pandas as pd 
+from pandas import DataFrame
 
-def write_styling_excel_file(path,df,sheet_name):
+
+def write_styling_excel_file(
+    path: str,
+    df: 'DataFrame',
+    sheet_name: str
+        ) -> None:
     "Создает отформатированный файл экслеля"
     if len(df) == 0:
         for col in df.columns:
-            df.loc[0,col] = 'Внесите значение...'
+            df.loc[0, col] = 'Внесите значение...'
 
     excel_writer = StyleFrame.ExcelWriter(path)
     sf = StyleFrame(df)
@@ -30,10 +35,9 @@ def write_styling_excel_file(path,df,sheet_name):
     StyleFrame.P_FACTOR = 1.1
 
     sf.to_excel(
-        excel_writer = excel_writer,
-        best_fit = set(df.columns),
+        excel_writer=excel_writer,
+        best_fit=set(df.columns),
         row_to_add_filters=0,
-        sheet_name= sheet_name,
+        sheet_name=sheet_name,
             )
     excel_writer.save()
-    return 1
