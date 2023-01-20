@@ -45,8 +45,11 @@ def razlojit_death_week():
         where [Исход заболевания] = 'Смерть'
             and [Дата исхода заболевания]  BETWEEN '{DATE_START}' AND '{DATE_END}'
             -- and YEAR([Дата исхода заболевания]) = YEAR(getdate())
-            and ([Посмертный диагноз]  in ('U07.1','U07.2')
-                or [Посмертный диагноз] like 'J1[2-8]%' )
+            and (
+                [Посмертный диагноз]  in ('U07.1','U07.2')
+                or
+                [Посмертный диагноз] like 'J1[2-8]%'
+                )
             and [Субъект РФ] = 'г. Санкт-Петербург'
         """
 
@@ -57,7 +60,6 @@ def razlojit_death_week():
 
     SQL = 'SELECT [Наименование в ФР], [user] from robo.directory'
     MO_DIR = covid_sql(SQL)
-
     STAT = pd.DataFrame()
     for MO in DF['Медицинская организация'].unique():
         k = len(STAT)
@@ -65,8 +67,11 @@ def razlojit_death_week():
 
         MO_FR = MO.replace(' (стац)', '').replace(' (амб.)', '')
         try:
-            MO_USER = MO_DIR.loc[MO_DIR['Наименование в ФР'] == MO_FR, 'user'][0]
-        except KeyError:
+            MO_USER = MO_DIR.loc[
+                MO_DIR['Наименование в ФР'] == MO_FR,
+                'user'
+                ].values[0]
+        except IndexError:
             STAT.loc[k, 'комментарий'] = 'не найдена МО в справочнике'
             continue
 
@@ -77,11 +82,11 @@ def razlojit_death_week():
         except FileExistsError:
             pass
 
-        OTCHET = DF[DF['Медицинская организация'] == MO]
+        OTCHET = DF.loc[DF['Медицинская организация'] == MO]
         NAME_PART = {
             '(стац)' in MO: '/умершие (стац) с ',
             '(амб.)' in MO: '/умершие (амб.) с ',
-            }.get([True], '/умершие с ')
+            }.get(True, '/умершие с ')
 
         FILE_NAME = DIR \
             + NAME_PART \
