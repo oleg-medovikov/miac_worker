@@ -1,4 +1,5 @@
 from datetime import datetime
+import pandas as pd
 import shutil
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -13,6 +14,10 @@ def grip_and_ori():
     DF_A = parus_sql(SQL_A)
     DF_B = parus_sql(SQL_B)
     DF_D = parus_sql(SQL_D)
+
+    DF_A['VALUE'] = pd.to_numeric(DF_A['VALUE'], errors="ignore")
+    DF_B['VALUE'] = pd.to_numeric(DF_B['VALUE'], errors="ignore")
+    DF_D['VALUE'] = pd.to_numeric(DF_D['VALUE'], errors="ignore")
 
     DF_A = DF_A.pivot_table(
         index=['ORGANIZATION'],
@@ -69,7 +74,7 @@ def grip_and_ori():
 
     ws = wb['svod']
     rows = dataframe_to_rows(DF_A, index=False, header=False)
-    for r_idx, row in enumerate(rows, 7):
+    for r_idx, row in enumerate(rows, 8):
         for c_idx, value in enumerate(row, 1):
             ws.cell(row=r_idx, column=c_idx, value=value)
 
@@ -79,7 +84,7 @@ def grip_and_ori():
 
     ws = wb['svod']
     rows = dataframe_to_rows(DF_B, index=False, header=False)
-    for r_idx, row in enumerate(rows, 9):
+    for r_idx, row in enumerate(rows, 10):
         for c_idx, value in enumerate(row, 1):
             ws.cell(row=r_idx, column=c_idx, value=value)
 
@@ -89,7 +94,7 @@ def grip_and_ori():
 
     ws = wb['svod']
     rows = dataframe_to_rows(DF_D, index=False, header=False)
-    for r_idx, row in enumerate(rows, 6):
+    for r_idx, row in enumerate(rows, 7):
         for c_idx, value in enumerate(row, 1):
             ws.cell(row=r_idx, column=c_idx, value=value)
 
