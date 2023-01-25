@@ -48,7 +48,7 @@ def grip_and_ori():
     DF_A = DF_A[['ORGANIZATION', 'table_sum_01', 'table_01', 'table_03']]
     DF_B = DF_B[[
         'ORGANIZATION', 'table_sum_02', 'table_sum_03', 'table_04', 'table_05',
-        'table_06', 'table_08', 'table_09', 'table_10', 'table_11',
+        'table_06', 'table_07', 'table_08', 'table_09', 'table_10', 'table_11',
         'table_12', 'table_13', 'table_14', 'table_15', 'table_16',
         'table_17', 'table_18', 'table_19', 'table_20', 'table_21',
         'table_22', 'table_23', 'table_24', 'table_25', 'table_26',
