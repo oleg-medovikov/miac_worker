@@ -1,10 +1,7 @@
 SELECT
-    a.AGNNAME ORGANIZATION ,
+    a.AGNNAME ORGANIZATION,
     bi.CODE  pokazatel,
-    CASE WHEN STRVAL IS NOT NULL THEN STRVAL
-         WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
-         WHEN DATEVAL IS NOT NULL THEN CAST(DATEVAL AS varchar(30))
-         ELSE NULL END value
+    NUMVAL value
     FROM PARUS.BLINDEXVALUES  d
        INNER JOIN PARUS.BLSUBREPORTS s
        ON (d.PRN = s.RN)
@@ -19,5 +16,5 @@ SELECT
        INNER JOIN PARUS.BALANCEINDEXES bi
        on(d.BALANCEINDEX = bi.RN)
     WHERE rf.code = 'ДиагнГриппаОРИ'
-        AND  r.BDATE =  trunc(SYSDATE)
-        AND  bi.CODE in ( 'table_sum_01', 'table_01', 'table_02', 'table_03' )
+        AND  r.BDATE = TO_DATE('__DAY__','DD.MM.YYYY')
+        AND  bi.CODE in ('table_sum_01', 'table_01', 'table_02', 'table_03', 'table_04', 'table_05')
