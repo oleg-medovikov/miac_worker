@@ -4,6 +4,7 @@ from .compliments import get_compliments
 from .ip_log import ip_log
 from .regiz_decomposition import regiz_decomposition
 from .regiz_load_to_base import regiz_load_to_base
+from .toxic_analitic import toxic_analitic
 
 __all__ = [
     'toxic_genarate_xml_day',
@@ -13,4 +14,5 @@ __all__ = [
     'ip_log',
     'regiz_decomposition',
     'regiz_load_to_base',
+    'toxic_analitic',
         ]

@@ -1,3 +1,25 @@
+from pandas import ExcelWriter, DataFrame
+
+
+def write_styling_excel_file(path: str, df: DataFrame, sheet_name: str):
+    "форматируем колонки файла эксель"
+    with ExcelWriter(path) as writer:
+        df.to_excel(writer, sheet_name=sheet_name, index=False, na_rep='NaN')
+
+        # автонастройка ширины колонок
+        # решил что больше ничего и не нужно
+        for column in df:
+            width = max(df[column].astype(str).map(len).max(), len(column)) + 5
+            if width > 45:
+                width = 45
+
+            col_idx = df.columns.get_loc(column)
+            writer.sheets[sheet_name].set_column(col_idx, col_idx, width)
+
+        writer.save()
+
+
+"""
 from styleframe import StyleFrame, Styler, utils
 from pandas import DataFrame
 
@@ -41,3 +63,6 @@ def write_styling_excel_file(
         sheet_name=sheet_name,
             )
     excel_writer.save()
+"""
+
+
