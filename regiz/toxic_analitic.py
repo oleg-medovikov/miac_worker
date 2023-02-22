@@ -18,10 +18,9 @@ def get_cases(START: str, END: str) -> 'pd.DataFrame':
     try:
         df = pd.DataFrame(data=requests.get(URL).json())
     except requests.Timeout:
-        my_except('Недоступен сервер нетрики, попробуйте позже')
+        raise my_except('Недоступен сервер нетрики, попробуйте позже')
     except requests.ConnectionError:
-        my_except('Недоступен сервер нетрики, попробуйте позже')
-
+        raise my_except('Недоступен сервер нетрики, попробуйте позже')
 
     if len(df) == 0:
         raise my_except('нет случаев!')
