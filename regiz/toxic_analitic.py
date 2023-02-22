@@ -15,7 +15,13 @@ def get_cases(START: str, END: str) -> 'pd.DataFrame':
     URL = " https://regiz.gorzdrav.spb.ru/N3.BI/getDData" \
         + f"?id=1127&args={START},{END}&auth={REGIZ_AUTH}"
 
-    df = pd.DataFrame(data=requests.get(URL).json())
+    try:
+        df = pd.DataFrame(data=requests.get(URL).json())
+    except requests.Timeout:
+        my_except('Недоступен сервер нетрики, попробуйте позже')
+    except requests.ConnectionError:
+        my_except('Недоступен сервер нетрики, попробуйте позже')
+
 
     if len(df) == 0:
         raise my_except('нет случаев!')
