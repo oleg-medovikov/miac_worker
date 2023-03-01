@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 from datetime import datetime, timedelta
 
+from system import return_mounth
 from conf import REGIZ_AUTH
 
 from .dict_toxic import Dict_Aim_Poison, Dict_Boolean_Alc, \
@@ -281,13 +282,10 @@ def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
 
 def toxic_genarate_xml_mounth(DATE_GLOBAL):
     "сгенерировать за месяц"
-    DATE_END = datetime.strptime(DATE_GLOBAL, '%d-%m-%Y').strftime('%Y-%m-%d')
-    DATE_START = (
-            datetime.strptime(DATE_GLOBAL, '%d-%m-%Y')
-            - timedelta(days=30)
-            ).strftime("%Y-%m-%d")
+    DATE = datetime.strptime(DATE_GLOBAL, '%d-%m-%Y')
+    START, END = return_mounth(DATE)
 
-    return toxic_genarate_xml(DATE_START, DATE_END)
+    return toxic_genarate_xml(START, END)
 
 
 def toxic_genarate_xml_week(DATE_GLOBAL):
