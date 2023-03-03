@@ -1,13 +1,13 @@
 SELECT DAY, 'г.Санкт-Петербург' region, ORGANIZATION, pok02,
-	nvl(cast(pok03 as int),0) pok03,nvl(cast(pok04 as int),0) pok04,
-	nvl(cast(pok05 as int),0) pok05,nvl(cast(pok06 as int),0) pok06,
-	nvl(cast(pok07 as int),0) pok07,nvl(cast(pok08 as int),0) pok08,
-	nvl(cast(pok09 as int),0) pok09,nvl(cast(pok10 as int),0) pok10,
-	nvl(cast(pok11 as int),0) pok11,nvl(cast(pok12 as int),0) pok12,
-	nvl(cast(pok13 as int),0) pok13,nvl(cast(pok14 as int),0) pok14,
-	nvl(cast(pok15 as int),0) pok15,nvl(cast(pok16 as int),0) pok16,
-	nvl(cast(pok17 as int),0) pok17,nvl(cast(pok18 as int),0) pok18,
-	nvl(cast(pok19 as int),0) pok19
+        nvl(cast(pok03 as int),0) pok03,nvl(cast(pok04 as int),0) pok04,
+        nvl(cast(pok05 as int),0) pok05,nvl(cast(pok06 as int),0) pok06,
+        nvl(cast(pok07 as int),0) pok07,nvl(cast(pok08 as int),0) pok08,
+        nvl(cast(pok09 as int),0) pok09,nvl(cast(pok10 as int),0) pok10,
+        nvl(cast(pok11 as int),0) pok11,nvl(cast(pok12 as int),0) pok12,
+        nvl(cast(pok13 as int),0) pok13,nvl(cast(pok14 as int),0) pok14,
+        nvl(cast(pok15 as int),0) pok15,nvl(cast(pok16 as int),0) pok16,
+        nvl(cast(pok17 as int),0) pok17,nvl(cast(pok18 as int),0) pok18,
+        nvl(cast(pok19 as int),0) pok19
 FROM (
 SELECT
     to_char(r.BDATE, 'DD.MM.YYYY') day,
