@@ -123,111 +123,53 @@ def svod_40_covid_19():
     shutil.copyfile('help/40_COVID_19_pred.xlsx', new_name_pred)
     shutil.copyfile('help/40_COVID_19_osn.xlsx', new_name_osn)
 
+    # Записываем данные в предварительный файл
     wb = openpyxl.load_workbook(new_name_pred)
 
-    ws = wb['Спутник-V']
-    rows = dataframe_to_rows(sput, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
+    DICT = {
+        'Спутник-V':          (sput,        5, 1),
+        'Вчера_Спутник':      (sput_old,    5, 1),
+        'ЭпиВакКорона':       (epivak,      5, 1),
+        'Вчера_ЭпиВак':       (epivak_old,  5, 1),
+        'КовиВак':            (covivak,     5, 1),
+        'Спутник Лайт':       (light,       5, 1),
+        'Вчера_КовиВак':      (covivak_old, 5, 1),
+        'Ревакцинация':       (revac,       9, 1),
+        'Вчера_ревакцин':     (revac_old,   9, 1),
+        'Вчера_Спутник Лайт': (light_old,   5, 1),
+            }
 
-    ws = wb['Вчера_Спутник']
-    rows = dataframe_to_rows(sput_old, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
-    ws = wb['ЭпиВакКорона']
-    rows = dataframe_to_rows(epivak, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
-    ws = wb['Вчера_ЭпиВак']
-    rows = dataframe_to_rows(epivak_old, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
-    ws = wb['КовиВак']
-    rows = dataframe_to_rows(covivak, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
-    ws = wb['Спутник Лайт']
-    rows = dataframe_to_rows(light, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
-    ws = wb['Вчера_КовиВак']
-    rows = dataframe_to_rows(covivak_old, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
-    ws = wb['Ревакцинация']
-    rows = dataframe_to_rows(revac, index=False, header=False)
-    for r_idx, row in enumerate(rows, 9):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
-    ws = wb['Вчера_ревакцин']
-    rows = dataframe_to_rows(revac_old, index=False, header=False)
-    for r_idx, row in enumerate(rows, 9):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
-    ws = wb['Вчера_Спутник Лайт']
-    rows = dataframe_to_rows(light_old, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
+    for key, value in DICT.items():
+        ws = wb[key]
+        rows = dataframe_to_rows(value[0], index=False, header=False)
+        for r_idx, row in enumerate(rows, value[1]):
+            for c_idx, val in enumerate(row, value[2]):
+                ws.cell(row=r_idx, column=c_idx, value=val)
 
     wb.save(new_name_pred)
 
     # основной отчёт
     # del sput[sput.columns[-1]]
-
-    wb = openpyxl.load_workbook(new_name_osn)
-    ws = wb['Спутник-V']
-    rows = dataframe_to_rows(sput, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
     # del epivak[epivak.columns[-1]]
-
-    ws = wb['ЭпиВакКорона']
-    rows = dataframe_to_rows(epivak, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
     # del covivak[covivak.columns[-1]]
-
-    ws = wb['КовиВак']
-    rows = dataframe_to_rows(covivak, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
     # del light[light.columns[-1]]
-
-    ws = wb['Спутник Лайт']
-    rows = dataframe_to_rows(light, index=False, header=False)
-    for r_idx, row in enumerate(rows, 5):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-
     del revac['SCEP']
 
-    ws = wb['Ревакцинация']
-    rows = dataframe_to_rows(revac, index=False, header=False)
-    for r_idx, row in enumerate(rows, 9):
-        for c_idx, value in enumerate(row, 1):
-            ws.cell(row=r_idx, column=c_idx, value=value)
+    wb = openpyxl.load_workbook(new_name_osn)
+    DICT = {
+        'Спутник-V':    (sput,    5, 1),
+        'ЭпиВакКорона': (epivak,  5, 1),
+        'КовиВак':      (covivak, 5, 1),
+        'Спутник Лайт': (light,   5, 1),
+        'Ревакцинация': (revac,   9, 1),
+            }
+
+    for key, value in DICT.items():
+        ws = wb[key]
+        rows = dataframe_to_rows(value[0], index=False, header=False)
+        for r_idx, row in enumerate(rows, value[1]):
+            for c_idx, val in enumerate(row, value[2]):
+                ws.cell(row=r_idx, column=c_idx, value=val)
 
     wb.save(new_name_osn)
 
