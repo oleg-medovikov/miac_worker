@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from system import return_mounth
 
-from .dict_toxic import Dict_Aim_Poison, Dict_Boolean_Alc, \
+from .toxic_dict import Dict_Aim_Poison, Dict_Boolean_Alc, \
     Dict_Place_Incident, Dict_Place_Poison, \
     Dict_MKB, Dict_Type_Poison, Dict_Medical_Help, \
     Dict_Set_Diagnosis, Dict_district, XML, Dict_soch_polojenie, \
