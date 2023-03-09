@@ -1,66 +1,19 @@
 import pandas as pd
-import requests
 from datetime import datetime
 
-from conf import REGIZ_AUTH
 from system import return_mounth, write_styling_excel_file
+from .toxic_get_cases import toxic_get_cases
 
 
 class my_except(Exception):
     pass
 
 
-def get_cases(START: str, END: str) -> 'pd.DataFrame':
-    """Получаем начальную выборку"""
-    URL = " https://regiz.gorzdrav.spb.ru/N3.BI/getDData" \
-        + f"?id=1127&args={START},{END}&auth={REGIZ_AUTH}"
-
-    try:
-        df = pd.DataFrame(data=requests.get(URL).json())
-    except requests.Timeout:
-        raise my_except('Недоступен сервер нетрики, попробуйте позже')
-    except requests.ConnectionError:
-        raise my_except('Недоступен сервер нетрики, попробуйте позже')
-
-    if len(df) == 0:
-        raise my_except('нет случаев!')
-
-    df['date_aff_first'] = pd.to_datetime(
-        df['date_aff_first'],
-        format='%Y-%m-%d'
-        )
-
-    df.sort_values(by=['date_aff_first'], inplace=True)
-    df.drop_duplicates(
-        subset=df.columns.drop('date_aff_first'),
-        keep='last',
-        inplace=True
-        )
-    df.index = range(len(df))
-
-    obs = df.pivot_table(
-        index=['luid'],
-        columns=['observation_code'],
-        values=['observation_value'],
-        aggfunc='first'
-        ).stack(0)
-    DF = df.copy()
-
-    del DF['observation_code']
-    del DF['observation_value']
-
-    DF = DF.drop_duplicates()
-    DF = DF.merge(obs, how='left', on=['luid'])
-    DF.index = range(len(DF))
-
-    return DF
-
-
 def toxic_analitic(ARG):
     "сгенерировать за месяц"
     DATE = datetime.strptime(ARG.split(';')[0], '%d-%m-%Y')
     START, END = return_mounth(DATE)
-    DF = get_cases(START, END)
+    DF = toxic_get_cases(START, END)
     DF = DF.loc[DF['medical_help_name'] == ARG.split(';')[1]]
 
     FILENAME = f'temp/Аналитика по полноте регистра с {START} по {END}.xlsx'
