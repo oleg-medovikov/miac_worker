@@ -10,6 +10,8 @@ from .dict_toxic import Dict_Aim_Poison, Dict_Boolean_Alc, \
     Dict_sex
 
 from .toxic_get_cases import toxic_get_cases
+from .toxic_checker import toxic_checker
+from system import write_styling_excel_file
 
 
 class my_except(Exception):
@@ -86,7 +88,10 @@ def generate_xml(DF: 'pd.DataFrame', XML: str) -> str:
     "генерация выходного шаблона для импорта в АИС ГЗ"
     STRING = XML
     for row in DF.to_dict('records'):
-        STRING += generate_row(row)
+        try:
+            STRING += generate_row(row)
+        except:
+            continue
 
     STRING += """
     </data>
@@ -107,17 +112,24 @@ def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
         raise my_except(
             f'Нет случаев отравления за период с {DATE_START} по {DATE_END}'
             )
+    # проверяем данные
+    error = toxic_checker(df)
+
+    if len(error):
+        df = df.loc[~df['history_number'].isin(error['history_number'])]
+        NAME_4 = f'temp/toxic_error_{DATE_START}_{DATE_END}.xlsx'
+        write_styling_excel_file(NAME_4, error, 'errors')
 
     # дербаним адрес на составляющие
     df['adress'] = df['1102']
     df = df.fillna({'adress': ''})
 
-    for i in range(len(df)):
+    for i in df.index:
         df.loc[i, 'street'] = find_street(df.at[i, 'adress'])
         df.loc[i, 'house'] = find_dom(df.at[i, 'adress'])
         df.loc[i, 'flat'] = find_kv(df.at[i, 'adress'])
 
-    for i in range(len(df)):
+    for i in df.index:
         "Пол"
         df.loc[i, 'gender'] = Dict_sex.get(df.at[i, 'gender'])
 
@@ -164,6 +176,8 @@ def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
         "Район места отравления"
         df.loc[i, 'c_district'] = Dict_district.get(df.at[i, '1123'])
 
+    NAME_2 = f'temp/toxic_{DATE_START}_{DATE_END}.xlsx'
+    df.to_excel(NAME_2)
     df['date_document'] = pd.to_datetime(
         df['date_document'],
         format='%d.%m.%Y',
@@ -178,7 +192,7 @@ def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
 
     df['date_first_recourse'] = pd.to_datetime(
         df['date_first_recourse'],
-        format='%d.%m.%Y',
+        format='%Y-%m-%d %H:%M:%S',
         errors='coerce'
         )
 
@@ -218,13 +232,15 @@ def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
     df = df.fillna('')
 
     NAME_1 = f'temp/toxic_{DATE_START}_{DATE_END}.xml'
-    NAME_2 = f'temp/toxic_{DATE_START}_{DATE_END}.xlsx'
 
     string = generate_xml(df, XML)
 
     df.to_excel(NAME_2)
     with open(NAME_1, 'w') as f:
         f.write(string)
+
+    if len(error):
+        return NAME_1 + ';' + NAME_2 + ';' + NAME_3 + ';' + NAME_4
 
     return NAME_1 + ';' + NAME_2 + ';' + NAME_3
 
