@@ -59,4 +59,7 @@ def toxic_checker(df: 'DataFrame') -> 'DataFrame':
         d['Ошибка'] = 'первичное обращения 1105 позднее даты диагноза 303'
         list_.append(d)
 
-    return concat(list_, ignore_index=True)
+    if len(list_):
+        return concat(list_, ignore_index=True)
+
+    return DataFrame()

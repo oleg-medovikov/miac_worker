@@ -62,6 +62,9 @@ def toxic_analitic(ARG):
     for key, value in DICT.items():
         try:
             E[value] = error[key]
+        except KeyError:
+            pass
+        try:
             D[value] = DF[key]
         except KeyError:
             continue
