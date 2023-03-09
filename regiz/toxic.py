@@ -1,76 +1,19 @@
 import pandas as pd
-import requests
 from datetime import datetime, timedelta
 
 from system import return_mounth
-from conf import REGIZ_AUTH
 
 from .dict_toxic import Dict_Aim_Poison, Dict_Boolean_Alc, \
     Dict_Place_Incident, Dict_Place_Poison, \
     Dict_MKB, Dict_Type_Poison, Dict_Medical_Help, \
-    Dict_Set_Diagnosis, Dict_district, XML, Dict_soch_polojenie
+    Dict_Set_Diagnosis, Dict_district, XML, Dict_soch_polojenie, \
+    Dict_sex
+
+from .toxic_get_cases import toxic_get_cases
 
 
 class my_except(Exception):
     pass
-
-
-NAME_3 = 'temp/initial_data.xlsx'
-NAME_4 = 'temp/toxic_raw.xlsx'
-
-
-def get_cases(START: str, END: str) -> 'pd.DataFrame':
-    """Получаем начальную выборку"""
-    URL = " https://regiz.gorzdrav.spb.ru/N3.BI/getDData" \
-        + f"?id=1127&args={START},{END}&auth={REGIZ_AUTH}"
-
-    try:
-        df = pd.DataFrame(data=requests.get(URL).json())
-    except requests.Timeout:
-        raise my_except('Недоступен сервер нетрики, попробуйте позже')
-    except requests.ConnectionError:
-        raise my_except('Недоступен сервер нетрики, попробуйте позже')
-
-    df.to_excel(NAME_4, index=False)
-    if len(df) == 0:
-        raise my_except('нет случаев!')
-
-    df['date_aff_first'] = pd.to_datetime(
-        df['date_aff_first'],
-        format='%Y-%m-%d'
-        )
-
-    df.sort_values(by=['date_aff_first'], inplace=True)
-    df.drop_duplicates(
-        subset=df.columns.drop('date_aff_first'),
-        keep='last',
-        inplace=True
-        )
-    df.index = range(len(df))
-
-    obs = df.pivot_table(
-        index=['luid'],
-        columns=['observation_code'],
-        values=['observation_value'],
-        aggfunc='first'
-        ).stack(0)
-    DF = df.copy()
-
-    del DF['observation_code']
-    del DF['observation_value']
-
-    DF = DF.drop_duplicates()
-    DF = DF.merge(obs, how='left', on=['luid'])
-    DF.index = range(len(DF))
-
-    DF.to_excel(NAME_3)
-    return DF
-
-#def find_district(STRING):
-#    for key,value in district.items():
-#        if key in STRING.lower():
-#            return value
-#    return district['не указан район']
 
 
 def find_street(STRING: str) -> str:
@@ -103,71 +46,67 @@ def find_kv(STRING: str) -> str:
     return ''
 
 
-def generate_xml(DF: 'pd.DataFrame', XML: str) -> tuple[str, 'pd.DataFrame']:
+def generate_row(row: dict) -> str:
+    LIST = (
+        '\n<r>',
+        '\n\t<v f="2">', row['history_number'], '</v>',  # номер ИБ
+        '\n\t<v f="3">***</v>',  # вместо ФИО звездочки
+        '\n\t<v f="4">', row['gender'],  '</v>',  # пол
+        '\n\t<v f="5">', row['age'],  '0000</v>',  # возраст
+        '\n\t<v f="6">', row['soch_polojenie'].split(';')[0], '</v>',
+        '\n\t<v f="7">', row['c_district'].split(';')[0], '</v>',
+        '\n\t<v f="8">',
+        '\n\t<v f="9">', row['place_incident'].split(';')[0], '</v>',
+        '\n\t<v f="10">', row['place_incident_name'], '</v>',
+        '\n\t<v f="11">', row['date_poison'], '</v>',
+        '\n\t<v f="12">', row['date_first_recourse'], '</v>',
+        '\n\t<v f="13">', row['date_aff_first'], '</v>',
+        '\n\t<v f="14">', row['diagnosis'].split(';')[0], '</v>',
+        '\n\t<v f="15">', row['boolean_alc'].split(';')[0], '</v>',
+        '\n\t<v f="16">', row['set_diagnosis'].split(';')[0], '</v>',
+        '\n\t<v f="17">', row['medical_help'].split(';')[0], '</v>',
+        '\n\t<v f="18"></v>',
+        '\n\t<v f="20">', row['type_poison'].split(';')[0], '</v>',
+        '\n\t<v f="21">1</v>',
+        '\n\t<v f="22">', row['aim_poison'].split(';')[0], '</v>',
+        '\n\t<v f="24">', row['place_poison'].split(';')[0], '</v>',
+        '\n\t<v f="26">', row['date_document'], '</v>',  # дата date_aff_first
+        '\n\t<v f="37">', row['street'], '</v>',
+        '\n\t<v f="38">', row['house'], '</v>',
+        '\n\t<v f="39">', row['flat'], '</v>',
+        '\n\t<v f="42">',
+        row['medical_help_name'].replace('НИИ СП', 'НИИ СП Джанелидзе'),
+        '</v>',
+        '\n</r>'
+        )
+    return ''.join(str(x) for x in LIST)
+
+
+def generate_xml(DF: 'pd.DataFrame', XML: str) -> str:
     "генерация выходного шаблона для импорта в АИС ГЗ"
     STRING = XML
-    for i in range(len(DF)):
-        part = f"""
-    <r>
-     <v f="2">{DF.at[i, 'history_number']}</v>
-     <v f="3">***</v>
-     <v f="4">{DF.at[i, 'gender'].replace('female','200').replace('male', '100')}</v>
-     <v f="5">{DF.at[i,'age'] + '0000'}</v>
-     <v f="6">{DF.at[i,'soch_polojenie'].split(';')[0]}</v>
-     <v f="7">{DF.at[i,'c_district'].split(';')[0]}</v>
-     <v f="8"></v>
-     <v f="9">{DF.at[i,  'place_incident'].split(';')[0]}</v>
-     <v f="10">{DF.at[i, 'place_incident_name']}</v>
-     <v f="11">{DF.at[i, 'data_poison']}</v>
-     <v f="12">{DF.at[i, 'date_first_recourse']}</v>
-     <v f="13">{DF.at[i, 'date_aff_first']}</v>
-     <v f="14">{DF.at[i, 'diagnosis'].split(';')[0]}</v>
-     <v f="15">{DF.at[i, 'boolean_alc'].split(';')[0]}</v>
-     <v f="16">{DF.at[i, 'set_diagnosis'].split(';')[0]}</v>
-     <v f="17">{DF.at[i, 'medical_help'].split(';')[0]}</v>
-     <v f="18"></v>
-     <v f="20">{DF.at[i, 'type_poison'].split(';')[0]}</v>
-     <v f="21">1</v>
-     <v f="22">{DF.at[i, 'aim_poison'].split(';')[0]}</v>
-     <v f="24">{DF.at[i, 'place_poison'].split(';')[0]}</v>
-     <v f="26">{DF.at[i, 'meddoc_creation_date']}</v>
-     <v f="37">{DF.at[i, 'street']}</v>
-     <v f="38">{DF.at[i, 'house']}</v>
-     <v f="39">{DF.at[i, 'flat']}</v>
-     <v f="42">{DF.at[i, 'medical_help_name'].replace('НИИ СП', 'НИИ СП Джанелидзе')}</v>
-    </r>"""
-        try:
-            STRING += part
-        except Exception as e:
-            DF.loc[i, 'comment'] = f'не попало в xml  {str(e)}'
+    for row in DF.to_dict('records'):
+        STRING += generate_row(row)
 
     STRING += """
     </data>
     </dataset>
     </package>"""
 
-    return STRING, DF
+    return STRING
 
 
 def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
     """Для ЦГиЭ случаи отравления"""
 
-    df = get_cases(DATE_START, DATE_END)
+    df = toxic_get_cases(DATE_START, DATE_END)
+    NAME_3 = 'temp/initial_data.xlsx'
+    df.to_excel(NAME_3)
 
     if len(df) == 0:
-        raise my_except(f'Нет случаев отравления за период с {DATE_START} по {DATE_END}')
-
-    # исправляем значения кейжев на коды аис гз
-    CASE_CODES = [
-        '303', '1101', '1102', '1103',
-        '1104', '1105', '1108', '1109',
-        '1110', '1113', '1115', '1117',
-        '1119', '1123'
-        ]
-
-    for CASE in CASE_CODES:
-        if CASE not in df.columns:
-            df[CASE] = ''
+        raise my_except(
+            f'Нет случаев отравления за период с {DATE_START} по {DATE_END}'
+            )
 
     # дербаним адрес на составляющие
     df['adress'] = df['1102']
@@ -179,6 +118,8 @@ def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
         df.loc[i, 'flat'] = find_kv(df.at[i, 'adress'])
 
     for i in range(len(df)):
+        "Пол"
+        df.loc[i, 'gender'] = Dict_sex.get(df.at[i, 'gender'])
 
         "Диагноз"
         df.loc[i, 'diagnosis'] = Dict_MKB.get(df.at[i, 'diagnosis'], '') \
@@ -190,8 +131,11 @@ def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
         "наименование места происшествия  Place_Incident_Name"
         df.loc[i, 'place_incident_name'] = df.at[i, '1103']
 
-        "Дата отравления DataPoison"
-        df.loc[i, 'data_poison'] = df.at[i, '1104']
+        "Дата создания документа"
+        df.loc[i, 'date_document'] = df.at[i, '303']
+
+        "Дата отравления DatePoison"
+        df.loc[i, 'date_poison'] = df.at[i, '1104']
 
         "Дата первичного обращения DateFirstRecourse"
         df.loc[i, 'date_first_recourse'] = df.at[i, '1105']
@@ -220,11 +164,14 @@ def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
         "Район места отравления"
         df.loc[i, 'c_district'] = Dict_district.get(df.at[i, '1123'])
 
+    df['date_document'] = pd.to_datetime(
+        df['date_document'],
+        format='%d.%m.%Y',
+        errors='coerce'
+        )
 
-    #df['date_aff_first'] = pd.to_datetime(df['date_aff_first'], format = '%Y-%m-%d', errors='coerce')
-
-    df['data_poison'] = pd.to_datetime(
-        df['data_poison'],
+    df['date_poison'] = pd.to_datetime(
+        df['date_poison'],
         format='%d.%m.%Y',
         errors='coerce'
         )
@@ -235,12 +182,14 @@ def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
         errors='coerce'
         )
 
+    df['date_document'] = df['date_document'].dt.strftime('%Y%m%d')
+
     df['date_aff_first'] = df['date_aff_first'].dt.strftime('%Y%m%d')
 
-    df['data_poison'].loc[
-        ~df['data_poison'].isnull()
-        ] = df['data_poison'].loc[
-            ~df['data_poison'].isnull()
+    df['date_poison'].loc[
+        ~df['date_poison'].isnull()
+        ] = df['date_poison'].loc[
+            ~df['date_poison'].isnull()
                 ].dt.strftime('%Y%m%d')
 
     df['date_first_recourse'].loc[
@@ -271,13 +220,13 @@ def toxic_genarate_xml(DATE_START: str, DATE_END: str) -> str:
     NAME_1 = f'temp/toxic_{DATE_START}_{DATE_END}.xml'
     NAME_2 = f'temp/toxic_{DATE_START}_{DATE_END}.xlsx'
 
-    string, df = generate_xml(df, XML)
+    string = generate_xml(df, XML)
 
     df.to_excel(NAME_2)
     with open(NAME_1, 'w') as f:
         f.write(string)
 
-    return NAME_1 + ';' + NAME_2 + ';' + NAME_3 + ';' + NAME_4
+    return NAME_1 + ';' + NAME_2 + ';' + NAME_3
 
 
 def toxic_genarate_xml_mounth(DATE_GLOBAL):
@@ -308,8 +257,3 @@ def toxic_genarate_xml_day(DATE_GLOBAL):
             ).strftime("%Y-%m-%d")
 
     return toxic_genarate_xml(DATE_START, DATE_END)
-
-
-
-
-
