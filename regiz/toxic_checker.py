@@ -18,7 +18,7 @@ def toxic_checker(df: 'DataFrame') -> 'DataFrame':
 
     # район
     spb = df.loc[
-        (df['1123'].isnull()) | ~(df['1123'].str.startswith('40'))
+        (df['1123'].isnull()) | ~(df['1123'].str.startswith('40', na=False))
         ]
 
     if len(spb):

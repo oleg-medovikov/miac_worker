@@ -3,6 +3,7 @@ from datetime import datetime
 
 from system import return_mounth, write_styling_excel_file
 from .toxic_get_cases import toxic_get_cases
+from .toxic_checker import toxic_checker
 
 
 class my_except(Exception):
@@ -17,7 +18,15 @@ def toxic_analitic(ARG):
     DF = DF.loc[DF['medical_help_name'] == ARG.split(';')[1]]
 
     FILENAME = f'temp/Аналитика по полноте регистра с {START} по {END}.xlsx'
+    FILERROR = f'temp/Ошибки заполнения {START} по {END}.xlsx'
+
+    # делаем проверку на ошибки
+    error = toxic_checker(DF)
+    if len(error):
+        DF = DF.loc[~DF['history_number'].isin(error['history_number'])]
+
     D = pd.DataFrame()
+    E = pd.DataFrame()
 
     DICT = {
         'history_number': 'Номер истории болезни',
@@ -47,15 +56,20 @@ def toxic_analitic(ARG):
         '1118': '1118 - Место приобретения яда текст',
         '1119': '1119 - Социальное положение',
         '1123': '1123 - Район',
+        'Ошибка': 'Ошибка',
     }
 
     for key, value in DICT.items():
         try:
+            E[value] = error[key]
             D[value] = DF[key]
         except KeyError:
             continue
 
     D = D.fillna('ПУСТО!!!')
     write_styling_excel_file(FILENAME, D, ARG.split(';')[1])
+    if len(error):
+        write_styling_excel_file(FILERROR, E, 'errors')
+        return FILENAME + ';' + FILERROR
 
     return FILENAME
