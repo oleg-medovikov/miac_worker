@@ -51,36 +51,36 @@ def find_kv(STRING: str) -> str:
 
 def generate_row(row: dict) -> str:
     LIST = (
-        '\n<r>',
-        '\n\t<v f="2">', row['history_number'], '</v>',  # номер ИБ
-        '\n\t<v f="3">***</v>',  # вместо ФИО звездочки
-        '\n\t<v f="4">', row['gender'],  '</v>',  # пол
-        '\n\t<v f="5">', row['age'],  '0000</v>',  # возраст
-        '\n\t<v f="6">', row['soch_polojenie'].split(';')[0], '</v>',
-        '\n\t<v f="7">', row['c_district'].split(';')[0], '</v>',
-        '\n\t<v f="8">',
-        '\n\t<v f="9">', row['place_incident'].split(';')[0], '</v>',
-        '\n\t<v f="10">', row['place_incident_name'], '</v>',
-        '\n\t<v f="11">', row['date_poison'], '</v>',
-        '\n\t<v f="12">', row['date_first_recourse'], '</v>',
-        '\n\t<v f="13">', row['date_aff_first'], '</v>',
-        '\n\t<v f="14">', row['diagnosis'].split(';')[0], '</v>',
-        '\n\t<v f="15">', row['boolean_alc'].split(';')[0], '</v>',
-        '\n\t<v f="16">', row['set_diagnosis'].split(';')[0], '</v>',
-        '\n\t<v f="17">', row['medical_help'].split(';')[0], '</v>',
-        '\n\t<v f="18"></v>',
-        '\n\t<v f="20">', row['type_poison'].split(';')[0], '</v>',
-        '\n\t<v f="21">1</v>',
-        '\n\t<v f="22">', row['aim_poison'].split(';')[0], '</v>',
-        '\n\t<v f="24">', row['place_poison'].split(';')[0], '</v>',
-        '\n\t<v f="26">', row['date_document'], '</v>',  # дата date_aff_first
-        '\n\t<v f="37">', row['street'], '</v>',
-        '\n\t<v f="38">', row['house'], '</v>',
-        '\n\t<v f="39">', row['flat'], '</v>',
-        '\n\t<v f="42">',
+        '\n   <r>',
+        '\n      <v f="2">', row['history_number'], '</v>',  # номер ИБ
+        '\n      <v f="3">***</v>',  # вместо ФИО звездочки
+        '\n      <v f="4">', row['gender'],  '</v>',  # пол
+        '\n      <v f="5">', row['age'],  '0000</v>',  # возраст
+        '\n      <v f="6">', row['soch_polojenie'].split(';')[0], '</v>',
+        '\n      <v f="7">', row['c_district'].split(';')[0], '</v>',
+        '\n      <v f="8"></v>',
+        '\n      <v f="9">', row['place_incident'].split(';')[0], '</v>',
+        '\n      <v f="10">', row['place_incident_name'], '</v>',
+        '\n      <v f="11">', row['date_poison'], '</v>',
+        '\n      <v f="12">', row['date_first_recourse'], '</v>',
+        '\n      <v f="13">', row['date_aff_first'], '</v>',
+        '\n      <v f="14">', row['diagnosis'].split(';')[0], '</v>',
+        '\n      <v f="15">', row['boolean_alc'].split(';')[0], '</v>',
+        '\n      <v f="16">', row['set_diagnosis'].split(';')[0], '</v>',
+        '\n      <v f="17">', row['medical_help'].split(';')[0], '</v>',
+        '\n      <v f="18"></v>',
+        '\n      <v f="20">', row['type_poison'].split(';')[0], '</v>',
+        '\n      <v f="21">1</v>',
+        '\n      <v f="22">', row['aim_poison'].split(';')[0], '</v>',
+        '\n      <v f="24">', row['place_poison'].split(';')[0], '</v>',
+        '\n      <v f="26">', row['date_document'], '</v>',  # date_aff_first
+        '\n      <v f="37">', row['street'], '</v>',
+        '\n      <v f="38">', row['house'], '</v>',
+        '\n      <v f="39">', row['flat'], '</v>',
+        '\n      <v f="42">',
         row['medical_help_name'].replace('НИИ СП', 'НИИ СП Джанелидзе'),
         '</v>',
-        '\n</r>'
+        '\n   </r>'
         )
     return ''.join(str(x) for x in LIST)
 
