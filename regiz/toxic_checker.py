@@ -1,4 +1,5 @@
 from pandas import DataFrame, concat, to_datetime
+from datetime import datetime
 
 
 def toxic_checker(df: 'DataFrame') -> 'DataFrame':
@@ -46,6 +47,13 @@ def toxic_checker(df: 'DataFrame') -> 'DataFrame':
         r_1105['Ошибка'] = 'не проставлена дата первичного обращения 1105'
         list_.append(r_1105)
         df = df.loc[~df['1105'].isnull()]
+
+    # дата диагноза 303 > текущей даты
+    d = df.loc[df['303'] > datetime.today()]
+    if len(d):
+        d['Ошибка'] = 'дата диагноза 303 > текущей даты'
+        list_.append(d)
+
 
     # дата отравления 1104 > даты диагноза 303
     d = df.loc[df['1104'] > df['303']]
