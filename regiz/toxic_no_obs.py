@@ -8,6 +8,7 @@ DICT = {
     'history_number': 'Номер истории болезни',
     'diagnosis': 'Диагноз',
     'medical_help_name': 'Организация',
+    'cancelled_obs': 'Есть ли отменённые показатели',
     }
 
 
