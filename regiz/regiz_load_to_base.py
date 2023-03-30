@@ -215,7 +215,11 @@ def regiz_load_to_base():
             STAT.loc[k, 'TextError'] = Dict['TextError']
             STAT.loc[k, 'mis'] = NAME_MIS
 
-            DF = Dict['df']
+            try:
+                DF = Dict['df']
+            except KeyError:
+                continue
+
             DF['LPU_level1_key'] = KEY
 
             LIST_DF.append(DF)
