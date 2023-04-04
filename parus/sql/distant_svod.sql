@@ -11,7 +11,7 @@ SELECT DAY, 'г.Санкт-Петербург' region, ORGANIZATION, pok02,
 FROM (
 SELECT
     to_char(r.BDATE, 'DD.MM.YYYY') day,
-    a.AGNNAME ORGANIZATION ,
+    a.RN ORGANIZATION ,
     rf.CODE  otchet,
     bi.CODE  pokazatel,
     CASE WHEN STRVAL IS NOT NULL THEN STRVAL
