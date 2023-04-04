@@ -9,6 +9,7 @@ DICT = {
     'diagnosis': 'Диагноз',
     'medical_help_name': 'Организация',
     'cancelled_obs': 'Есть ли отменённые показатели',
+    'step_hospital_department': 'Отделение выбытия',
     }
 
 
