@@ -3,16 +3,21 @@ import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
 from base import parus_sql
 import pandas as pd
-from .distant_orgs import DICT_ORG
+
+from system import dict_ogrn_frmoname
 
 
 def distant_consult():
     SQL = open('parus/sql/distant_svod.sql', 'r').read()
 
     DF = parus_sql(SQL)
+    DICT_ORG = dict_ogrn_frmoname()
 
     for i in DF.index:
-        DF.loc[i, 'ORGANIZATION'] = DICT_ORG.get(DF.at[i, 'ORGANIZATION'])
+        DF.loc[i, 'POK02'] = DICT_ORG.get(
+            int(DF.at[i, 'ORGANIZATION']),
+            DF.at[i, 'POK02']
+            )
 
     DATE = DF.at[0, 'DAY']
     del DF['DAY']
@@ -29,10 +34,9 @@ def distant_consult():
         ORG = OLD.at[i, 'Полное наименование МО (из ФРМО)']
         if ORG not in DF["POK02"].unique():
             col = 'Краткое наименование МО (для вывода должников)'
-            #DOLG.loc[len(DOLG), "ORGANIZATION"] = OLD.at[i, col]
+            DOLG.loc[len(DOLG), "ORGANIZATION"] = OLD.at[i, col]
 
-    #del DF['ORGANIZATION']
-    del DF["POK02"]
+    del DF['ORGANIZATION']
 
     wb = openpyxl.load_workbook(NEW_NAME)
 

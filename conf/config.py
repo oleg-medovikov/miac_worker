@@ -18,6 +18,7 @@ DATABASE_DN122 = config('DATABASE_DN122', cast=str)
 
 URL_870 = config('URL_870', cast=str)
 REGIZ_AUTH = config('REGIZ_AUTH', cast=str)
+NSIUI_URL = config('NSIUI_URL', cast=str)
 
 DADATA_TOKEN = config('dadata_token', cast=str)
 DADATA_SECRET = config('dadata_secret', cast=str)
