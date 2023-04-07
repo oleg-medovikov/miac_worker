@@ -33,8 +33,14 @@ header_bunk = ['idRows','nameMO','bn_Count_All','bn_Count_Ill_All',
         'bn_Count_Ill_Faulty','bn_Count_Ill_Free']
 
 
-def load_sheet(file, sheetName, ColumsName, startRows, header_): 
-    df = pd.read_excel(file, sheet_name= sheetName,header = None , usecols=ColumsName,  skiprows = startRows)
+def load_sheet(file, sheetName, ColumsName, startRows, header_):
+    df = pd.read_excel(
+            file,
+            sheet_name=sheetName,
+            header=None,
+            usecols=ColumsName,
+            skiprows=startRows
+            )
     df = df.set_axis(header_, axis=1, inplace=False)
     df["idRows"] = pd.to_numeric(df["idRows"]) 
     df = df.sort_values(["idRows"])
@@ -68,10 +74,10 @@ class guber_09_debtors(Exception):
     pass
 
 def report_guber():
-    
+
     DIRECTORY =  Dir.get('MG')
     PATH = DIRECTORY + '/' + datetime.datetime.now().strftime("%Y%m%d")
-    
+
     try:
         os.mkdir(PATH)
     except:

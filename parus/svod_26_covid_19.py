@@ -1,4 +1,6 @@
-import time, datetime, shutil, openpyxl
+from datetime import datetime, timedelta
+import shutil
+import openpyxl
 import pandas as pd
 from openpyxl.utils.dataframe import dataframe_to_rows
 from base import parus_sql
@@ -12,7 +14,7 @@ def svod_26_covid_19():
 
     DF['type'] = 'parus'
 
-    DATE = datetime.datetime.now().strftime('%d.%m.%Y')
+    DATE = (datetime.now() - timedelta(days=0)).strftime('%d.%m.%Y')
 
     OLD_FILE = Dir.get('punct_zabor') + '/' + DATE + ' Пункты отбора.xlsx'
 
@@ -43,32 +45,32 @@ def svod_26_covid_19():
         'ADDR_PZ',
         'LAB_UTR_02'])
 
-    DATE = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%d_%m_%Y')
+    DATE = (datetime.now() + timedelta(days=1)).strftime('%d_%m_%Y')
 
     NEW_NAME = 'temp/' + DATE + '_26_COVID_19_cvod.xlsx'
 
-    shutil.copyfile('help/26_COVID_19_svod.xlsx', NEW_NAME )
+    shutil.copyfile('help/26_COVID_19_svod.xlsx', NEW_NAME)
 
-    wb= openpyxl.load_workbook( NEW_NAME )
+    wb = openpyxl.load_workbook(NEW_NAME)
 
     ws = wb['Из паруса']
-    rows = dataframe_to_rows(DF,index=False, header=False)
-    for r_idx, row in enumerate(rows,5):  
-        for c_idx, value in enumerate(row, 2):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-    
-    ws = wb['Из файла']
-    rows = dataframe_to_rows(OLD,index=False, header=False)
-    for r_idx, row in enumerate(rows,5):  
-        for c_idx, value in enumerate(row, 2):
-            ws.cell(row=r_idx, column=c_idx, value=value)
-    
-    ws = wb['Соединение']
-    rows = dataframe_to_rows(NEW_DF,index=False, header=False)
-    for r_idx, row in enumerate(rows,5):  
+    rows = dataframe_to_rows(DF, index=False, header=False)
+    for r_idx, row in enumerate(rows, 5):
         for c_idx, value in enumerate(row, 2):
             ws.cell(row=r_idx, column=c_idx, value=value)
 
-    wb.save( NEW_NAME )
+    ws = wb['Из файла']
+    rows = dataframe_to_rows(OLD, index=False, header=False)
+    for r_idx, row in enumerate(rows, 5):
+        for c_idx, value in enumerate(row, 2):
+            ws.cell(row=r_idx, column=c_idx, value=value)
+
+    ws = wb['Соединение']
+    rows = dataframe_to_rows(NEW_DF, index=False, header=False)
+    for r_idx, row in enumerate(rows, 5):
+        for c_idx, value in enumerate(row, 2):
+            ws.cell(row=r_idx, column=c_idx, value=value)
+
+    wb.save(NEW_NAME)
 
     return NEW_NAME
