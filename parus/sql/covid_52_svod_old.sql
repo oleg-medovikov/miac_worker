@@ -35,7 +35,11 @@ CASE WHEN org IS NULL THEN  ORGANIZATION ELSE substr(org ,INSTR(org , ' ')+1, LE
         INNER JOIN PARUS.BLREPFORM rf
         on(rd.PRN = rf.RN)
         WHERE rf.code = '52 COVID 19'
-        and r.BDATE =  trunc(SYSDATE-2)
+        and(
+            r.BDATE =  trunc(SYSDATE-2)
+            ORGANIZATIONS
+            )
+
          and i.CODE in ('vac_in_dist','vac_in_tvsp', 'vac_in_vac',
                         'vac_in_02','vac_in_03','vac_in_04','vac_in_05',
                         'vac_in_08','vac_in_09','vac_in_12', 'vac_in_13', 'vac_in_14')
