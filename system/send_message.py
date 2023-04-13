@@ -18,7 +18,7 @@ def bot_send_text(mess: str, chat_id: int) -> bool:
         try:
             requests.get(send_text, data=data)
         except ConnectionError:
-            sleep(5)
+            sleep(1)
             continue
         else:
             break
@@ -36,7 +36,7 @@ def bot_send_file(file: str, chat_id: int) -> None:
             try:
                 requests.post(url, data={"chat_id": chat_id}, files=files)
             except ConnectionError:
-                sleep(5)
+                sleep(1)
                 continue
             else:
                 break

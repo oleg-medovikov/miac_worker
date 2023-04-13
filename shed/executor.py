@@ -12,6 +12,8 @@ from system import bot_send_text, bot_send_file
 import sys
 import os
 import warnings
+from time import sleep
+
 warnings.filterwarnings("ignore")
 
 
@@ -46,6 +48,9 @@ def executor(TASK: Task):
                 for FILE in return_value.split(';'):
                     for USER in USERS:
                         bot_send_file(FILE, USER)
+                # подождем несколько секунд и удалим файлы
+                sleep(15)
+                for FILE in return_value.split(';'):
                     os.remove(FILE)
             else:
                 TASK.comment = return_value

@@ -1,4 +1,4 @@
-SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(EVC_TVSP_2_02 ,1,INSTR(EVC_TVSP_2_02 , ' ')-1) dist, 
+SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(EVC_TVSP_2_02 ,1,INSTR(EVC_TVSP_2_02 , ' ')-1) dist,
         REPLACE(substr(EVC_TVSP_2_02 ,INSTR(EVC_TVSP_2_02 , ' ')+1, length(EVC_TVSP_2_02)),'район ','') EVC_TVSP_2_02,
         nvl(cast(EVC_TVSP_2_04 as int),0)  EVC_TVSP_2_04,
         nvl(cast(EVC_TVSP_2_05_z as int),0)  EVC_TVSP_2_05_z,nvl(cast(EVC_TVSP_2_06 as int),0)  EVC_TVSP_2_06,
@@ -10,9 +10,9 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(EVC_TVSP_2_
         nvl(cast(EVC_TVSP_2_17_z as int),0)  EVC_TVSP_2_17_z,nvl(cast(EVC_TVSP_2_18 as int),0)  EVC_TVSP_2_18,
         nvl(cast(EVC_TVSP_2_19_z as int),0)  EVC_TVSP_2_19_z,
         nvl(cast(EVC_TVSP_2_20 as int),0)  EVC_TVSP_2_20,nvl(cast(EVC_TVSP_2_21 as int),0)  EVC_TVSP_2_21,
-        nvl(cast(EVC_TVSP_2_22 as int),0)  EVC_TVSP_2_22,nvl(cast(EVC_TVSP_2_23_z as int),0)  EVC_TVSP_2_23_z, 
+        nvl(cast(EVC_TVSP_2_22 as int),0)  EVC_TVSP_2_22,nvl(cast(EVC_TVSP_2_23_z as int),0)  EVC_TVSP_2_23_z,
         nvl(cast(EVC_TVSP_2_24 as int),0)  EVC_TVSP_2_24,nvl(cast(EVC_TVSP_2_25 as int),0)  EVC_TVSP_2_25,
-        nvl(cast(revac_20_01 as int),0)  revac_20_01
+        nvl(cast(EVC_TVSP_2_26 as int),0)  EVC_TVSP_2_26,nvl(cast(revac_20_01 as int),0)  revac_20_01
                 FROM (
                 SELECT
                     to_char(r.BDATE, 'DD.MM.YYYY') day,
@@ -43,34 +43,39 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(EVC_TVSP_2_
                 on(rd.PRN = rf.RN)
                 WHERE rf.code = '40 COVID 19'
                 and r.BDATE =  trunc(SYSDATE) - 2
-                and i.CODE in ('EVC_TVSP_2_02','EVC_TVSP_2_04','EVC_TVSP_2_05_z',
-                               'EVC_TVSP_2_06','EVC_TVSP_2_07_z', 'EVC_TVSP_2_08', 
-                                'EVC_TVSP_2_09_z', 'EVC_TVSP_2_10', 'EVC_TVSP_2_11_z',
-                                'EVC_TVSP_2_12','EVC_TVSP_2_13_z', 'EVC_TVSP_2_14', 
-                                'EVC_TVSP_2_15_z', 'EVC_TVSP_2_16','EVC_TVSP_2_17_z', 'EVC_TVSP_2_18',
-                                'EVC_TVSP_2_19_z', 'EVC_TVSP_2_20', 'EVC_TVSP_2_21', 'EVC_TVSP_2_22',
-                                'EVC_TVSP_2_23_z', 'EVC_TVSP_2_24', 'EVC_TVSP_2_25_z')
+                and i.CODE in (
+                    'EVC_TVSP_2_02','EVC_TVSP_2_04','EVC_TVSP_2_05_z',
+                    'EVC_TVSP_2_06','EVC_TVSP_2_07_z', 'EVC_TVSP_2_08',
+                    'EVC_TVSP_2_09_z', 'EVC_TVSP_2_10', 'EVC_TVSP_2_11_z',
+                    'EVC_TVSP_2_12','EVC_TVSP_2_13_z', 'EVC_TVSP_2_14',
+                    'EVC_TVSP_2_15_z', 'EVC_TVSP_2_16','EVC_TVSP_2_17_z', 'EVC_TVSP_2_18',
+                    'EVC_TVSP_2_19_z', 'EVC_TVSP_2_20', 'EVC_TVSP_2_21', 'EVC_TVSP_2_22',
+                    'EVC_TVSP_2_23_z', 'EVC_TVSP_2_24', 'EVC_TVSP_2_25_z', 'EVC_TVSP_2_26'
+                    )
                 )
                 pivot
                 (
                 max(value)
-                FOR POKAZATEL IN ('EVC_TVSP_2_02'  EVC_TVSP_2_02,
-        'EVC_TVSP_2_04'  EVC_TVSP_2_04,'EVC_TVSP_2_05_z'  EVC_TVSP_2_05_z,'EVC_TVSP_2_06'  EVC_TVSP_2_06,
-        'EVC_TVSP_2_07_z'  EVC_TVSP_2_07_z,'EVC_TVSP_2_08'  EVC_TVSP_2_08,
-        'EVC_TVSP_2_09_z'  EVC_TVSP_2_09_z,'EVC_TVSP_2_10'  EVC_TVSP_2_10,
-        'EVC_TVSP_2_11_z'  EVC_TVSP_2_11_z,'EVC_TVSP_2_12'  EVC_TVSP_2_12,
-        'EVC_TVSP_2_13_z'  EVC_TVSP_2_13_z,'EVC_TVSP_2_14'  EVC_TVSP_2_14,
-        'EVC_TVSP_2_15_z'  EVC_TVSP_2_15_z,'EVC_TVSP_2_16'  EVC_TVSP_2_16,
-        'EVC_TVSP_2_17_z'  EVC_TVSP_2_17_z,'EVC_TVSP_2_18'  EVC_TVSP_2_18,
-        'EVC_TVSP_2_19_z'  EVC_TVSP_2_19_z,'EVC_TVSP_2_20'  EVC_TVSP_2_20,'EVC_TVSP_2_21'  EVC_TVSP_2_21,
-        'EVC_TVSP_2_22'  EVC_TVSP_2_22, 'EVC_TVSP_2_23_z'  EVC_TVSP_2_23_z,
-        'EVC_TVSP_2_24'  EVC_TVSP_2_24,'EVC_TVSP_2_25_z'  EVC_TVSP_2_25)
+                FOR POKAZATEL IN (
+                    'EVC_TVSP_2_02'  EVC_TVSP_2_02,'EVC_TVSP_2_04'  EVC_TVSP_2_04,
+                    'EVC_TVSP_2_05_z'  EVC_TVSP_2_05_z,'EVC_TVSP_2_06'  EVC_TVSP_2_06,
+                    'EVC_TVSP_2_07_z'  EVC_TVSP_2_07_z,'EVC_TVSP_2_08'  EVC_TVSP_2_08,
+                    'EVC_TVSP_2_09_z'  EVC_TVSP_2_09_z,'EVC_TVSP_2_10'  EVC_TVSP_2_10,
+                    'EVC_TVSP_2_11_z'  EVC_TVSP_2_11_z,'EVC_TVSP_2_12'  EVC_TVSP_2_12,
+                    'EVC_TVSP_2_13_z'  EVC_TVSP_2_13_z,'EVC_TVSP_2_14'  EVC_TVSP_2_14,
+                    'EVC_TVSP_2_15_z'  EVC_TVSP_2_15_z,'EVC_TVSP_2_16'  EVC_TVSP_2_16,
+                    'EVC_TVSP_2_17_z'  EVC_TVSP_2_17_z,'EVC_TVSP_2_18'  EVC_TVSP_2_18,
+                    'EVC_TVSP_2_19_z'  EVC_TVSP_2_19_z,'EVC_TVSP_2_20'  EVC_TVSP_2_20,
+                    'EVC_TVSP_2_21'  EVC_TVSP_2_21,'EVC_TVSP_2_22'  EVC_TVSP_2_22,
+                    'EVC_TVSP_2_23_z'  EVC_TVSP_2_23_z,'EVC_TVSP_2_24'  EVC_TVSP_2_24,
+                    'EVC_TVSP_2_25_z'  EVC_TVSP_2_25,'EVC_TVSP_2_26'  EVC_TVSP_2_26
+                )
                 ) it LEFT JOIN (SELECT TABLICHA, revac_20_01
-        		FROM (
-        		SELECT
-                    i.CODE pokazatel,
-                    ro.NUMB row_index ,
-                    ro.RN TABLICHA,
+                    FROM (
+                        SELECT
+                        i.CODE pokazatel,
+                        ro.NUMB row_index,
+                        ro.RN TABLICHA,
                         CASE WHEN STRVAL  IS NOT NULL THEN STRVAL
                                  WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
                                  WHEN DATEVAL IS NOT NULL THEN CAST(DATEVAL AS varchar(30))
@@ -81,15 +86,15 @@ SELECT ORGANIZATION, 'Пункт вакцинации' type,  substr(EVC_TVSP_2_
                 INNER JOIN PARUS.BALANCEINDEXES i
                 on(si.BALANCEINDEXES = i.RN)
                 INNER JOIN PARUS.BLTBLROWS ro
-                on(v.PRN = ro.RN) 
-                WHERE  i.CODE IN ('revac_20_01'  )) 
+                on(v.PRN = ro.RN)
+                WHERE  i.CODE IN ('revac_20_01'))
                     pivot
                 (
                 max(value)
                 FOR POKAZATEL IN ('revac_20_01' revac_20_01)
- 				)) ii
+                )) ii
         ON (ii.TABLICHA = it.TABLICHA)
-UNION 
+UNION
         SELECT ORGANIZATION, 'Медицинская организация' TYPE, REPLACE (EVC_TVSP_01,' район ','') dist, EVC_TVSP_02,
         nvl(cast(EVC_TVSP_04 as int),0)  EVC_TVSP_04,nvl(cast(EVC_TVSP_05_z as int),0)  EVC_TVSP_05_z,
         nvl(cast(EVC_TVSP_06 as int),0)  EVC_TVSP_06,nvl(cast(EVC_TVSP_07_z as int),0)  EVC_TVSP_07_z,
@@ -102,14 +107,14 @@ UNION
         nvl(cast(EVC_TVSP_20 as int),0)  EVC_TVSP_20,nvl(cast(EVC_TVSP_21   as int),0)  EVC_TVSP_21,
         nvl(cast(EVC_TVSP_22 as int),0)  EVC_TVSP_22,nvl(cast(EVC_TVSP_23_z as int),0)  EVC_TVSP_23_z,
         nvl(cast(EVC_TVSP_24 as int),0)  EVC_TVSP_24,nvl(cast(EVC_TVSP_25 as int),0)  EVC_TVSP_25,
-        nvl(cast(revac_20_04 as int),0)  revac_20_04
+        nvl(cast(EVC_TVSP_26 as int),0)  EVC_TVSP_26,nvl(cast(revac_20_04 as int),0)  revac_20_04
                 FROM (
                 SELECT
                 to_char(r.BDATE, 'DD.MM.YYYY') day,
-                        a.AGNNAME ORGANIZATION ,
+                        a.AGNNAME ORGANIZATION,
                         rf.CODE  otchet,
                         bi.CODE  pokazatel,
-                CASE WHEN STRVAL IS NOT NULL THEN STRVAL 
+                CASE WHEN STRVAL IS NOT NULL THEN STRVAL
                  WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
                      WHEN DATEVAL IS NOT NULL THEN CAST(DATEVAL AS varchar(30))
                         ELSE NULL END value
@@ -118,36 +123,44 @@ UNION
                         ON (d.PRN = s.RN)
                         INNER JOIN PARUS.BLREPORTS r
                         ON(s.PRN = r.RN)
-                        INNER JOIN PARUS.AGNLIST a 
+                        INNER JOIN PARUS.AGNLIST a
                         on(r.AGENT = a.rn)
-                        INNER JOIN PARUS.BLREPFORMED pf 		
+                        INNER JOIN PARUS.BLREPFORMED pf
                         on(r.BLREPFORMED = pf.RN)
-                        INNER JOIN PARUS.BLREPFORM rf 
+                        INNER JOIN PARUS.BLREPFORM rf
                         on(pf.PRN = rf.RN)
-                        INNER JOIN PARUS.BALANCEINDEXES bi 
+                        INNER JOIN PARUS.BALANCEINDEXES bi
                         on(d.BALANCEINDEX = bi.RN)
                 WHERE rf.code = '40 COVID 19'
                  and  r.BDATE =  trunc(SYSDATE) - 2
-                 and bi.CODE in ('EVC_TVSP_01','EVC_TVSP_02','EVC_TVSP_04','EVC_TVSP_05_z',
-                                                'EVC_TVSP_06','EVC_TVSP_07_z', 'EVC_TVSP_08', 
-                                                'EVC_TVSP_09_z', 'EVC_TVSP_10', 'EVC_TVSP_11_z',
-                                                'EVC_TVSP_12','EVC_TVSP_13_z', 'EVC_TVSP_14', 
-                                                'EVC_TVSP_15_z', 'EVC_TVSP_16','EVC_TVSP_17_z', 'EVC_TVSP_18'
-                                                , 'EVC_TVSP_19_z', 'EVC_TVSP_20', 'EVC_TVSP_21', 'EVC_TVSP_22'
-                                                , 'EVC_TVSP_23_z', 'EVC_TVSP_24', 'EVC_TVSP_25_z', 'revac_20_04_s')
+                 and bi.CODE in (
+                    'EVC_TVSP_01','EVC_TVSP_02','EVC_TVSP_04','EVC_TVSP_05_z',
+                    'EVC_TVSP_06','EVC_TVSP_07_z', 'EVC_TVSP_08',
+                    'EVC_TVSP_09_z', 'EVC_TVSP_10', 'EVC_TVSP_11_z',
+                    'EVC_TVSP_12','EVC_TVSP_13_z', 'EVC_TVSP_14',
+                    'EVC_TVSP_15_z', 'EVC_TVSP_16','EVC_TVSP_17_z', 'EVC_TVSP_18',
+                    'EVC_TVSP_19_z', 'EVC_TVSP_20', 'EVC_TVSP_21', 'EVC_TVSP_22',
+                    'EVC_TVSP_23_z', 'EVC_TVSP_24', 'EVC_TVSP_25_z',
+                    'EVC_TVSP_26', 'revac_20_04_s'
+                    )
                 )
                 pivot
                 (
                 max(value)
-                FOR POKAZATEL IN ('EVC_TVSP_01'  EVC_TVSP_01,'EVC_TVSP_02'  EVC_TVSP_02,
-        'EVC_TVSP_04'  EVC_TVSP_04,'EVC_TVSP_05_z'  EVC_TVSP_05_z,'EVC_TVSP_06'  EVC_TVSP_06,
-        'EVC_TVSP_07_z'  EVC_TVSP_07_z,'EVC_TVSP_08'  EVC_TVSP_08,'EVC_TVSP_09_z'  EVC_TVSP_09_z,
-        'EVC_TVSP_10'  EVC_TVSP_10,'EVC_TVSP_11_z'  EVC_TVSP_11_z,'EVC_TVSP_12'  EVC_TVSP_12,
-        'EVC_TVSP_13_z'  EVC_TVSP_13_z,'EVC_TVSP_14'  EVC_TVSP_14,'EVC_TVSP_15_z'  EVC_TVSP_15_z,
-        'EVC_TVSP_16'  EVC_TVSP_16,'EVC_TVSP_17_z'  EVC_TVSP_17_z,'EVC_TVSP_18'  EVC_TVSP_18,
-        'EVC_TVSP_19_z'  EVC_TVSP_19_z,'EVC_TVSP_20'  EVC_TVSP_20,'EVC_TVSP_21'  EVC_TVSP_21,
-        'EVC_TVSP_22'  EVC_TVSP_22,'EVC_TVSP_23_z'  EVC_TVSP_23_z,'EVC_TVSP_24'  EVC_TVSP_24,
-        'EVC_TVSP_25_z'  EVC_TVSP_25,'revac_20_04_s'  revac_20_04
+                FOR POKAZATEL IN (
+                    'EVC_TVSP_01'  EVC_TVSP_01,'EVC_TVSP_02'  EVC_TVSP_02,
+                    'EVC_TVSP_04'  EVC_TVSP_04,'EVC_TVSP_05_z'  EVC_TVSP_05_z,
+                    'EVC_TVSP_06'  EVC_TVSP_06,'EVC_TVSP_07_z'  EVC_TVSP_07_z,
+                    'EVC_TVSP_08'  EVC_TVSP_08,'EVC_TVSP_09_z'  EVC_TVSP_09_z,
+                    'EVC_TVSP_10'  EVC_TVSP_10,'EVC_TVSP_11_z'  EVC_TVSP_11_z,
+                    'EVC_TVSP_12'  EVC_TVSP_12,'EVC_TVSP_13_z'  EVC_TVSP_13_z,
+                    'EVC_TVSP_14'  EVC_TVSP_14,'EVC_TVSP_15_z'  EVC_TVSP_15_z,
+                    'EVC_TVSP_16'  EVC_TVSP_16,'EVC_TVSP_17_z'  EVC_TVSP_17_z,
+                    'EVC_TVSP_18'  EVC_TVSP_18,'EVC_TVSP_19_z'  EVC_TVSP_19_z,
+                    'EVC_TVSP_20'  EVC_TVSP_20,'EVC_TVSP_21'  EVC_TVSP_21,
+                    'EVC_TVSP_22'  EVC_TVSP_22,'EVC_TVSP_23_z'  EVC_TVSP_23_z,
+                    'EVC_TVSP_24'  EVC_TVSP_24,'EVC_TVSP_25_z'  EVC_TVSP_25,
+                    'EVC_TVSP_26'  EVC_TVSP_26,'revac_20_04_s'  revac_20_04
         )
-                ) WHERE EVC_TVSP_02 IS NOT NULL
+                )  WHERE EVC_TVSP_02 IS NOT NULL
         ORDER BY ORGANIZATION,TYPE
