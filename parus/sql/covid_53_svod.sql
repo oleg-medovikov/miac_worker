@@ -34,16 +34,25 @@ FROM (
         on(rd.PRN = rf.RN)
         WHERE rf.code = '53 COVID 19'
         and r.BDATE =  trunc(SYSDATE-1)
-        and i.CODE in  ('vac_det_01','vac_det_02','vac_det_03','vac_det_04','vac_det_05','vac_det_07','vac_det_49',
-        				'vac_det_51','vac_det_16','vac_det_18','vac_det_37','vac_det_39','vac_det_52','vac_det_54',
-        				'vac_det_40','vac_det_42','vac_det_43','vac_det_45','vac_det_47','vac_det_48')
+        and i.CODE in  (
+            'vac_det_01','vac_det_02','vac_det_03','vac_det_04','vac_det_05','vac_det_07','vac_det_49',
+            'vac_det_51','vac_det_16','vac_det_18','vac_det_37','vac_det_39','vac_det_52','vac_det_54',
+            'vac_det_40','vac_det_42','vac_det_43','vac_det_45','vac_det_55','vac_det_56','vac_det_47',
+            'vac_det_48'
+        )
                 )
         pivot
         (
         max(value)
-        FOR POKAZATEL IN ('vac_det_01' pok01,'vac_det_02' pok02,'vac_det_03' pok03,'vac_det_04' pok04,'vac_det_05' pok05,
-        				  'vac_det_07' pok07,'vac_det_49' pok49,'vac_det_51' pok51,'vac_det_16' pok16,'vac_det_18' pok18,
-                          'vac_det_37' pok37,'vac_det_39' pok39,'vac_det_52' pok52,'vac_det_54' pok54,'vac_det_40' pok40,
-                          'vac_det_42' pok42,'vac_det_43' pok43,'vac_det_45' pok45,'vac_det_47' pok47,'vac_det_48' pok48)
-        )            
-        WHERE POK01 IS NOT NULL
+        FOR POKAZATEL IN (
+            'vac_det_01' pok01,'vac_det_02' pok02,'vac_det_03' pok03,
+            'vac_det_04' pok04,'vac_det_05' pok05,'vac_det_07' pok07,
+            'vac_det_49' pok49,'vac_det_51' pok51,'vac_det_16' pok16,
+            'vac_det_18' pok18,'vac_det_37' pok37,'vac_det_39' pok39,
+            'vac_det_52' pok52,'vac_det_54' pok54,'vac_det_40' pok40,
+            'vac_det_42' pok42,'vac_det_43' pok43,'vac_det_45' pok45,
+            'vac_det_55' pok55,'vac_det_56' pok56,'vac_det_47' pok47,
+            'vac_det_48' pok48
+            )
+        )
+WHERE POK01 IS NOT NULL
