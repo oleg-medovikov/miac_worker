@@ -6,7 +6,8 @@ SELECT to_char(day, 'YYYY_MM_DD') day,ORGANIZATION,'Пункт вакцинац�
     nvl(cast(pok39 as int),0)  pok39,nvl(cast(pok52 as int),0)  pok52,
     nvl(cast(pok54 as int),0)  pok54,nvl(cast(pok40 as int),0)  pok40,
     nvl(cast(pok42 as int),0)  pok42,nvl(cast(pok43 as int),0)  pok43,
-    nvl(cast(pok45 as int),0)  pok45,nvl(cast(pok47 as int),0)  pok47,
+    nvl(cast(pok45 as int),0)  pok45,nvl(cast(pok55 as int),0)  pok55,
+    nvl(cast(pok56 as int),0)  pok56,nvl(cast(pok47 as int),0)  pok47,
     nvl(cast(pok48 as int),0)  pok48
 FROM (
         SELECT

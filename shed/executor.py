@@ -49,9 +49,9 @@ def executor(TASK: Task):
                     for USER in USERS:
                         bot_send_file(FILE, USER)
                 # подождем несколько секунд и удалим файлы
-                sleep(15)
-                for FILE in return_value.split(';'):
-                    os.remove(FILE)
+                #sleep(15)
+                #for FILE in return_value.split(';'):
+                #    os.remove(FILE)
             else:
                 TASK.comment = return_value
                 TASK.stop()
