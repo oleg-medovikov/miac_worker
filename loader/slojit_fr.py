@@ -72,8 +72,8 @@ def slojit_fr():
     OTCHET_9 = glob(ROOT + '/9. Отчет по пациентам COVID-центр*.xlsx')
 
     MESS = '``` \n'
-    MESS += f'Успешно сложены {len(FILES)} файлов выгрузки ФР, \
-        всего строк: {df.shape[0]}'
+    MESS += f'Успешно сложены {len(FILES)} файлов выгрузки ФР,'
+    MESS += f'\nвсего строк: {df.shape[0]}'
 
     if len(OTCHET_9):
         OTCHET_9_NEW = Dir.get('covid_iac2') \
