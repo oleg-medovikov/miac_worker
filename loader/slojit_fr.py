@@ -307,12 +307,18 @@ def slojit_fr():
         format='%d.%m.%Y',
         errors='ignore'
         )
+    df['Дата исхода заболевания'] = pd.to_datetime(
+        df['Дата исхода заболевания'],
+        format='%d.%m.%Y',
+        errors='ignore'
+        )
 
     DIAGNOZ_DATE = df['Диагноз установлен'] >= '2022-01-01'
+    ISHOD_DATE = df['Дата исхода заболевания'] >= '2022-01-01'
 
     count_deti_ill = df.loc[COVID & AGE_18 & DIAGNOZ_DATE].shape[0]
     count_deti_rec = df.loc[COVID & AGE_18 & REC & DIAGNOZ_DATE].shape[0]
-    count_deti_death = df.loc[COVID_D & AGE_18 & DEATH & DIAGNOZ_DATE].shape[0]
+    count_deti_death = df.loc[COVID_D & AGE_18 & DEATH & ISHOD_DATE].shape[0]
 
     MESS += f""" ```
 Отдельно по детям, заболевшим с 01-01-2022
