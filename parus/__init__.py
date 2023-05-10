@@ -25,6 +25,7 @@ from .evulshed import evulshed
 from .mp_travm_v_hode_co import mp_travm_v_hode_co
 from .laboratory import laboratory
 from .grip_and_ori import grip_and_ori
+from .HCV_dolg import HCV_dolg
 
 __all__ = [
     'svod_4_2_covid_19',
@@ -54,4 +55,5 @@ __all__ = [
     'mp_travm_v_hode_co',
     'laboratory',
     'grip_and_ori',
+    'HCV_dolg',
     ]
