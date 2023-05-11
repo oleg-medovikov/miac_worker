@@ -1,5 +1,6 @@
 from pandas import DataFrame
 import requests
+from json.decoder import JSONDecodeError
 
 from conf import REGIZ_AUTH
 
@@ -24,6 +25,8 @@ def toxic_no_obs(START: str, END: str, ORG=None) -> 'DataFrame':
 
     try:
         df = DataFrame(data=requests.get(URL).json())
+    except JSONDecodeError:
+        return DataFrame()
     except requests.Timeout:
         return DataFrame()
     except requests.ConnectionError:

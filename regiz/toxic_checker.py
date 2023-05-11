@@ -54,7 +54,6 @@ def toxic_checker(df: 'DataFrame') -> 'DataFrame':
         d['Ошибка'] = 'дата диагноза 303 > текущей даты'
         list_.append(d)
 
-
     # дата отравления 1104 > даты диагноза 303
     d = df.loc[df['1104'] > df['303']]
     if len(d):

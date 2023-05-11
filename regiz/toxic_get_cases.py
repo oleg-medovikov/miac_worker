@@ -1,5 +1,6 @@
 from pandas import DataFrame, to_datetime
 import requests
+from json.decoder import JSONDecodeError
 
 from conf import REGIZ_AUTH
 
@@ -13,8 +14,14 @@ def toxic_get_cases(START: str, END: str) -> 'DataFrame':
     URL = " https://regiz.gorzdrav.spb.ru/N3.BI/getDData" \
         + f"?id=1127&args={START},{END}&auth={REGIZ_AUTH}"
 
+    req = requests.get(URL)
+    if req.status_code != 200:
+        raise my_except('Недоступен сервер нетрики, попробуйте позже')
+
     try:
-        df = DataFrame(data=requests.get(URL).json())
+        df = DataFrame(data=req.json())
+    except JSONDecodeError:
+        raise my_except('Недоступен сервер нетрики, попробуйте позже')
     except requests.Timeout:
         raise my_except('Недоступен сервер нетрики, попробуйте позже')
     except requests.ConnectionError:

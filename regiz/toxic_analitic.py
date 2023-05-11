@@ -24,10 +24,12 @@ def toxic_analitic(ARG):
 
     # делаем проверку на ошибки
     error = toxic_checker(DF)
+
     if len(error):
         DF = DF.loc[~DF['history_number'].isin(error['history_number'])]
         error = toxic_columns(error)
         error = error.fillna('ПУСТО!!!')
+
     # проверяем на пац без показателей
     no_obs = toxic_no_obs(START, END, ARG.split(';')[1])
 
