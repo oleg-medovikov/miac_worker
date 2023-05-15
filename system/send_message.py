@@ -30,7 +30,6 @@ def bot_send_file(file: str, chat_id: int) -> None:
 
     with open(file, 'rb') as f:
         files = {'document': f}
-#        title = file.rsplit('/', 1)[-1]
         url = f'https://api.telegram.org/bot{TELEGRAM_API}/sendDocument'
         while True:
             try:
