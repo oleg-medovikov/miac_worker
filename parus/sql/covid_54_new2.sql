@@ -89,7 +89,7 @@ from
                 INNER JOIN PARUS.BLREPFORM rf
                 on(rd.PRN = rf.RN)
                 WHERE rf.code = '54 COVID 19 NEW2'
-                and r.BDATE =  trunc(SYSDATE)
+                and r.BDATE = trunc(SYSDATE)
                 and i.CODE in ('etest_03', 'etest_04', 'etest_05', 'etest_06', 'etest_07')
                 )
                 pivot

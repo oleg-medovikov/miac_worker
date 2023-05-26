@@ -45,4 +45,3 @@ class Command(BaseModel):
         req = requests.get(URL, headers=HEADERS)
         if not req.json() is None:
             return Command(**req.json())
-

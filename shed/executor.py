@@ -12,7 +12,6 @@ from system import bot_send_text, bot_send_file
 import sys
 import os
 import warnings
-from time import sleep
 
 warnings.filterwarnings("ignore")
 
