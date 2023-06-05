@@ -28,7 +28,7 @@ def laboratory():
         except:
             pass
 
-    NEW_NAME = 'Мониторинг_деятельности_лабораторий_' + DATE + '.xlsx'
+    NEW_NAME = 'temp/Мониторинг_деятельности_лабораторий_' + DATE + '.xlsx'
 
     shutil.copyfile('help/laboratory.xlsx', NEW_NAME)
 

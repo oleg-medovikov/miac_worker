@@ -25,7 +25,7 @@ def svod_51_covid_19():
 
     DF.loc[len(DF)-1, 'COV_02'] = 'ИТОГО:'
 
-    NEW_NAME = DATE + '_51_COVID_19_cvod.xlsx'
+    NEW_NAME = 'temp/' + DATE + '_51_COVID_19_cvod.xlsx'
 
     shutil.copyfile('help/51_COVID_19_svod.xlsx', NEW_NAME)
 

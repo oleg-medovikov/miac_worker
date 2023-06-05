@@ -28,7 +28,7 @@ def extra_izv():
         if ORG not in DF['POK01'].unique():
             DOLG.loc[len(DOLG), 'ORGANIZATION'] = ORG
 
-    NEW_NAME = 'Экстренные_извещения_' + DATE + '.xlsx'
+    NEW_NAME = 'temp/Экстренные_извещения_' + DATE + '.xlsx'
 
     shutil.copyfile('help/extra_izv.xlsx', NEW_NAME)
 
