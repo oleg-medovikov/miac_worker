@@ -6,21 +6,21 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 from base import parus_sql
 
 
-MNEMOKOD = '40 COVID 192'
+MNEMOKOD = '40 COVID 19'
 DATE_NEW = 'trunc(SYSDATE + 2 )'
 DATE_OLD = 'trunc(SYSDATE + 1 )'
 POKAZATELS = ['KOVIVAC', 'KONVASEL', 'CPUTNIKL', 'CPUTNIKV', 'EPIVAK']
 LIST_POK_1 = [
-    'distr', 'org', 'type',
-    '_03', '_04', '_05', '_06', '_07', '_08', '_09', '_10',
-    '_11', '_12', '_13', '_14', '_15', '_16', '_17', '_18', '_19', '_20',
-    '_21', '_22', '_23', '_24', '_25', '_26', '_27', '_28', '_29', '_30',
+    'distr', 'org', 'type', '_03', '_04', '_05', '_06', '_07', '_08', '_09',
+    '_10', '_11', '_12', '_13', '_14', '_15', '_16', '_17', '_18', '_19',
+    '_20', '_21', '_22', '_23', '_24', '_25', '_26', '_27', '_28', '_29',
+    '_30', '_31', '_32',
 ]
 LIST_POK_2 = [
-    '_01', '_02', 'type',
-    '_03', '_04', '_05', '_06', '_07', '_08', '_09', '_10',
-    '_11', '_12', '_13', '_14', '_15', '_16', '_17', '_18', '_19', '_20',
-    '_21', '_22', '_23', '_24', '_25', '_26', '_27', '_28', '_29', '_30',
+    '_01', '_02', 'type', '_03', '_04', '_05', '_06', '_07', '_08', '_09',
+    '_10', '_11', '_12', '_13', '_14', '_15', '_16', '_17', '_18', '_19',
+    '_20', '_21', '_22', '_23', '_24', '_25', '_26', '_27', '_28', '_29',
+    '_30', '_31', '_32',
 ]
 
 
@@ -91,7 +91,7 @@ SQL_REVAC_MO = f"""SELECT
         'индекс' indx,
         rf.CODE  otchet,
         bi.CODE  pokazatel,
-        CASE WHEN STRVAL IS NOT NULL THEN STRVAL 
+        CASE WHEN STRVAL IS NOT NULL THEN STRVAL
             WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
             WHEN DATEVAL IS NOT NULL THEN CAST(DATEVAL AS varchar(30))
             ELSE NULL END value
@@ -100,23 +100,23 @@ SQL_REVAC_MO = f"""SELECT
                 ON (d.PRN = s.RN)
             INNER JOIN PARUS.BLREPORTS r
                 ON(s.PRN = r.RN)
-            INNER JOIN PARUS.AGNLIST a 
+            INNER JOIN PARUS.AGNLIST a
                 on(r.AGENT = a.rn)
             INNER JOIN PARUS.BLREPFORMED pf
                 on(r.BLREPFORMED = pf.RN)
-            INNER JOIN PARUS.BLREPFORM rf 
+            INNER JOIN PARUS.BLREPFORM rf
                 on(pf.PRN = rf.RN)
-            INNER JOIN PARUS.BALANCEINDEXES bi 
+            INNER JOIN PARUS.BALANCEINDEXES bi
                 on(d.BALANCEINDEX = bi.RN)
         WHERE rf.code = '{MNEMOKOD}'
             and  r.BDATE in ({DATE_OLD}, {DATE_NEW})
             and bi.CODE in (
-                'revac_02_0индекс_s', 'revac_0индекс_03_s', 'revac_04_0индекс_s',
-                'revac_05_0индекс_s', 'revac_06_0индекс_s', 'revac_07_0индекс_s',
-                'revac_08_0индекс_s', 'revac_09_0индекс_s', 'revac_10_0индекс_s',
-                'revac_11_0индекс_s', 'revac_12_0индекс_s', 'revac_13_0индекс_s',
-                'revac_14_0индекс_s', 'revac_15_0индекс_s', 'revac_16_0индекс_s',
-                'revac_17_0индекс_s', 'revac_18_0индекс_s', 'revac_19_0индекс_s'
+            'revac_02_0индекс_s', 'revac_0индекс_03_s', 'revac_04_0индекс_s',
+            'revac_05_0индекс_s', 'revac_06_0индекс_s', 'revac_07_0индекс_s',
+            'revac_08_0индекс_s', 'revac_09_0индекс_s', 'revac_10_0индекс_s',
+            'revac_11_0индекс_s', 'revac_12_0индекс_s', 'revac_13_0индекс_s',
+            'revac_14_0индекс_s', 'revac_15_0индекс_s', 'revac_16_0индекс_s',
+            'revac_17_0индекс_s', 'revac_18_0индекс_s', 'revac_19_0индекс_s'
                 )
 """
 
@@ -192,7 +192,7 @@ def svod_40_covid_new():
         )
         list_.append(DF.reset_index())
 
-    DF = pd.concat(list_, ignore_index=True)
+    DF = concat(list_, ignore_index=True)
     OLD = DF.loc[DF['DAY'] == DF['DAY'].min()]
     NEW = DF.loc[DF['DAY'] == DF['DAY'].max()]
 
