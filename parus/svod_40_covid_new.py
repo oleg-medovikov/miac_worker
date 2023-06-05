@@ -175,9 +175,18 @@ def svod_40_covid_new():
         NEW = DF.loc[DF['DAY'] == DF['DAY'].max()]
         OLD.index = range(len(OLD))
         NEW.index = range(len(NEW))
+        # Нужно сложить ТВСП с организациями
 
-        DICT[POKAZATEL] = NEW[[COLUMNS]]
-        DICT[POKAZATEL + '_OLD'] = OLD[[COLUMNS]]
+        DICT[POKAZATEL] = concat(
+            NEW,
+            DICT[POKAZATEL],
+            ignore_index=True
+        )
+        DICT[POKAZATEL + '_OLD'] = concat(
+            OLD,
+            DICT[POKAZATEL + '_OLD'],
+            ignore_index=True
+        )
 
     # Вытаскиваем ревакцинацию за МО
     list_ = []
@@ -196,7 +205,39 @@ def svod_40_covid_new():
     OLD = DF.loc[DF['DAY'] == DF['DAY'].min()]
     NEW = DF.loc[DF['DAY'] == DF['DAY'].max()]
 
+    DICT['REVAC'] = NEW[[COLUMNS]]
+    DICT['REVAC_OLD'] = OLD[[COLUMNS]]
 
+    new_name_pred = 'temp/40_COVID_19_БОТКИНА_' + DF['DAY'].max() + '_предварительный.xlsx'
+    new_name_osn = 'temp/40_COVID_19_БОТКИНА_' + DF['DAY'].max() + '_основной.xlsx'
 
+    shutil.copyfile('help/40_COVID_19_pred.xlsx', new_name_pred)
+    shutil.copyfile('help/40_COVID_19_osn.xlsx', new_name_osn)
 
+    # Записываем данные в предварительный файл
+    wb = openpyxl.load_workbook(new_name_pred)
+    # 'KOVIVAC', 'KONVASEL', 'CPUTNIKL', 'CPUTNIKV', 'EPIVAK'
+    D_PRINT = {
+        'Спутник-V':          ('CPUTNIKV',        5, 1),
+        'Вчера_Спутник':      ('CPUTNIKV_OLD',    5, 1),
+        'ЭпиВакКорона':       ('EPIVAK',      5, 1),
+        'Вчера_ЭпиВак':       ('EPIVAK_OLD',  5, 1),
+        'КовиВак':            ('KOVIVAC',     5, 1),
+        'Вчера_КовиВак':      ('KOVIVAC_OLD', 5, 1),
+        'Спутник Лайт':       ('CPUTNIKL',       5, 1),
+        'Вчера_Спутник Лайт': ('CPUTNIKL_OLD',   5, 1),
+        'Ревакцинация':       ('REVAC',       9, 1),
+        'Вчера_ревакцин':     ('REVAC_OLD',   9, 1),
+            }
 
+    for key, value in D_PRINT.items():
+        ws = wb[key]
+        DATA = DICT[value[0]]
+        rows = dataframe_to_rows(DATA, index=False, header=False)
+        for r_idx, row in enumerate(rows, value[1]):
+            for c_idx, val in enumerate(row, value[2]):
+                ws.cell(row=r_idx, column=c_idx, value=val)
+
+    wb.save(new_name_pred)
+
+    return new_name_pred

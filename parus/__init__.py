@@ -11,6 +11,7 @@ from .svod_36_covid_19 import svod_36_covid_19
 from .svod_37_covid_19 import svod_37_covid_19
 from .svod_38_covid_19 import svod_38_covid_19
 from .svod_40_covid_19 import svod_40_covid_19
+from .svod_40_covid_new import svod_40_covid_new
 from .svod_40_covid_19_dates import svod_40_covid_19_dates
 from .svod_43_covid_19 import svod_43_covid_19
 from .svod_50_covid_19 import svod_50_covid_19
@@ -41,6 +42,7 @@ __all__ = [
     'svod_37_covid_19',
     'svod_38_covid_19',
     'svod_40_covid_19',
+    'svod_40_covid_new',
     'svod_40_covid_19_dates',
     'svod_43_covid_19',
     'svod_50_covid_19',
@@ -56,4 +58,4 @@ __all__ = [
     'laboratory',
     'grip_and_ori',
     'HCV_dolg',
-    ]
+]
