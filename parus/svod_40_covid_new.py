@@ -117,7 +117,10 @@ def svod_40_covid_new():
         '/mnt/COVID-списки/bot/40_COVID_19_pred_new.xlsx',
         new_name_pred
     )
-    shutil.copyfile('help/40_COVID_19_osn_new.xlsx', new_name_osn)
+    shutil.copyfile(
+        '/mnt/COVID-списки/bot/40_COVID_19_osn_new.xlsx',
+        new_name_osn
+    )
 
     # Записываем данные в предварительный файл
     wb = openpyxl.load_workbook(new_name_pred)
@@ -144,8 +147,8 @@ def svod_40_covid_new():
             continue
 
         del DATA['DAY']
-        
-        for i in range(4, ws.max_row):
+
+        for i in range(value[1], ws.max_row):
             if ws.cell(row=i, column=1).value is None:
                 rowNum = i
                 break
@@ -171,7 +174,7 @@ def svod_40_covid_new():
         ws = wb[key]
         DATA = DICT[value[0]]
 
-        for i in range(4, ws.max_row):
+        for i in range(value[1], ws.max_row):
             if ws.cell(row=i, column=1).value is None:
                 rowNum = i
                 break
