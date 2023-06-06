@@ -113,7 +113,10 @@ def svod_40_covid_new():
     new_name_pred = 'temp/40_COVID_19_БОТКИНА_' + DF['DAY'].max() + '_предварительный.xlsx'
     new_name_osn = 'temp/40_COVID_19_БОТКИНА_' + DF['DAY'].max() + '_основной.xlsx'
 
-    shutil.copyfile('help/40_COVID_19_pred_new.xlsx', new_name_pred)
+    shutil.copyfile(
+        '/mnt/COVID-списки/bot/40_COVID_19_pred_new.xlsx',
+        new_name_pred
+    )
     shutil.copyfile('help/40_COVID_19_osn_new.xlsx', new_name_osn)
 
     # Записываем данные в предварительный файл
@@ -139,9 +142,16 @@ def svod_40_covid_new():
             DATA = DICT[value[0]]
         except KeyError:
             continue
+
         del DATA['DAY']
+        
+        for i in range(4, ws.max_row):
+            if ws.cell(row=i, column=1).value is None:
+                rowNum = i
+                break
+
         rows = dataframe_to_rows(DATA, index=False, header=False)
-        for r_idx, row in enumerate(rows, value[1]):
+        for r_idx, row in enumerate(rows, rowNum):
             for c_idx, val in enumerate(row, value[2]):
                 ws.cell(row=r_idx, column=c_idx, value=val)
 
@@ -160,8 +170,14 @@ def svod_40_covid_new():
     for key, value in D_PRINT.items():
         ws = wb[key]
         DATA = DICT[value[0]]
+
+        for i in range(4, ws.max_row):
+            if ws.cell(row=i, column=1).value is None:
+                rowNum = i
+                break
+
         rows = dataframe_to_rows(DATA, index=False, header=False)
-        for r_idx, row in enumerate(rows, value[1]):
+        for r_idx, row in enumerate(rows, rowNum):
             for c_idx, val in enumerate(row, value[2]):
                 ws.cell(row=r_idx, column=c_idx, value=val)
 
