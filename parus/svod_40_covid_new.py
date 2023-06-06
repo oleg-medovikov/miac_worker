@@ -66,12 +66,22 @@ def svod_40_covid_new():
             & (PART['TYPE'] == 'Пункт вакцинации'),
             POKAZATEL + '_01'] = DF[
                 POKAZATEL + '_02'
-                ].str.split().str[0] + ' район'
+                ].str.split().str[0]
 
+        PART.loc[
+            ~(PART[POKAZATEL + '_01'].isnull())
+            & ~(PART[POKAZATEL + '_01'].str.contains('район', na=False)),
+            POKAZATEL + '_02'] = PART[POKAZATEL + '_02'].str.split(n=1).str[1]
         PART = PART.loc[~PART[POKAZATEL + '_02'].isnull()]
 
+        DISTRICTS = [str(x).replace(' район', '') for x in PART[POKAZATEL + '_01'].unique()]
+        for DIST in DISTRICTS:
+            PART[POKAZATEL + '_02'] = PART[POKAZATEL + '_02'].str.replace(str(DIST), '')
+        PART[POKAZATEL + '_02'] = PART[POKAZATEL + '_02'].str.lstrip()
+
         DICT[POKAZATEL] = PART.loc[PART['DAY'] == PART['DAY'].max()]
-        DICT[POKAZATEL + '_OLD'] = PART.loc[PART['DAY'] == PART['DAY'].min()]
+        if PART['DAY'].min() !=  PART['DAY'].max():
+            DICT[POKAZATEL + '_OLD'] = PART.loc[PART['DAY'] == PART['DAY'].min()]
 
     # Вытаскиваем ревакцинацию за МО
     list_ = []
@@ -92,12 +102,13 @@ def svod_40_covid_new():
     DF['TYPEVACINE'] = DF['INDX'].map(D_VAC)
     DF['SCEP'] = DF['ORGANIZATION'] + DF['TYPEVACINE']
 
-    TVSP = parus_sql(SQL_REVAC_TVSP)
-    DF = concat([DF, TVSP], ignore_index=True)
-    DF = DF.sort_values(['INDX', 'ORGANIZATION'])
+    # TVSP = parus_sql(SQL_REVAC_TVSP)
+    # DF = concat([DF, TVSP], ignore_index=True)
+    DF = DF.sort_values(['ORGANIZATION', 'INDX'])
 
     DICT['REVAC'] = DF.loc[DF['DAY'] == DF['DAY'].max()]
-    DICT['REVAC_OLD'] = DF.loc[DF['DAY'] == DF['DAY'].min()]
+    if DF['DAY'].min() != DF['DAY'].max():
+        DICT['REVAC_OLD'] = DF.loc[DF['DAY'] == DF['DAY'].min()]
 
     new_name_pred = 'temp/40_COVID_19_БОТКИНА_' + DF['DAY'].max() + '_предварительный.xlsx'
     new_name_osn = 'temp/40_COVID_19_БОТКИНА_' + DF['DAY'].max() + '_основной.xlsx'
@@ -124,7 +135,10 @@ def svod_40_covid_new():
 
     for key, value in D_PRINT.items():
         ws = wb[key]
-        DATA = DICT[value[0]]
+        try:
+            DATA = DICT[value[0]]
+        except KeyError:
+            continue
         del DATA['DAY']
         rows = dataframe_to_rows(DATA, index=False, header=False)
         for r_idx, row in enumerate(rows, value[1]):
