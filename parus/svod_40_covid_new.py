@@ -103,24 +103,23 @@ def svod_40_covid_new():
     new_name_osn = 'temp/40_COVID_19_БОТКИНА_' + DF['DAY'].max() + '_основной.xlsx'
 
     shutil.copyfile('help/40_COVID_19_pred_new.xlsx', new_name_pred)
-    shutil.copyfile('help/40_COVID_19_osn.xlsx', new_name_osn)
+    shutil.copyfile('help/40_COVID_19_osn_new.xlsx', new_name_osn)
 
     # Записываем данные в предварительный файл
     wb = openpyxl.load_workbook(new_name_pred)
-    # 'KOVIVAC', 'KONVASEL', 'CPUTNIKL', 'CPUTNIKV', 'EPIVAK'
     D_PRINT = {
-        'Спутник-V':          ('CPUTNIKV',        5, 1),
-        'Вчера_Спутник':      ('CPUTNIKV_OLD',    5, 1),
-        'ЭпиВакКорона':       ('EPIVAK',      5, 1),
-        'Вчера_ЭпиВак':       ('EPIVAK_OLD',  5, 1),
-        'КовиВак':            ('KOVIVAC',     5, 1),
-        'Конвасэл':           ('KONVASEL', 5, 1),
-        'Вчера_КовиВак':      ('KOVIVAC_OLD', 5, 1),
-        'Спутник Лайт':       ('CPUTNIKL',       5, 1),
-        'Вчера_Спутник Лайт': ('CPUTNIKL_OLD',   5, 1),
-        'Ревакцинация':       ('REVAC',       10, 1),
-        'Вчера_ревакцин':     ('REVAC_OLD',   10, 1),
-        'Вчера_Конвасэл':     ('KONVASEL_OLD', 5, 1),
+        'Спутник-V':          ('CPUTNIKV',      5, 1),
+        'Вчера_Спутник':      ('CPUTNIKV_OLD',  5, 1),
+        'ЭпиВакКорона':       ('EPIVAK',        5, 1),
+        'КовиВак':            ('KOVIVAC',       5, 1),
+        'Конвасэл':           ('KONVASEL',      5, 1),
+        'Спутник Лайт':       ('CPUTNIKL',      5, 1),
+        'Ревакцинация':       ('REVAC',         10, 1),
+        'Вчера_КовиВак':      ('KOVIVAC_OLD',   5, 1),
+        'Вчера_ЭпиВак':       ('EPIVAK_OLD',    5, 1),
+        'Вчера_Спутник Лайт': ('CPUTNIKL_OLD',  5, 1),
+        'Вчера_ревакцин':     ('REVAC_OLD',     10, 1),
+        'Вчера_Конвасэл':     ('KONVASEL_OLD',  5, 1),
             }
 
     for key, value in D_PRINT.items():
@@ -134,4 +133,24 @@ def svod_40_covid_new():
 
     wb.save(new_name_pred)
 
-    return new_name_pred
+    wb = openpyxl.load_workbook(new_name_osn)
+    D_PRINT = {
+        'Спутник-V':          ('CPUTNIKV',  5, 1),
+        'ЭпиВакКорона':       ('EPIVAK',    5, 1),
+        'КовиВак':            ('KOVIVAC',   5, 1),
+        'Конвасэл':           ('KONVASEL',  5, 1),
+        'Спутник Лайт':       ('CPUTNIKL',  5, 1),
+        'Ревакцинация':       ('REVAC',     10, 1),
+    }
+
+    for key, value in D_PRINT.items():
+        ws = wb[key]
+        DATA = DICT[value[0]]
+        rows = dataframe_to_rows(DATA, index=False, header=False)
+        for r_idx, row in enumerate(rows, value[1]):
+            for c_idx, val in enumerate(row, value[2]):
+                ws.cell(row=r_idx, column=c_idx, value=val)
+
+    wb.save(new_name_osn)
+
+    return new_name_pred + ';' + new_name_osn

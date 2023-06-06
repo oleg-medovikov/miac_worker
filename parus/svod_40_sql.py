@@ -1,6 +1,6 @@
 MNEMOKOD = '40 COVID 19'
-DATE_NEW = 'trunc(SYSDATE + 1)'
-DATE_OLD = 'trunc(SYSDATE + 0)'
+DATE_NEW = 'trunc(SYSDATE - 1)'
+DATE_OLD = 'trunc(SYSDATE - 2)'
 
 SQL_VACHIN = f"""
 SELECT
