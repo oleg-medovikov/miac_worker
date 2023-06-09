@@ -7,8 +7,10 @@ from multiprocessing import Pool
 import pandas as pd
 from datetime import datetime, timedelta
 
+from conf import MASTER
 from clas import Dir
 from base import covid_sql
+from system import send_message
 
 NAMES = [
     'п/н', 'Дата создания РЗ', 'УНРЗ', 'Дата изменения РЗ',
@@ -39,6 +41,7 @@ def read_file(FILE):
 
 def slojit_fr():
     "это функция складывает выгрузки ФР в 1 файл"
+    print('test 1')
 
     xlrd.xlsx.ensure_elementtree_imported(False, None)
     xlrd.xlsx.Element_has_iter = True
@@ -55,9 +58,12 @@ def slojit_fr():
 
     pool = Pool()
     df_list = pool.map(read_file, FILES)
-    df = pd.concat(df_list, ignore_index=True)
+    print('test_1.4')
 
+    df = pd.concat(df_list, ignore_index=True)
+    print('test_1.5')
     df["п/н"] = range(1, len(df)+1)
+    print('test_1.6')
 
     TOMORROW = (datetime.today() + timedelta(days=1)).strftime("%Y_%m_%d")
 
@@ -74,6 +80,7 @@ def slojit_fr():
     MESS = '``` \n'
     MESS += f'Успешно сложены {len(FILES)} файлов выгрузки ФР,'
     MESS += f'\nвсего строк: {df.shape[0]}'
+    print(MESS)
 
     if len(OTCHET_9):
         OTCHET_9_NEW = Dir.get('covid_iac2') \
@@ -114,7 +121,10 @@ def slojit_fr():
                                 and date_rows = '{YESTERDAY}'
                         )"""
 
-    count_vizd_old = covid_sql(SQL).iat[0, 0]
+    try:
+        count_vizd_old = covid_sql(SQL).iat[0, 0]
+    except ValueError:
+        raise my_except('нет цифры выздоровших за вчера')
     count_vizd_new = df[
             df['Исход заболевания'].isin(['Выздоровление'])
             & df['Диагноз'].isin(['U07.1'])
@@ -209,22 +219,27 @@ def slojit_fr():
     count_deti_amb = df.loc[COVID & AGE_18 & AMB & ILL].shape[0]
     count_deti_stach = df.loc[COVID & AGE_18 & STAC & ILL].shape[0]
 
-    count_deti_ill_old = covid_sql(f"""
-        SELECT [value_count] FROM [robo].[values]
-            where id = (select max(id)
-                from [robo].[values]
-                    where [value_name] = 'Всего детей заболело от COVID'
-                and date_rows = '{YESTERDAY}' )"""
-                                   ).iat[0, 0]
+    try:
+        count_deti_ill_old = covid_sql(f"""
+            SELECT [value_count] FROM [robo].[values]
+                where id = (select max(id)
+                    from [robo].[values]
+                        where [value_name] = 'Всего детей заболело от COVID'
+                    and date_rows = '{YESTERDAY}' )"""
+                                       ).iat[0, 0]
+    except KeyError:
+        raise my_except('нет цифры заболевшие дети вчера')
 
-    count_deti_rec_old = covid_sql(f"""
-        SELECT [value_count] FROM [robo].[values]
-            where id = (select max(id)
-                from [robo].[values]
-                where [value_name] = 'Всего детей выздоровело от COVID'
-                and date_rows = '{YESTERDAY}' )"""
-                                   ).iat[0, 0]
-
+    try:
+        count_deti_rec_old = covid_sql(f"""
+            SELECT [value_count] FROM [robo].[values]
+                where id = (select max(id)
+                    from [robo].[values]
+                    where [value_name] = 'Всего детей выздоровело от COVID'
+                    and date_rows = '{YESTERDAY}' )"""
+                                       ).iat[0, 0]
+    except KeyError:
+        raise my_except('нет цифры выздоровевшие дети вчера')
     count_deti_death_old = covid_sql(f"""
         SELECT [value_count] FROM [robo].[values]
             where id = (select max(id)
@@ -285,6 +300,7 @@ def slojit_fr():
                     where [value_name] = 'Всего школьников умерло от COVID'
                 and date_rows = '{YESTERDAY}' )"""
                                      ).iat[0, 0]
+    print('test 2')
 
     MESS +=f""" ```
 Отдельно по школьникам, больным COVID-19:

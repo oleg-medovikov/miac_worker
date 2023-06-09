@@ -1,4 +1,5 @@
-import datetime, glob
+import datetime
+from glob import glob
 import pandas as pd
 import numpy
 
@@ -6,21 +7,28 @@ from clas import Dir
 from base import covid_insert, covid_sql, covid_exec
 
 NAMES = [
-'п/н','Дата создания РЗ','УНРЗ','Дата изменения РЗ','СНИЛС',
-'ФИО','Пол','Дата рождения','Диагноз','Диагноз установлен',
-'Осложнение основного диагноза','Субъект РФ','Медицинская организация',
-'Ведомственная принадлежность','Вид лечения','Дата госпитализации',
-'Дата исхода заболевания','Исход заболевания','Степень тяжести',
-'Посмертный диагноз','ИВЛ','ОРИТ','МО прикрепления','Медицинский работник'
-    ]
+    'п/н', 'Дата создания РЗ', 'УНРЗ', 'Дата изменения РЗ', 'СНИЛС',
+    'ФИО', 'Пол', 'Дата рождения', 'Диагноз', 'Диагноз установлен',
+    'Осложнение основного диагноза', 'Субъект РФ', 'Медицинская организация',
+    'Ведомственная принадлежность', 'Вид лечения', 'Дата госпитализации',
+    'Дата исхода заболевания', 'Исход заболевания', 'Степень тяжести',
+    'Посмертный диагноз', 'ИВЛ', 'ОРИТ', 'МО прикрепления',
+    'Медицинский работник',
+]
+
 
 class my_except(Exception):
     pass
 
+
 def report_fr(df):
     """ Репорт о количестве выздоровевших """
-    df ['Возраст'] = (pd.to_datetime(df['Диагноз установлен'], format='%d.%m.%Y') \
-            - pd.to_datetime(df['Дата рождения'], format='%d.%m.%Y' ))/ numpy.timedelta64(1, 'Y')
+    df['Возраст'] = (pd.to_datetime(
+        df['Диагноз установлен'],
+        format='%d.%m.%Y') - pd.to_datetime(
+            df['Дата рождения'],
+            format='%d.%m.%Y')
+    ) / numpy.timedelta64(1, 'Y')
 
     report = pd.DataFrame()
     report.loc[0,'date_rows'] = pd.to_datetime(df['Дата создания РЗ'],format='%d.%m.%Y').max().date()
@@ -66,23 +74,23 @@ def report_fr(df):
 
 def calculate_hash(df):
     """Считаем хеш строк федерального регистра"""
-    df['string']= df['СНИЛС'] + \
-             df['ФИО'] + \
-             df['Пол'] + \
-             df['Дата рождения'] + \
-             df['Диагноз'] + \
-             df['Диагноз установлен'] + \
-             df['Медицинская организация'] + \
-             df['Дата исхода заболевания'] + \
-             df['Исход заболевания'] + \
-             df['Дата госпитализации'] + \
-             df['Степень тяжести'] + \
-             df['Посмертный диагноз'] + \
-             df['ИВЛ'] + \
-             df['ОРИТ'] + \
-             df['Вид лечения'] + \
-             df['Медицинский работник'] + \
-             df['МО прикрепления']
+    df['string'] = df['СНИЛС'] + \
+        df['ФИО'] + \
+        df['Пол'] + \
+        df['Дата рождения'] + \
+        df['Диагноз'] + \
+        df['Диагноз установлен'] + \
+        df['Медицинская организация'] + \
+        df['Дата исхода заболевания'] + \
+        df['Исход заболевания'] + \
+        df['Дата госпитализации'] + \
+        df['Степень тяжести'] + \
+        df['Посмертный диагноз'] + \
+        df['ИВЛ'] + \
+        df['ОРИТ'] + \
+        df['Вид лечения'] + \
+        df['Медицинский работник'] + \
+        df['МО прикрепления']
 
     df['string'] = df['string'].str.replace(' ', '')
 
@@ -94,13 +102,14 @@ def calculate_hash(df):
 
     return df['string'].apply_parallel(func, num_processes=10)
 
+
 def load_fr():
     """Загрузка федерального регистра"""
     PATH = Dir.get('path_robot') + '/' + datetime.datetime.now().strftime("%Y_%m_%d")
 
-    FILE_CSV = glob.glob(PATH + '/Федеральный регистр лиц, больных *[!ИАЦ].csv')
+    FILE_CSV = glob(PATH + '/Федеральный регистр лиц, больных *[!ИАЦ].csv')
 
-    if len (FILE_CSV) == 0:
+    if len(FILE_CSV) == 0:
         raise my_except('Не найден файл Федерального регистра! Директория:\n' + PATH)
 
     FILE_CSV = FILE_CSV[0]
@@ -119,18 +128,23 @@ def load_fr():
     except Exception as e:
         raise my_except(str(e))
 
-    del DF ['Ведомственная принадлежность']
-    del DF ['Осложнение основного диагноза']
-    
-    DF.drop_duplicates(subset=['УНРЗ'], keep='last', inplace=True)
+    del DF['Ведомственная принадлежность']
+    del DF['Осложнение основного диагноза']
 
+    DF.drop_duplicates(subset=['УНРЗ'], keep='last', inplace=True)
+    # обрезаем длинные строки
+    for col in DF.columns:
+        try:
+            DF[col] = DF[col].str[0:255]
+        except ValueError:
+            continue
     # Считаем хеш суммы строк
-    DF ['md5'] = calculate_hash(DF)
+    DF['md5'] = calculate_hash(DF)
 
     # Получаем хеш загруженного в базу регистра
     SQL = "SELECT UNRZ, hash_MD5 FROM dbo.hash_fr"
     FR = covid_sql(SQL)
-    
+
     """
     FR_A - часть регистра, которая не изменилась
            md5 == hash_MD5
@@ -140,48 +154,57 @@ def load_fr():
            md5 is Null and hash_MD5 is not Null
 
     FR_C - новые строки регистра, которые нужно загрузить
-           в cv_input_fr для дальнейшей обработки и 
+           в cv_input_fr для дальнейшей обработки и
            добавления в регистр
            md5 is not Null and hash_MD5 is Null
     """
 
-    SVOD = DF.merge( FR, how='outer', left_on=['УНРЗ','md5'], right_on=['UNRZ','hash_MD5'])
+    SVOD = DF.merge(
+        FR,
+        how='outer',
+        left_on=['УНРЗ', 'md5'],
+        right_on=['UNRZ', 'hash_MD5']
+    )
 
-    FR_C = SVOD.loc[ (~SVOD['md5'].isnull()) & (SVOD['hash_MD5'].isnull()) ]
-    
-    if len (FR_C) == 0:
+    FR_C = SVOD.loc[(~SVOD['md5'].isnull()) & (SVOD['hash_MD5'].isnull())]
+
+    if len(FR_C) == 0:
         raise my_except('В базу загружен актуальный ФР!')
 
-    del FR_C ['string']
-    del FR_C ['hash_MD5']
-    del FR_C ['UNRZ']
-    FR_C.rename( columns={'md5': 'hash_md5'}, inplace=True )
-    
-    covid_exec('TRUNCATE TABLE dbo.cv_input_fr')
-    covid_insert( FR_C, 'cv_input_fr', 'dbo', False, 'append' )
+    del FR_C['string']
+    del FR_C['hash_MD5']
+    del FR_C['UNRZ']
+    FR_C.rename(columns={'md5': 'hash_md5'}, inplace=True)
 
-    FR_B = SVOD.loc[ (SVOD['md5'].isnull()) & (~SVOD['hash_MD5'].isnull()) ]
-    
-    FR_B = FR_B [[ 'UNRZ','hash_MD5' ]]
+    # Отправляем числа статистики по выздоровевшим
+    report_fr(DF)
+
+    # Ещё один отчёт
+    covid_exec('EXEC [mz].[p_Recalculate_for_50_Report]')
+
+    try:
+        covid_exec('TRUNCATE TABLE dbo.cv_input_fr')
+    except:
+        pass
+
+    FR_C.to_excel('temp/fr_c.xlsx', index=False)
+    covid_insert(FR_C, 'cv_input_fr', 'dbo', False, 'append')
+
+    FR_B = SVOD.loc[(SVOD['md5'].isnull()) & (~SVOD['hash_MD5'].isnull())]
+
+    FR_B = FR_B[['UNRZ', 'hash_MD5']]
 
     covid_exec('TRUNCATE TABLE dbo.hash_fr_base')
-    covid_insert( FR_B, 'hash_fr_base', 'dbo', False, 'append' )
+    covid_insert(FR_B, 'hash_fr_base', 'dbo', False, 'append')
 
     # Все данные загружены, запускаем процедуры обработки
 
     covid_exec('EXEC dbo.p_hash_md5')
     covid_exec('EXEC dbo.cv_Load_FedReg_new')
-
-    # Отправляем числа статистики по выздоровевшим
-    report_fr(DF)
-    # Ещё один отчёт
-    covid_exec('EXEC [mz].[p_Recalculate_for_50_Report]')
-
     mess = 'Регистр успешно загружен!' \
-            + '\nИмя файла: '       + FILE_CSV.rsplit('/',1)[-1] \
-            + '\nВсего строк: '     + str(len(DF)) \
-            + '\nУдалено строк: '   + str(len(FR_B)) \
-            + '\nДобавлено строк: ' + str(len(FR_C))
+        + '\nИмя файла: ' + FILE_CSV.rsplit('/', 1)[-1] \
+        + '\nВсего строк: ' + str(len(DF)) \
+        + '\nУдалено строк: ' + str(len(FR_B)) \
+        + '\nДобавлено строк: ' + str(len(FR_C))
 
     return mess
-

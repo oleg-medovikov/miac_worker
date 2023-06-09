@@ -68,6 +68,7 @@ def svod_40_covid_new():
                 POKAZATEL + '_02'
                 ].str.split().str[0]
 
+        # какие-то махинации с вырезкой района из названия ТВСП
         PART.loc[
             ~(PART[POKAZATEL + '_01'].isnull())
             & ~(PART[POKAZATEL + '_01'].str.contains('район', na=False)),
@@ -79,6 +80,13 @@ def svod_40_covid_new():
             PART[POKAZATEL + '_02'] = PART[POKAZATEL + '_02'].str.replace(str(DIST), '')
         PART[POKAZATEL + '_02'] = PART[POKAZATEL + '_02'].str.lstrip()
 
+        # особенность спутника лайта - итого по первой и второй вакцине равны
+        if POKAZATEL == 'CPUTNIKL':
+            PART['CPUTNIKL_26'] =  PART['CPUTNIKL_24']
+            PART['CPUTNIKL_27'] =  PART['CPUTNIKL_25']
+
+
+        # запись итоговых данных 
         DICT[POKAZATEL] = PART.loc[PART['DAY'] == PART['DAY'].max()]
         if PART['DAY'].min() !=  PART['DAY'].max():
             DICT[POKAZATEL + '_OLD'] = PART.loc[PART['DAY'] == PART['DAY'].min()]
@@ -86,7 +94,7 @@ def svod_40_covid_new():
     # Вытаскиваем ревакцинацию за МО
     list_ = []
     D_VAC = {
-        '1': ' Всего',
+        '1': 'Всего',
         '2': 'Гам-КОВИД-Вак (Спутник-V)',
         '3': 'КовиВак',
         '4': 'ЭпиВакКорона',
@@ -100,10 +108,16 @@ def svod_40_covid_new():
 
     DF = concat(list_, ignore_index=True)
     DF['TYPEVACINE'] = DF['INDX'].map(D_VAC)
-    DF['SCEP'] = DF['ORGANIZATION'] + DF['TYPEVACINE']
+    DF['SCEP'] = DF['ORGANIZATION'] + ' ' + DF['TYPEVACINE']
 
     # TVSP = parus_sql(SQL_REVAC_TVSP)
     # DF = concat([DF, TVSP], ignore_index=True)
+    # особенность спутника лайта
+    DF.loc[DF['INDX'] == '5', 'POK_18'] = DF['POK_16']
+    DF.loc[DF['INDX'] == '5', 'POK_19'] = DF['POK_17']
+    DF.loc[DF['INDX'] == '5', 'POK_16'] = 0
+    DF.loc[DF['INDX'] == '5', 'POK_17'] = 0
+
     DF = DF.sort_values(['ORGANIZATION', 'INDX'])
 
     DICT['REVAC'] = DF.loc[DF['DAY'] == DF['DAY'].max()]
