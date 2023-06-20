@@ -236,9 +236,11 @@ def regiz_load_to_base():
     SVOD.index = range(1, len(SVOD) + 1)
     SVOD = SVOD.apply(lambda x: x.loc[::].str[:255])
 
-    ncrn_insert(SVOD, 'TempTableFromMO', 'dbo', False, 'append')
-
-    ncrn_exec('EXEC [dbo].[Insert_Table_FileMO]')
+    for DF in LIST_DF:
+        DF = DF.drop_duplicates()
+        DF = DF.apply(lambda x: x.loc[::].str[:255])
+        ncrn_insert(DF, 'TempTableFromMO', 'dbo', False, 'append')
+        ncrn_exec('EXEC [dbo].[Insert_Table_FileMO]')
 
     TIME = datetime.now().strftime('%d.%m.%Y_%H-%M')
 
