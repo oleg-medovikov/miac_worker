@@ -54,7 +54,7 @@ SELECT
 												INNER JOIN PARUS.BLREPFORM rf
 													ON (pf.PRN = rf.RN)
 											WHERE rf.code = '51 COVID 19'
-									AND r.BDATE < trunc(SYSDATE)
+									AND r.BDATE <= trunc(SYSDATE)
 								) dan1
 						GROUP BY RN) dates on( dates.DAY = r.bdate AND dates.rn = a.rn)
 					WHERE rf.code = '51 COVID 19'

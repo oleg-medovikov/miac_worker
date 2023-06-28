@@ -33,7 +33,7 @@ SELECT day, cov_02
 			INNER JOIN PARUS.BALANCEINDEXES bi
 			on(d.BALANCEINDEX = bi.RN)
 		WHERE rf.code = '51 COVID 19'
-			and  r.BDATE =  trunc(SYSDATE)
+			and  r.BDATE = trunc(SYSDATE)
 			and bi.CODE in ('51_cov_02','51_cov_04','51_cov_05','51_cov_06','51_cov_08'
 							,'51_cov_10','51_cov_11','51_cov_12','51_cov_13')
 		)

@@ -5,7 +5,7 @@ import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
 from base import parus_sql
 
-from .svod_40_sql import SQL_VACHIN, SQL_REVAC_MO, SQL_REVAC_TVSP
+from .svod_40_sql import SQL_VACHIN, SQL_REVAC_MO
 
 LIST_POK = [
     'DAY', 'TYPE', 'distr', 'org',
@@ -82,13 +82,16 @@ def svod_40_covid_new():
 
         # особенность спутника лайта - итого по первой и второй вакцине равны
         if POKAZATEL == 'CPUTNIKL':
-            PART['CPUTNIKL_26'] =  PART['CPUTNIKL_24']
-            PART['CPUTNIKL_27'] =  PART['CPUTNIKL_25']
+            PART['CPUTNIKL_26'] = PART['CPUTNIKL_24']
+            PART['CPUTNIKL_27'] = PART['CPUTNIKL_25']
+        # конвасел оказывается тоже однокомпонетный!
+        if POKAZATEL == 'KONVASEL':
+            PART['KONVASEL_26'] = PART['KONVASEL_24']
+            PART['KONVASEL_27'] = PART['KONVASEL_25']
 
-
-        # запись итоговых данных 
+        # запись итоговых данных
         DICT[POKAZATEL] = PART.loc[PART['DAY'] == PART['DAY'].max()]
-        if PART['DAY'].min() !=  PART['DAY'].max():
+        if PART['DAY'].min() != PART['DAY'].max():
             DICT[POKAZATEL + '_OLD'] = PART.loc[PART['DAY'] == PART['DAY'].min()]
 
     # Вытаскиваем ревакцинацию за МО
