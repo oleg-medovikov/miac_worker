@@ -120,6 +120,11 @@ def svod_40_covid_new():
     DF.loc[DF['INDX'] == '5', 'POK_19'] = DF['POK_17']
     DF.loc[DF['INDX'] == '5', 'POK_16'] = 0
     DF.loc[DF['INDX'] == '5', 'POK_17'] = 0
+    # особенность конвасела
+    DF.loc[DF['INDX'] == '6', 'POK_18'] = DF['POK_16']
+    DF.loc[DF['INDX'] == '6', 'POK_19'] = DF['POK_17']
+    DF.loc[DF['INDX'] == '6', 'POK_16'] = 0
+    DF.loc[DF['INDX'] == '6', 'POK_17'] = 0
 
     DF = DF.sort_values(['ORGANIZATION', 'INDX'])
 

@@ -4,7 +4,7 @@ DATE_OLD = 'trunc(SYSDATE - 2)'
 
 SQL_VACHIN = f"""
 SELECT
-    to_char(r.BDATE, 'DD.MM.YYYY') day,
+    to_char(r.BDATE, 'YYYY.MM.DD') day,
     bi.CODE pokazatel,
     a.AGNNAME ORGANIZATION,
     1 row_index,
@@ -38,7 +38,7 @@ SELECT
                     ))
 UNION
 SELECT
-            to_char(r.BDATE, 'DD.MM.YYYY') day,
+            to_char(r.BDATE, 'YYYY.MM.DD') day,
             i.CODE pokazatel,
             a.AGNNAME organization,
             ro.NUMB row_index,
@@ -88,7 +88,7 @@ select DAY, 'Медицинская организация' AS tip, indx, ORGANI
     nvl(cast(pok_18 as int),0) pok_18, nvl(cast(pok_19 as int),0) pok_19
     from (
     SELECT
-            to_char(r.BDATE, 'DD.MM.YYYY') day,
+            to_char(r.BDATE, 'YYYY.MM.DD') day,
             a.AGNNAME ORGANIZATION,
             'индекс' indx,
             '' typevacine,
@@ -150,7 +150,7 @@ SQL_REVAC_TVSP = f"""SELECT  DAY, 'Пункт вакцинации' AS tip, 7 AS
 		,nvl(cast(pok_19 as int),0) pok_19
 		FROM (
         SELECT
-                to_char(r.BDATE, 'DD.MM.YYYY') day,
+                to_char(r.BDATE, 'YYYY.MM.DD') day,
                 a.AGNNAME organization,
             i.CODE pokazatel,
             ro.NUMB row_index ,
