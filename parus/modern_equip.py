@@ -51,12 +51,16 @@ def modern_equip():
     DF_2['row'] = DF_2['row'].map(names_2)
 
     DF_1_all = DF_1.pivot_table(index=['ORGANIZATION', 'row'], columns=['col'], values='VALUE', aggfunc='first')
+    DF_1_all.index.names = [None, None]
     DF_1_svd = DF_1_all[cols_1]
-    DF_1_sum = DF_1.pivot_table(index=['row'], columns=['col'], values='VALUE', aggfunc='sum').reset_index()
+    DF_1_svd.index.names = [None, None]
+    DF_1_sum = DF_1.pivot_table(index=['row'], columns=['col'], values='VALUE', aggfunc='sum')[cols_1].reset_index()
 
     DF_2_all = DF_2.pivot_table(index=['ORGANIZATION', 'row'], columns=['col'], values='VALUE', aggfunc='first')
+    DF_2_all.index.names = [None, None]
     DF_2_svd = DF_2_all[cols_2]
-    DF_2_sum = DF_2.pivot_table(index=['row'], columns=['col'], values='VALUE', aggfunc='sum').reset_index()
+    DF_2_svd.index.names = [None, None]
+    DF_2_sum = DF_2.pivot_table(index=['row'], columns=['col'], values='VALUE', aggfunc='sum')[cols_2].reset_index()
 
     DATE = DF_1['DAY'].max()
     FILE = f'/tmp/Модернизация_оснащения_за_{DATE}.xlsx'
@@ -65,12 +69,12 @@ def modern_equip():
     wb = openpyxl.load_workbook(FILE)
 
     WRITE = {
-        'ЗДАНИЯ':            (DF_1_all, 4, 1, True),
-        'ОБОРУДОВАНИЕ':      (DF_2_all, 4, 1, True),
-        'Свод зд мо':        (DF_1_svd, 4, 1, True),
-        'Свод об мо':        (DF_2_svd, 4, 1, True),
-        'Свод здания':       (DF_1_sum, 4, 1, False),
-        'Свод оборудование': (DF_2_sum, 4, 1, False),
+        'ЗДАНИЯ':            (DF_1_all, 3, 1, True),
+        'ОБОРУДОВАНИЕ':      (DF_2_all, 3, 1, True),
+        'Свод зд мо':        (DF_1_svd, 2, 1, True),
+        'Свод об мо':        (DF_2_svd, 2, 1, True),
+        'Свод здания':       (DF_1_sum, 3, 1, False),
+        'Свод оборудование': (DF_2_sum, 3, 1, False),
     }
 
     for key, value in WRITE.items():
