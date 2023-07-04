@@ -27,6 +27,7 @@ from .mp_travm_v_hode_co import mp_travm_v_hode_co
 from .laboratory import laboratory
 from .grip_and_ori import grip_and_ori
 from .HCV_dolg import HCV_dolg
+from .modern_equip import modern_equip
 
 __all__ = [
     'svod_4_2_covid_19',
@@ -58,4 +59,5 @@ __all__ = [
     'laboratory',
     'grip_and_ori',
     'HCV_dolg',
+    'modern_equip',
 ]

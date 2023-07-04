@@ -1,4 +1,7 @@
-import time, datetime, shutil, openpyxl
+import time
+import datetime
+import shutil
+import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
 import pandas as pd
 from base import parus_sql, miac_ds_sql
