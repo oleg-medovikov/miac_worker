@@ -19,6 +19,7 @@ from .medical_personal_sick import medical_personal_sick
 from .razlojit_death_week import razlojit_death_week
 from .sbor_death_week_files import sbor_death_week_files
 from .sbor_death_week_svod import sbor_death_week_svod
+from .dead_not_mss import dead_not_mss
 
 __all__ = [
     'check_robot',
@@ -42,4 +43,5 @@ __all__ = [
     'razlojit_death_week',
     'sbor_death_week_files',
     'sbor_death_week_svod',
+    'dead_not_mss',
         ]
