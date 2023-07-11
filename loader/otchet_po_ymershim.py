@@ -4,6 +4,12 @@ from clas import Dir
 from system import send_mail_with_excel
 from base import covid_sql
 
+EMAILS = [
+    'svetlichnay_mail',
+    'darina_mail',
+    'zahvatova_mail',
+]
+
 
 def otchet_po_ymershim():
     "отчёт по умершим почтой в понедельник"
@@ -18,21 +24,25 @@ def otchet_po_ymershim():
 
     DF_1.to_excel(filename_1, index=False)
 
-    send_mail_with_excel(
-            Dir.get('svetlichnay_mail'),
+    for mail in EMAILS:
+        send_mail_with_excel(
+            Dir.get(mail),
             'Отчёт по умершим',
             'Добрый день! Это отчёт от Олега',
-            filename_1)
+            filename_1
+            )
 
     filename_2 = 'temp/Умершие для РЗН.xlsx'
 
     DF_2.to_excel(filename_2, index=False)
 
-    send_mail_with_excel(
-            Dir.get('svetlichnay_mail'),
+    for mail in EMAILS:
+        send_mail_with_excel(
+            Dir.get(mail),
             'Отчёт по умершим',
             'Добрый день! Это отчёт "умершие для РЗН" от Олега',
-            filename_2)
+            filename_2
+            )
 
     try:
         os.remove(filename_1)
