@@ -64,5 +64,5 @@ SELECT
 						FOR POKAZATEL IN ('51_cov_02' cov_02,'51_cov_04' cov_04,'51_cov_05' cov_05
 					  ,'51_cov_06' cov_06,'51_cov_08' cov_08,'51_cov_10' cov_10
 					  ,'51_cov_11' cov_11,'51_cov_12' cov_12,'51_cov_13' cov_13) )	  
-        WHERE cov_02 IS NOT NULL
+        WHERE cov_02 IS NOT NULL and cov_04 > 0
 			ORDER BY DAY DESC, cov_02 ASC

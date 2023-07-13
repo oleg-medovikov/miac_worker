@@ -16,19 +16,21 @@ def svod_51_covid_19():
     DF = parus_sql(SQL_1)
     ALL = parus_sql(SQL_2)
 
+    if len(DF) == 0:
+        raise no_data('Нет данных за сегодня!')
+
     try:
         DATE = DF.at[0, 'DAY']
+        del DF['DAY']
     except KeyError:
         DATE = to_datetime(ALL['DAY'], format='%d.%m.%Y').max()
         DATE = DATE.strftime('%d.%m.%Y')
-
-    del DF['DAY']
 
     DF = DF.append(DF.sum(numeric_only=True), ignore_index=True)
 
     DF.loc[len(DF)-1, 'COV_02'] = 'ИТОГО:'
 
-    NEW_NAME = 'temp/' + str(DATE) + '_51_COVID_19_cvod.xlsx'
+    NEW_NAME = f'/tmp/{str(DATE)}_51_COVID_19_cvod.xlsx'
 
     shutil.copyfile('help/51_COVID_19_svod.xlsx', NEW_NAME)
 
