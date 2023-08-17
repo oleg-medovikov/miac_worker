@@ -41,7 +41,7 @@ def read_file(FILE):
 
 def slojit_fr():
     "это функция складывает выгрузки ФР в 1 файл"
-    print('test 1')
+    # print('test 1')
 
     xlrd.xlsx.ensure_elementtree_imported(False, None)
     xlrd.xlsx.Element_has_iter = True
@@ -56,14 +56,14 @@ def slojit_fr():
     if not len(FILES):
         raise my_except('В папке нет файлов!')
 
-    pool = Pool()
+    pool = Pool(processes=4)
     df_list = pool.map(read_file, FILES)
-    print('test_1.4')
+    # print('test_1.4')
 
     df = pd.concat(df_list, ignore_index=True)
-    print('test_1.5')
+    # print('test_1.5')
     df["п/н"] = range(1, len(df)+1)
-    print('test_1.6')
+    # print('test_1.6')
 
     TOMORROW = (datetime.today() + timedelta(days=1)).strftime("%Y_%m_%d")
 
@@ -80,7 +80,7 @@ def slojit_fr():
     MESS = '``` \n'
     MESS += f'Успешно сложены {len(FILES)} файлов выгрузки ФР,'
     MESS += f'\nвсего строк: {df.shape[0]}'
-    print(MESS)
+    # print(MESS)
 
     if len(OTCHET_9):
         OTCHET_9_NEW = Dir.get('covid_iac2') \
