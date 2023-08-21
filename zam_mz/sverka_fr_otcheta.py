@@ -7,6 +7,10 @@ from .put_excel_for_mo import put_excel_for_mo_2
 from base import covid_sql
 
 
+class my_except(Exception):
+    pass
+
+
 # замена названий
 def change_MO_dict() -> dict:
     "возвращаем словарь заменяемых названий"
@@ -49,7 +53,7 @@ def sverka_fr_otcheta():
     try:
         FILE_FR = glob.glob(MASK)[0]
     except IndexError:
-        raise 'Не найден двенадцатичасовой федеральный регистр'
+        raise my_except('Не найден двенадцатичасовой федеральный регистр')
 
     MASK = Dir.get('path_robot') + '/' + DATE_OTCH + '/' \
         + 'Поликлиники*.xlsx'
@@ -57,8 +61,7 @@ def sverka_fr_otcheta():
     try:
         FILE_VP = glob.glob(MASK)[0]
     except IndexError:
-        raise 'Не найден файл Поликлиники.xlsx'
-
+        raise my_except('Не найден файл Поликлиники.xlsx')
 
     # Читаем файлы
     names = ['mo', 'cov_il', 'cov_rec']
@@ -118,25 +121,28 @@ def sverka_fr_otcheta():
     VP = VP.merge(FR_IL, how='left', on='mo')
     VP = VP.merge(FR_REC, how='left', on='mo')
 
-    VP = VP.set_index('mo')
+    # VP = VP.set_index('mo')
     VP = VP.fillna(0)
 
-    VP.loc['Всего', 'cov_il_fr'] = VP['cov_il_fr'].sum()
-    VP.loc['Всего', 'cov_rec_fr'] = VP['cov_rec_fr'].sum()
+    VP.loc[VP.mo == 'Всего', 'cov_il_fr'] = VP['cov_il_fr'].sum()
+    VP.loc[VP.mo == 'Всего', 'cov_rec_fr'] = VP['cov_rec_fr'].sum()
     VP['delta_il'] = VP['cov_il'] - VP['cov_il_fr']
     VP['delta_rec'] = VP['cov_rec'] - VP['cov_rec_fr']
+    VP.loc[VP.mo.isin(POL_BOL), 'mo'] = VP['mo'] + ' (амб.)'
 
     # разбиваем на части и переименовываем
     IL = VP[[
-        'cov_il', 'cov_il_fr', 'delta_il'
+        'mo', 'cov_il', 'cov_il_fr', 'delta_il'
         ]].rename(columns={
+            'mo': 'Медицинская организация',
             'cov_il': 'болеют ковид из ежедневного отчета',
             'cov_il_fr': 'ФР диагноз U07.1',
             'delta_il': 'Разница',
             })
     REC = VP[[
-        'cov_rec', 'cov_rec_fr', 'delta_rec'
+        'mo', 'cov_rec', 'cov_rec_fr', 'delta_rec'
         ]].rename(columns={
+            'mo': 'Медицинская организация',
             'cov_rec': 'выздоровело от ковида из ежедневного отчета',
             'cov_rec_fr': 'ФР выздоровело от U07.1',
             'delta_rec': 'Разница',
