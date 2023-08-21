@@ -7,10 +7,10 @@ from multiprocessing import Pool
 import pandas as pd
 from datetime import datetime, timedelta
 
-from conf import MASTER
+# from conf import MASTER
 from clas import Dir
 from base import covid_sql
-from system import send_message
+# from system import send_message
 
 NAMES = [
     'п/н', 'Дата создания РЗ', 'УНРЗ', 'Дата изменения РЗ',
