@@ -28,6 +28,7 @@ from .laboratory import laboratory
 from .grip_and_ori import grip_and_ori
 from .HCV_dolg import HCV_dolg
 from .modern_equip import modern_equip
+from .polyative_help import polyative_help
 
 __all__ = [
     'svod_4_2_covid_19',
@@ -60,4 +61,5 @@ __all__ = [
     'grip_and_ori',
     'HCV_dolg',
     'modern_equip',
+    'polyative_help',
 ]
