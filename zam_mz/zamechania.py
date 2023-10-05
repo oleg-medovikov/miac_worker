@@ -1,18 +1,19 @@
 from base import covid_sql, covid_exec, covid_insert
 
 SQL_NAMES = [
-['net_diagnoz_covid.sql', 'Не стоит диагноз ковид' ],
-['no_snils.sql', 'Без СНИЛСа'],
-['no_OMS.sql', 'Нет сведений ОМС'],
-['bez_ishod.sql', 'Без исхода заболевания больше 45 дней'],
-['no_lab.sql', 'без лабораторного потверждения'],
-['net_dnevnik.sql','Нет дневниковых записей'],
-['net_pad.sql', 'Нет ПАД'],
-['neverni_vid_lecenia.sql','Неверный вид лечения'],
-['bez_ambulat_level.sql', 'Нет амбулаторного этапа'],
-['bez_ambulat_level_amb.sql', 'Пациенты зависшие по МО'],
-['bez_ambulat_level_noMO.sql', 'Пациенты зависшие без МО']
-    ]
+    ['net_diagnoz_covid.sql', 'Не стоит диагноз ковид'],
+    ['no_snils.sql', 'Без СНИЛСа'],
+    ['no_OMS.sql', 'Нет сведений ОМС'],
+    ['bez_ishod.sql', 'Без исхода заболевания больше 45 дней'],
+    ['no_lab.sql', 'без лабораторного потверждения'],
+    ['net_dnevnik.sql', 'Нет дневниковых записей'],
+    ['net_pad.sql', 'Нет ПАД'],
+    ['neverni_vid_lecenia.sql', 'Неверный вид лечения'],
+    ['bez_ambulat_level.sql', 'Нет амбулаторного этапа'],
+    ['bez_ambulat_level_amb.sql', 'Пациенты зависшие по МО'],
+    ['bez_ambulat_level_noMO.sql', 'Пациенты зависшие без МО']
+]
+
 
 def zamechania():
     SQL = """
@@ -20,15 +21,15 @@ def zamechania():
         from robo.v_FedReg
     """
 
-    DATE = covid_sql(SQL).iloc[0,0]
+    DATE = covid_sql(SQL).iloc[0, 0]
 
     SQL = open('zam_mz/sql/kolichestvo.sql').read()
 
-    DF = covid_sql( SQL )
-    del DF ['Принадлежность']
-    DF ['дата отчета'] = DATE
+    DF = covid_sql(SQL)
+    del DF['Принадлежность']
+    DF['дата отчета'] = DATE
 
-    for FILE,NAME in SQL_NAMES:
+    for FILE, NAME in SQL_NAMES:
         SQL = open('zam_mz/sql/' + FILE, 'r').read()
         PART = covid_sql( SQL )
         PART = PART.groupby(
