@@ -225,7 +225,7 @@ def load_file(FILE: str, MO: 'pd.DataFrame') -> dict:
 
     try:
         DF['MO'] = MO.loc[
-            MO['Account'].str.contains(ACCOUNT),
+            MO['Account'] == ACCOUNT,
             'Name'
             ].iat[0]
         DF['OID'] = MO.loc[
