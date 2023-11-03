@@ -169,8 +169,5 @@ def zamechania_file():
             ws.cell(row=r_idx, column=c_idx, value=value)
 
     wb.save( NEW_FILE )
- 
 
     return NEW_FILE
-
-
