@@ -1,5 +1,3 @@
-from typing import Optional
-
 from clas import Dir
 from system import send_mail_with_excel
 from base import covid_sql
@@ -11,7 +9,7 @@ EMAILS = [
 ]
 
 
-def otchet_po_ymershim(chat: Optional[str]):
+def otchet_po_ymershim(chat: str = "false"):
     "отчёт по умершим почтой в понедельник"
 
     SQL_1 = "select * from [dbo].[View_Count_Dead_In_MO]"
