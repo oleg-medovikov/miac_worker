@@ -1,12 +1,28 @@
-from clas import *
-from shed import *
-from conf import *
-from base import *
+import clas
+import shed
+import conf
+import base
+import system
 
-from system import *
+import loader
+import parus
+import zam_mz
+import regiz
+import cardio
+import year_otch
 
-from loader import *
-from parus  import *
-from zam_mz import *
-from regiz  import *
-from cardio import *
+
+__all__ = [
+    "clas",
+    "shed",
+    "conf",
+    "base",
+    "system",
+    # scripts
+    "loader",
+    "parus",
+    "zam_mz",
+    "regiz",
+    "cardio",
+    "year_otch",
+]

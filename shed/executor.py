@@ -6,6 +6,7 @@ from parus import *
 from zam_mz import *
 from regiz import *
 from cardio import *
+from year_otch import *
 
 from system import bot_send_text, bot_send_file
 
@@ -20,12 +21,10 @@ def executor(TASK: Task):
     COMMAND = Command.get(TASK.c_id)
 
     with ThreadPoolExecutor() as executor:
-        if TASK.c_arg == 'no':
+        if TASK.c_arg == "no":
             future = executor.submit(globals()[COMMAND.c_procedure])
         else:
-            future = executor.submit(
-                    globals()[COMMAND.c_procedure],
-                    TASK.c_arg)
+            future = executor.submit(globals()[COMMAND.c_procedure], TASK.c_arg)
         try:
             return_value = future.result()
         except Exception as e:
@@ -44,16 +43,16 @@ def executor(TASK: Task):
 
             if COMMAND.return_file:
                 TASK.stop()
-                for FILE in return_value.split(';'):
+                for FILE in return_value.split(";"):
                     for USER in USERS:
                         bot_send_file(FILE, USER)
                 # подождем несколько секунд и удалим файлы
-                #sleep(15)
-                #for FILE in return_value.split(';'):
+                # sleep(15)
+                # for FILE in return_value.split(';'):
                 #    os.remove(FILE)
             else:
                 TASK.comment = return_value
                 TASK.stop()
                 for USER in USERS:
-                    for MESS in return_value.split(';mess;'):
+                    for MESS in return_value.split(";mess;"):
                         bot_send_text(MESS, USER)
