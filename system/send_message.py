@@ -6,14 +6,10 @@ from conf import TELEGRAM_API
 
 
 def bot_send_text(mess: str, chat_id: int) -> bool:
-    mess = mess.replace('_', '\\_').replace('@', '\\@').replace('&', '\\&')
+    mess = mess.replace("_", "\\_").replace("@", "\\@").replace("&", "\\&")
 
-    send_text = f'https://api.telegram.org/bot{TELEGRAM_API}/sendMessage'
-    data = {
-        'chat_id':    chat_id,
-        'parse_mode': 'Markdown',
-        'text':        mess
-        }
+    send_text = f"https://api.telegram.org/bot{TELEGRAM_API}/sendMessage"
+    data = {"chat_id": chat_id, "parse_mode": "Markdown", "text": mess}
     while True:
         try:
             requests.get(send_text, data=data)
@@ -27,10 +23,12 @@ def bot_send_text(mess: str, chat_id: int) -> bool:
 
 
 def bot_send_file(file: str, chat_id: int) -> None:
+    if file == "":
+        return
 
-    with open(file, 'rb') as f:
-        files = {'document': f}
-        url = f'https://api.telegram.org/bot{TELEGRAM_API}/sendDocument'
+    with open(file, "rb") as f:
+        files = {"document": f}
+        url = f"https://api.telegram.org/bot{TELEGRAM_API}/sendDocument"
         while True:
             try:
                 requests.post(url, data={"chat_id": chat_id}, files=files)
