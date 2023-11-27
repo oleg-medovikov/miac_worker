@@ -26,20 +26,18 @@ INNER JOIN PARUS.BLREPFORMED rd
 on(r.BLREPFORMED = rd.RN)
 INNER JOIN PARUS.BLREPFORM rf
 on(rd.PRN = rf.RN)
-WHERE rf.CODE = 'ИнфконтрольНРД' 
-and i.CODE IN ('papnrd_01', 'papnrd_02', 'papnrd_03', 'papnrd_04', 'papnrd_05')
+WHERE rf.CODE = 'ИнфконтрольОБЩ' 
+and i.CODE IN ('shtat_01','shtat_02', 'shtat_03')
 """
 
 pokazatel = {
-    "papnrd_01": "1. Наличие протокола ПАП (да/нет)",
-    "papnrd_02": "2. Торговое наименование лекарственного препарата, используемого для ПАП",
-    "papnrd_03": "3. Количество операций ВСЕГО",
-    "papnrd_04": "4. Количество операций, при которых показано ПАП",
-    "papnrd_05": "5. Количество операций, при которых проведено ПАП ВСЕГО",
+    "shtat_01": "1. Специалист инфекционного контроля",
+    "shtat_02": "2. Квалификационная категория специалиста",
+    "shtat_03": "3. Стаж работы специалиста (в годах)",
 }
 
-pap_NRD = SQL_otchet(
-    filename="/tmp/Инфконтроль_НРД.xlsx",
+staf_GEN = SQL_otchet(
+    filename="/tmp/Инфконтроль_ОБЩ.xlsx",
     sql=sql,
     pokazatel=pokazatel,
     del_col=["level_2", "ROW_INDEX"],

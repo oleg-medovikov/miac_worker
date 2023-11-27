@@ -46,7 +46,14 @@ pokazatel = {
 }
 
 info_NRD = SQL_otchet(
+    filename="/tmp/Инфконтроль_НРД.xlsx",
     sql=sql,
     pokazatel=pokazatel,
-    filename="/tmp/ИнфконтрольНРД_.xlsx",
+    del_col=["level_1"],
+    pivot={
+        "index": ["ORGANIZATION"],
+        "columns": ["POKAZATEL"],
+        "values": ["VALUE"],
+        "aggfunc": "first",
+    },
 )
