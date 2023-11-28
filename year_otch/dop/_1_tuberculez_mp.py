@@ -26,24 +26,32 @@ INNER JOIN PARUS.BLREPFORMED rd
 on(r.BLREPFORMED = rd.RN)
 INNER JOIN PARUS.BLREPFORM rf
 on(rd.PRN = rf.RN)
-WHERE rf.CODE = 'ИнфконтрольНРД' 
+WHERE rf.CODE = 'ОхранаЗОбщ' 
 and i.CODE IN (
-    'papnrd_01', 'papnrd_02', 'papnrd_03', 'papnrd_04', 'papnrd_05'
+    'tub_01', 'tub_02', 'tub_03', 'tub_04', 'tub_05',
+    'tub_06', 'tub_07', 'tub_08', 'tub_09', 'tub_10',
+    'tub_11'
 )
 and r.BDATE between  to_date(__start__,'yyyy-mm-dd')
     AND  to_date(__stop__,'yyyy-mm-dd')
 """
 
 pokazatel = {
-    "papnrd_01": "1. Наличие протокола ПАП (да/нет)",
-    "papnrd_02": "2. Торговое наименование лекарственного препарата, используемого для ПАП",
-    "papnrd_03": "3. Количество операций ВСЕГО",
-    "papnrd_04": "4. Количество операций, при которых показано ПАП",
-    "papnrd_05": "5. Количество операций, при которых проведено ПАП ВСЕГО",
+    "tub_01": "01. Эпидномер",
+    "tub_02": "02. Дата заболевания",
+    "tub_03": "03. Дата регистрации заболевания",
+    "tub_04": "04. Возраст",
+    "tub_05": "05. Должность",
+    "tub_06": "06. Отделение",
+    "tub_07": "07. Стаж работы в отделении (в годах)",
+    "tub_08": "08. Дата последнего флюрографического исследования",
+    "tub_09": "09. Выявлен активно",
+    "tub_10": "10. Результаты лабораторных исследований",
+    "tub_11": "11. Окончательный диагноз (форма туберкулеза)",
 }
 
-pap_NRD = SQL_otchet(
-    filename="/tmp/Инфконтроль_НРД.xlsx",
+tuberculez_mp = SQL_otchet(
+    filename="/tmp/Охрана_Здоровья.xlsx",
     sql=sql,
     pokazatel=pokazatel,
     del_col=["level_2", "ROW_INDEX"],
