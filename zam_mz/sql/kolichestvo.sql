@@ -1,30 +1,32 @@
-select kol.*, dubli.[Количество дублей] from (
-    SELECT [Медицинская организация],[Принадлежность],[Тип организации]
-        , count(*) as 'Всего записей'
-        , count (distinct dbo.get_Gid(idPatient)) as 'Уникальных пациентов'
-        from robo.v_FedReg
-            where [Тип организации] is not null
-            group by [Медицинская организация],[Принадлежность],[Тип организации] ) as kol
-    left join  (select itog.[Первая организация], count(*) as 'Количество дублей' from (
-                    select distinct
-                    fr1.УНРЗ as 'Первое УНРЗ', fr1.[Медицинская организация] as 'Первая организация'
-                        from (select distinct dbo.get_Gid(IdPatient) as 'Gid',[idFedreg],[УНРЗ],[ФИО],[Диагноз установлен],[Медицинская организация],[СНИЛС],[Исход заболевания]
-                                    from  robo.v_FedReg) as fr1
-
-                        inner join (select  distinct dbo.get_Gid(IdPatient) as 'Gid',[idFedreg],[УНРЗ],[ФИО],[Диагноз установлен],[Медицинская организация],[СНИЛС],[Исход заболевания]
-                                            from robo.v_FedReg ) as fr2
-                            on(
-                            fr1.Gid = fr2.Gid and fr1.УНРЗ < fr2.УНРЗ
-                            and fr1.[Медицинская организация] = fr2.[Медицинская организация]
-                            and(fr1.[СНИЛС] = 'Не идентифицирован' or fr2.[СНИЛС] = 'Не идентифицирован')
-                            and  abs(DATEDIFF (day,fr1.[Диагноз установлен],fr2.[Диагноз установлен])) < 60
-                            )
-								left join robo.no_dubli as nd
-									on (
-										fr1.УНРЗ = nd.[Первое УНРЗ] and
-										fr2.УНРЗ = nd.[Второе УНРЗ]
-										)
-									where nd.[Первое УНРЗ] is null
-							) as  itog
-        group by itog.[Первая организация] ) as dubli
-    on (kol.[Медицинская организация] = dubli.[Первая организация])
+select al.*, dubli.[Количество дублей]
+from
+(
+select 
+	F.[Медицинская организация],F.[Принадлежность],F.[Тип организации]
+	,count(*) as 'Всего записей'
+	,count (distinct P.Gid) as 'Уникальных пациентов'
+	from robo.v_FedReg F left join cv_Patient P on(F.idPatient = P.idPatient)
+group by F.[Медицинская организация],F.[Принадлежность],F.[Тип организации]
+) as al
+left join (
+ select d.[Медицинская организация], count(d.[GID]) as 'Количество дублей'
+	from (
+	SELECT
+		F.[Медицинская организация]
+		,10* DATEPART(year, F.[Диагноз установлен]) + DATEPART(q, F.[Диагноз установлен]) as 'квартал'
+		,P.[GID]
+		,sum(case when F.[СНИЛС] = 'Не идентифицирован' then -1 else 0 end) as 'снилс'
+		,count (distinct F.[УНРЗ]) as 'дубли'
+		from robo.v_FedReg F left join cv_Patient P on(F.idPatient = P.idPatient)
+		GROUP BY 
+				F.[Медицинская организация]
+				,10* DATEPART(year, F.[Диагноз установлен]) + DATEPART(q, F.[Диагноз установлен])
+				,P.[GID] 
+		having  (
+			sum(case when F.[СНИЛС] = 'Не идентифицирован' then -1 else 0 end) < 0
+			and count(distinct F.[УНРЗ]) > 1
+			)
+		) as d
+group by d.[Медицинская организация]
+) as dubli
+on (al.[Медицинская организация] = dubli.[Медицинская организация] )
