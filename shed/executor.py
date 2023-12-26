@@ -30,12 +30,12 @@ def executor(TASK: Task):
         except Exception as e:
             # если функция сломалась
             exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)
             ERROR = e, fname, exc_tb.tb_lineno
 
             TASK.comment = str(ERROR)
             TASK.stop()
-            bot_send_text(str(e), TASK.client)
+            bot_send_text(f"{str(e)} \n{ERROR} \n{fname}", TASK.client)
         else:
             # Если все хорошо, то получаем список, кому вернуть результат
             USERS = TASK.users()
