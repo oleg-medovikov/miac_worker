@@ -36,4 +36,4 @@ SELECT  distinct
          on(r.BLREPFORMED = rd.RN) 
          INNER JOIN PARUS.BLREPFORM rf 
          on(rd.PRN = rf.RN) 
-         WHERE rf.code = 'Внбпневм' AND r.BDATE <= trunc(SYSDATE) + 2 )
+         WHERE rf.code = 'Внбпневм' AND r.BDATE <= trunc(SYSDATE) )

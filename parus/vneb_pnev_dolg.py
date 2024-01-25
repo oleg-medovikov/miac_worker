@@ -1,20 +1,26 @@
 from base import parus_sql
 from pandas import DataFrame
+import re
 
 
 def vneb_pnev_dolg():
     SQL = open("parus/sql/vneb_pnevm_org.sql", "r").read()
     DF = parus_sql(SQL)
+    org = DF.ORGANIZATION.str.replace("[\W]", "").str.lower().unique()
 
     DOLG = DataFrame(columns=["Поликлинники", "Стационары"])
 
     for _ in polic:
-        if _ not in DF["ORGANIZATION"]:
+        name = re.sub("[\W_]", "", _).lower()
+
+        if name not in org:
             k = len(DOLG)
             DOLG.loc[k, "Поликлинники"] = _
 
     for _ in stach:
-        if _ not in DF["ORGANIZATION"]:
+        name = re.sub("[\W_]", "", _).lower()
+
+        if name not in org:
             try:
                 k = len(DF["Стационары"].unique())
             except KeyError:
@@ -118,4 +124,8 @@ stach = [
     "СПб ГБУЗ Клиническая больница Святителя Луки ",
     'СПб ГБУЗ "Городская больница №38 им. Н.А.Семашко"',
     'СПб ГБУЗ "Госпиталь для ветеранов войн"',
+    'СПб ГБУЗ "Детская городская больница №2 святой Марии Магдалины"',
+    'СПб ГБУЗ "Детская городская больница Святой Ольги"',
+    'СПб ГБУЗ "Детская городская клиническая больница №5 имени Нила Федоровича Филатова"',
+    'СПб ГБУЗ "ДГМКЦ ВМТ им. К.А. Раухфуса"',
 ]

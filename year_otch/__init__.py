@@ -5,6 +5,7 @@ from .general_indicators_year import general_indicators_year
 from .health_care_year import health_care_year
 from .obstetrics_year import obstetrics_year
 from .infections_year import infections_year
+from .ismp_year import ismp_year
 
 __all__ = [
     "vactination_year",
@@ -13,4 +14,5 @@ __all__ = [
     "health_care_year",
     "obstetrics_year",
     "infections_year",
+    "ismp_year",
 ]
