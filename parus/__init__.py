@@ -32,6 +32,7 @@ from .polyative_help import polyative_help
 from .mp_veteran_cvo import mp_veteran_cvo
 from .vneb_pnev_dolg import vneb_pnev_dolg
 from .kadry_schet_palat import kadry_schet_palat
+from .kadry_schet_14_15_16 import kadry_schet_14_15_16
 
 __all__ = [
     "svod_4_2_covid_19",
@@ -68,4 +69,5 @@ __all__ = [
     "mp_veteran_cvo",
     "vneb_pnev_dolg",
     "kadry_schet_palat",
+    "kadry_schet_14_15_16",
 ]
