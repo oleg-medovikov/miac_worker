@@ -21,6 +21,7 @@ from .sbor_death_week_files import sbor_death_week_files
 from .sbor_death_week_svod import sbor_death_week_svod
 from .dead_not_mss import dead_not_mss
 from .svod_all_sick import svod_all_sick
+from .death_15_day import death_15_day
 
 __all__ = [
     "check_robot",
@@ -46,4 +47,5 @@ __all__ = [
     "sbor_death_week_svod",
     "dead_not_mss",
     "svod_all_sick",
+    "death_15_day",
 ]
