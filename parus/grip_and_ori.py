@@ -121,8 +121,8 @@ def grip_and_ori():
     DF_G2 = DF_G[
         [
             "ORGANIZATION",
-            "table_43",
-            "table_44",
+            "table_55",
+            "table_56",
             "table_57",
             "table_58",
             "table_59",
