@@ -5,6 +5,7 @@ from base import parus_sql
 SQL_14 = """SELECT
     extract(year from r.BDATE) year,
     a.AGNNAME ORGANIZATION ,
+    a.OGRN,
     bi.CODE  pokazatel,
     CASE WHEN STRVAL  IS NOT NULL THEN STRVAL
         WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
@@ -28,7 +29,8 @@ and bi.CODE like 'schetpl_0%'"""
 
 SQL_15 = """SELECT
     extract(year from r.BDATE) year,
-    a.AGNNAME ORGANIZATION ,
+    a.AGNNAME ORGANIZATION,
+    a.OGRN,
     bi.CODE  pokazatel,
     CASE WHEN STRVAL  IS NOT NULL THEN STRVAL
         WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
@@ -52,7 +54,8 @@ and bi.CODE like 'schetplt_0%'
 """
 SQL_16 = """SELECT
     extract(year from r.BDATE) year,
-    a.AGNNAME ORGANIZATION ,
+    a.AGNNAME ORGANIZATION,
+    a.OGRN,
     bi.CODE  pokazatel,
     CASE WHEN STRVAL  IS NOT NULL THEN STRVAL
         WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
@@ -156,7 +159,7 @@ def kadry_schet_14_15_16():
     ] = "6. Прочий персонал"
 
     pr_14 = df.pivot_table(
-        index=["ORGANIZATION", "Количество работников"],
+        index=["ORGANIZATION", "OGRN", "Количество работников"],
         columns=["YEAR", "Должности"],
         values=["VALUE"],
         aggfunc="first",
@@ -288,7 +291,7 @@ def kadry_schet_14_15_16():
     ] = "13. Среднемесячная зарплата"
 
     pr_15 = df.pivot_table(
-        index=["ORGANIZATION", "Сотрудники экономической службы", "YEAR"],
+        index=["ORGANIZATION", "OGRN", "Сотрудники экономической службы", "YEAR"],
         columns=["параметры"],
         values=["VALUE"],
         aggfunc="first",
@@ -421,7 +424,7 @@ def kadry_schet_14_15_16():
     ] = "13. Среднемесячная зарплата"
 
     pr_16 = df.pivot_table(
-        index=["ORGANIZATION", "Сотрудники бухгалтерии", "YEAR"],
+        index=["ORGANIZATION", "OGRN", "Сотрудники бухгалтерии", "YEAR"],
         columns=["параметры"],
         values=["VALUE"],
         aggfunc="first",
