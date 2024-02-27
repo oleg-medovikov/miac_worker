@@ -7,6 +7,8 @@ from .obstetrics_year import obstetrics_year
 from .infections_year import infections_year
 from .ismp_year import ismp_year
 
+from .lab_koklucsh import lab_koklucsh
+
 __all__ = [
     "vactination_year",
     "dezinfection_year",
@@ -15,4 +17,5 @@ __all__ = [
     "obstetrics_year",
     "infections_year",
     "ismp_year",
+    "lab_koklucsh",
 ]
