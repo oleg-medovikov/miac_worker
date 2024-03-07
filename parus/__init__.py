@@ -27,6 +27,7 @@ from .mp_travm_v_hode_co import mp_travm_v_hode_co
 from .laboratory import laboratory
 from .grip_and_ori import grip_and_ori
 from .HCV_dolg import HCV_dolg
+from .SZPV_dolg import SZPV_dolg
 from .modern_equip import modern_equip
 from .polyative_help import polyative_help
 from .mp_veteran_cvo import mp_veteran_cvo
@@ -70,4 +71,5 @@ __all__ = [
     "vneb_pnev_dolg",
     "kadry_schet_palat",
     "kadry_schet_14_15_16",
+    "SZPV_dolg",
 ]
