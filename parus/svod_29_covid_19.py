@@ -4,7 +4,7 @@ from base import parus_sql
 
 
 def svod_29_covid_19():
-    if int(time.strftime("%H")) < 16:
+    if int(time.strftime("%H")) <= 17:
         SQL = open("parus/sql/covid_29_svod1.sql", "r").read()
         DATE = datetime.datetime.now() - datetime.timedelta(days=1)
     else:

@@ -32,4 +32,5 @@
       INNER JOIN PARUS.BALANCEINDEXES bi
       on(d.BALANCEINDEX = bi.RN)
       WHERE rf.CODE = 'СЗПВ'
+        and r.BDATE < trunc(SYSDATE) + 2
 )
