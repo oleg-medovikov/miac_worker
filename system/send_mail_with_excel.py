@@ -3,7 +3,6 @@ from email.message import EmailMessage
 
 from clas import Dir
 
-SENDER_EMAIL = Dir.get('SENDER_EMAIL')
 
 
 def send_mail_with_excel(
@@ -13,6 +12,8 @@ def send_mail_with_excel(
         excel_file: str
         ):
     "отправляем отчёт почтой"
+
+    SENDER_EMAIL = Dir.get('SENDER_EMAIL')
 
     msg = EmailMessage()
     msg['Subject'] = subject
