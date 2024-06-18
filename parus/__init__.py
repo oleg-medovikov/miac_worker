@@ -35,6 +35,7 @@ from .vneb_pnev_dolg import vneb_pnev_dolg
 from .kadry_schet_palat import kadry_schet_palat
 from .kadry_schet_14_15_16 import kadry_schet_14_15_16
 from .czpv_part_4 import czpv_part_4
+from .patogens_ismp import patogens_ismp
 
 __all__ = [
     "svod_4_2_covid_19",
@@ -74,4 +75,5 @@ __all__ = [
     "kadry_schet_14_15_16",
     "SZPV_dolg",
     "czpv_part_4",
+    "patogens_ismp",
 ]
