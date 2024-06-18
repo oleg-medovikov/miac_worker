@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import NewType
 from base import parus_sql
 
 
@@ -60,4 +61,43 @@ def patogens_ismp():
 
     DF.to_excel(NEW_NAME_1)
 
-    return NEW_NAME_1
+    # случаи ИСМП
+    SQL = open("parus/sql/patogens_ismp_2.sql", "r").read()
+
+    DF = parus_sql(SQL)
+    DATE = DF.at[0, "BDATE"].strftime("%d_%m_%Y")
+
+    names = {
+        "s_001": "Форма ИСМП",
+        "i_z_01": "Профиль МО",
+        "1_01_001": "Численность пострадавших",
+        "s_002": "Возбудители ИСМП",
+        "s_003": "Фено (гено)-тип",
+        "1_01_002": "Кол-во групп АМП, используемых для типирования выделенных возбудителей ИСМП",
+        "i_z_02": "в том числе наименование групп АМП, к представителям которых выделенные возбудители ИСМП резистентны",
+        "1_01_003": "Кол-во групп дезинфекционных средств (по действующему веществу) использовали для типирования выделенных возбудителей ИСМП",
+        "i_z_03": "в том числе наименование групп дезинфектантов, к которым выделенные возбудители ИСМП резистентны",
+        "s_004": "Источник ИСМП",
+        "s_005": "Факторы передачи",
+        "1_01_004": "Длительность вспышки (в днях)",
+        "1_01_005": "Количество летальных исходов",
+    }
+
+    DF = DF.pivot_table(
+        index=["ORGANIZATION", "AGN_COMMENT"],
+        columns=["POKAZATEL"],
+        values=["VALUE"],
+        aggfunc="first",
+    ).stack(0)
+
+    if "i_z_03" not in DF.columns:
+        DF["i_z_03"] = None
+
+    DF = DF[names.keys()]
+    DF.rename(columns=names, inplace=True)
+
+    NEW_NAME_2 = "/tmp/" + DATE + "_случаи_ИСМП.xlsx"
+
+    DF.to_excel(NEW_NAME_2)
+
+    return NEW_NAME_1 + ";" + NEW_NAME_2
