@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import NewType
 from base import parus_sql
+from pandas import to_numeric
 
 
 def patogens_ismp():
@@ -61,7 +62,7 @@ def patogens_ismp():
 
     DF.to_excel(NEW_NAME_1)
 
-    # случаи ИСМП
+    # вспышки_ИнфЗаб
     SQL = open("parus/sql/patogens_ismp_2.sql", "r").read()
 
     DF = parus_sql(SQL)
@@ -96,8 +97,204 @@ def patogens_ismp():
     DF = DF[names.keys()]
     DF.rename(columns=names, inplace=True)
 
-    NEW_NAME_2 = "/tmp/" + DATE + "_случаи_ИСМП.xlsx"
+    NEW_NAME_2 = "/tmp/" + DATE + "_вспышки_ИнфЗаб.xlsx"
 
     DF.to_excel(NEW_NAME_2)
 
-    return NEW_NAME_1 + ";" + NEW_NAME_2
+    # Возбудители ИСМП
+    SQL = open("parus/sql/patogens_ismp_3.sql", "r").read()
+
+    DF = parus_sql(SQL)
+    DATE = DF.at[0, "BDATE"].strftime("%d_%m_%Y")
+
+    DF.loc[DF.POKAZATEL.str.startswith("7_01_"), "COLUMN"] = "J"
+    DF.loc[DF.POKAZATEL.str.startswith("7_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("7_01_"), "POKAZATEL"]
+        .str.replace("7_01_", "")
+        .str.replace("013", "010")
+        .str.replace("014", "011")
+        .str.replace("015", "012")
+        .str.replace("016", "013")
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("8_01_"), "COLUMN"] = "K"
+    DF.loc[DF.POKAZATEL.str.startswith("8_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("8_01_"), "POKAZATEL"]
+        .str.replace("8_01_", "")
+        .str.replace("013", "010")
+        .str.replace("014", "011")
+        .str.replace("015", "012")
+        .str.replace("016", "013")
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("10_01_"), "COLUMN"] = "M"
+    DF.loc[DF.POKAZATEL.str.startswith("10_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("10_01_"), "POKAZATEL"]
+        .str.replace("10_01_", "")
+        .str.replace("013", "010")
+        .str.replace("014", "011")
+        .str.replace("015", "012")
+        .str.replace("016", "013")
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("11_01_"), "COLUMN"] = "N"
+    DF.loc[DF.POKAZATEL.str.startswith("11_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("11_01_"), "POKAZATEL"]
+        .str.replace("11_01_", "")
+        .str.replace("013", "010")
+        .str.replace("014", "011")
+        .str.replace("015", "012")
+        .str.replace("016", "013")
+    )
+
+    DF.loc[DF.POKAZATEL.str.startswith("19_01_"), "COLUMN"] = "C"
+    DF.loc[DF.POKAZATEL.str.startswith("19_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("19_01_"), "POKAZATEL"].str.replace(
+            "19_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("ICMP"), "COLUMN"] = "D"
+    DF.loc[DF.POKAZATEL.str.startswith("ICMP"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("ICMP"), "POKAZATEL"].str.replace("ICMP", "")
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("2_01_"), "COLUMN"] = "E"
+    DF.loc[DF.POKAZATEL.str.startswith("2_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("2_01_"), "POKAZATEL"].str.replace(
+            "2_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("3_01_"), "COLUMN"] = "F"
+    DF.loc[DF.POKAZATEL.str.startswith("3_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("3_01_"), "POKAZATEL"].str.replace(
+            "3_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("4_01_"), "COLUMN"] = "G"
+    DF.loc[DF.POKAZATEL.str.startswith("4_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("4_01_"), "POKAZATEL"].str.replace(
+            "4_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("5_01_"), "COLUMN"] = "H"
+    DF.loc[DF.POKAZATEL.str.startswith("5_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("5_01_"), "POKAZATEL"].str.replace(
+            "5_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("6_01_"), "COLUMN"] = "I"
+    DF.loc[DF.POKAZATEL.str.startswith("6_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("6_01_"), "POKAZATEL"].str.replace(
+            "6_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("9_01_"), "COLUMN"] = "L"
+    DF.loc[DF.POKAZATEL.str.startswith("9_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("9_01_"), "POKAZATEL"].str.replace(
+            "9_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("12_01_"), "COLUMN"] = "O"
+    DF.loc[DF.POKAZATEL.str.startswith("12_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("12_01_"), "POKAZATEL"].str.replace(
+            "12_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("13_01_"), "COLUMN"] = "P"
+    DF.loc[DF.POKAZATEL.str.startswith("13_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("13_01_"), "POKAZATEL"].str.replace(
+            "13_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("14_01_"), "COLUMN"] = "Q"
+    DF.loc[DF.POKAZATEL.str.startswith("14_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("14_01_"), "POKAZATEL"].str.replace(
+            "14_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("15_01_"), "COLUMN"] = "R"
+    DF.loc[DF.POKAZATEL.str.startswith("15_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("15_01_"), "POKAZATEL"].str.replace(
+            "15_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("16_01_"), "COLUMN"] = "S"
+    DF.loc[DF.POKAZATEL.str.startswith("16_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("16_01_"), "POKAZATEL"].str.replace(
+            "16_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("17_01_"), "COLUMN"] = "T"
+    DF.loc[DF.POKAZATEL.str.startswith("17_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("17_01_"), "POKAZATEL"].str.replace(
+            "17_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("s_ICMP"), "COLUMN"] = "U"
+    DF.loc[DF.POKAZATEL.str.startswith("s_ICMP"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("s_ICMP"), "POKAZATEL"].str.replace(
+            "s_ICMP", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("18_01_"), "COLUMN"] = "V"
+    DF.loc[DF.POKAZATEL.str.startswith("18_01_"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("18_01_"), "POKAZATEL"].str.replace(
+            "18_01_", ""
+        )
+    )
+    DF.loc[DF.POKAZATEL.str.startswith("s_1"), "COLUMN"] = "W"
+    DF.loc[DF.POKAZATEL.str.startswith("s_1"), "ROW"] = to_numeric(
+        DF.loc[DF.POKAZATEL.str.startswith("s_1"), "POKAZATEL"].str.replace("s_1", "")
+    )
+
+    row = {
+        1: "01. Инфекции в области хирургического вмешательства (ИОХВ)",
+        2: "02. Инфекции нижних дыхательных путей (ИНДП)",
+        3: "03. ИВЛ-ассоциированные ИНДП",
+        4: "04. Инфекции кровотока (ИК)",
+        5: "05. Катетер-ассоциированные инфекции кровотока (КАИК)",
+        6: "06. ИСМП, связанные с применением эндоскопических методов исследования",
+        7: "07. Инфекции мочевыводящих путей (ИМВП)",
+        8: "08. Катетер-ассоциированные ИМВП",
+        9: "09. Постинъекционные инфекции",
+        10: "10. ИСМП, связанные с переливанием крови и препаратов крови",
+        11: "11. ИСМП родильниц",
+        12: "12. ИСМП новорожденных",
+        13: "13. ВУИ новорожденных",
+    }
+
+    column = {
+        "C": "C. Кол-во случаев ИСМП данной формы  (всего)",
+        "D": "D. Численность пациентов с ИСМП данной формы (всего)",
+        "E": "E. в том числе пациентов, материал которых исследован на возбудителей ИСМП",
+        "F": "F. Кол-во проб материала пациентов с ИСМП данной формы (всего)",
+        "G": "G. в том числе проб, из которых выделены возбудители ИСМП",
+        "H": "H. Всего выделено возбудителей ИСМП (всего штаммов)",
+        "I": "I. Кол-во штаммов S.aureus",
+        "J": "J. Кол-во штаммов S.epidermidis",
+        "K": "K. Кол-во штаммов Klebsiella spp.",
+        "L": "L. Кол-во штаммов Acinetobacter spp.",
+        "M": "M. Кол-во штаммов P.aeruginosa",
+        "N": "N. Кол-во штаммов Enterococcus spp.",
+        "O": "O. Кол-во штаммов Proteus spp.",
+        "P": "P. Кол-во штаммов E.coli",
+        "Q": "Q. Кол-во штаммов других Грам (+) микроорганизмов",
+        "R": "R. Кол-во штаммов других Грам (-) микроорганизмов",
+        "S": "S. Кол-во штаммов грибов",
+        "T": "T. Кол-во штаммов других микроорганизмов",
+        "U": "U. Комментарии (расписать другие микроорганизмы и количество штаммов)",
+        "V": "V. Кол-во  ассоциаций",
+        "W": "W. Комментарии (расписать виды микроорганизмов в ассоциации и количество штаммов)",
+    }
+
+    DF["ROW"] = DF["ROW"].map(row)
+    DF["COLUMN"] = DF["COLUMN"].map(column)
+
+    DF = DF.pivot_table(
+        index=["ORGANIZATION", "ROW"],
+        columns=["COLUMN"],
+        values=["VALUE"],
+        aggfunc="first",
+    ).stack(0)
+
+    NEW_NAME_3 = "/tmp/" + DATE + "_Возбудители_ИСМП.xlsx"
+
+    DF.to_excel(NEW_NAME_3)
+
+    return NEW_NAME_1 + ";" + NEW_NAME_2 + ";" + NEW_NAME_3
