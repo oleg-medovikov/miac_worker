@@ -1,6 +1,9 @@
-MNEMOKOD = '40 COVID 19'
-DATE_NEW = 'trunc(SYSDATE - 1)'
-DATE_OLD = 'trunc(SYSDATE - 2)'
+MNEMOKOD = "40 COVID 19"
+# DATE_NEW = "trunc(SYSDATE - 1)"
+# DATE_OLD = "trunc(SYSDATE - 2)"
+
+START = "trunc(SYSDATE - 30)"
+STOP = "trunc(SYSDATE + 7)"
 
 SQL_VACHIN = f"""
 SELECT
@@ -27,7 +30,6 @@ SELECT
        INNER JOIN PARUS.BALANCEINDEXES bi
        on(d.BALANCEINDEX = bi.RN)
     WHERE rf.code = '{MNEMOKOD}'
-        AND r.BDATE in  ({DATE_OLD}, {DATE_NEW})
         AND  (bi.CODE not like '%_O' and
                     (bi.CODE like 'KOVIVAC%'
                     or bi.CODE like 'KONVASEL%'
@@ -36,6 +38,21 @@ SELECT
                     or bi.CODE like 'EPIVAK%'
                     or bi.CODE in ('distr', 'org')
                     ))
+        AND r.BDATE IN (
+            SELECT dates
+            FROM (
+                SELECT DISTINCT r.BDATE AS dates
+                FROM PARUS.BLINDEXVALUES d
+                INNER JOIN PARUS.BLSUBREPORTS s ON (d.PRN = s.RN)
+                INNER JOIN PARUS.BLREPORTS r ON (s.PRN = r.RN)
+                INNER JOIN PARUS.BLREPFORMED pf ON (r.BLREPFORMED = pf.RN)
+                INNER JOIN PARUS.BLREPFORM rf ON (pf.PRN = rf.RN)
+                WHERE rf.CODE = '40 COVID 19'
+                  AND r.BDATE BETWEEN {START} AND {STOP}
+                ORDER BY r.BDATE DESC
+            )
+            WHERE ROWNUM <= 2
+        )
 UNION
 SELECT
             to_char(r.BDATE, 'YYYY.MM.DD') day,
@@ -65,7 +82,6 @@ SELECT
         INNER JOIN PARUS.BLREPFORM rf
             on(rd.PRN = rf.RN)
             WHERE rf.code =  '{MNEMOKOD}'
-                and r.BDATE  in  ({DATE_OLD}, {DATE_NEW})
                 and (i.CODE not like '%_O' and
                     (i.CODE like 'KOVIVAC%'
                     or i.CODE like 'KONVASEL%'
@@ -73,6 +89,21 @@ SELECT
                     or i.CODE like 'CPUTNIKV%'
                     or i.CODE like 'EPIVAK%'
                     ))
+                AND r.BDATE IN (
+                    SELECT dates
+                    FROM (
+                        SELECT DISTINCT r.BDATE AS dates
+                        FROM PARUS.BLINDEXVALUES d
+                        INNER JOIN PARUS.BLSUBREPORTS s ON (d.PRN = s.RN)
+                        INNER JOIN PARUS.BLREPORTS r ON (s.PRN = r.RN)
+                        INNER JOIN PARUS.BLREPFORMED pf ON (r.BLREPFORMED = pf.RN)
+                        INNER JOIN PARUS.BLREPFORM rf ON (pf.PRN = rf.RN)
+                        WHERE rf.CODE = '40 COVID 19'
+                          AND r.BDATE BETWEEN {START} AND {STOP}
+                        ORDER BY r.BDATE DESC
+                    )
+                    WHERE ROWNUM <= 2
+                )
 """
 
 SQL_REVAC_MO = f"""
@@ -113,7 +144,6 @@ select DAY, 'Медицинская организация' AS tip, indx, ORGANI
             INNER JOIN PARUS.BALANCEINDEXES bi
             on(d.BALANCEINDEX = bi.RN)
         WHERE rf.code = '{MNEMOKOD}'
-            and  r.BDATE in ({DATE_OLD}, {DATE_NEW})
             and bi.CODE in (
                 'revac_02_0индекс_s', 'revac_03_0индекс_s', 'revac_04_0индекс_s',
                 'revac_05_0индекс_s', 'revac_06_0индекс_s', 'revac_07_0индекс_s',
@@ -121,7 +151,22 @@ select DAY, 'Медицинская организация' AS tip, indx, ORGANI
                 'revac_11_0индекс_s', 'revac_12_0индекс_s', 'revac_13_0индекс_s',
                 'revac_14_0индекс_s', 'revac_15_0индекс_s', 'revac_16_0индекс_s',
                 'revac_17_0индекс_s', 'revac_18_0индекс_s', 'revac_19_0индекс_s'
-                ))
+                )
+            AND r.BDATE IN (
+                            SELECT dates
+                            FROM (
+                                SELECT DISTINCT r.BDATE AS dates
+                                FROM PARUS.BLINDEXVALUES d
+                                INNER JOIN PARUS.BLSUBREPORTS s ON (d.PRN = s.RN)
+                                INNER JOIN PARUS.BLREPORTS r ON (s.PRN = r.RN)
+                                INNER JOIN PARUS.BLREPFORMED pf ON (r.BLREPFORMED = pf.RN)
+                                INNER JOIN PARUS.BLREPFORM rf ON (pf.PRN = rf.RN)
+                                WHERE rf.CODE = '40 COVID 19'
+                                  AND r.BDATE BETWEEN {START} AND {STOP}
+                                ORDER BY r.BDATE DESC
+                            )
+                            WHERE ROWNUM <= 2
+                        ))
         pivot
             (
             max(value)
@@ -176,13 +221,27 @@ SQL_REVAC_TVSP = f"""SELECT  DAY, 'Пункт вакцинации' AS tip, 7 AS
         INNER JOIN PARUS.BLREPFORM rf
         on(rd.PRN = rf.RN)
         WHERE rf.code = '{MNEMOKOD}'
-            and r.BDATE in ({DATE_OLD}, {DATE_NEW})
 			and i.CODE in ( 
             'tvsp_revac','vak_revac','revac_02_01','revac_03_01','revac_04_01',
 			'revac_05_01','revac_06_01','revac_07_01','revac_08_01','revac_09_01',
 			'revac_10_01','revac_11_01','revac_12_01','revac_13_01','revac_14_01',
 			'revac_15_01','revac_16_01','revac_17_01','revac_18_01','revac_19_01'
 			)
+            AND r.BDATE IN (
+                SELECT dates
+                FROM (
+                    SELECT DISTINCT r.BDATE AS dates
+                    FROM PARUS.BLINDEXVALUES d
+                    INNER JOIN PARUS.BLSUBREPORTS s ON (d.PRN = s.RN)
+                    INNER JOIN PARUS.BLREPORTS r ON (s.PRN = r.RN)
+                    INNER JOIN PARUS.BLREPFORMED pf ON (r.BLREPFORMED = pf.RN)
+                    INNER JOIN PARUS.BLREPFORM rf ON (pf.PRN = rf.RN)
+                    WHERE rf.CODE = '40 COVID 19'
+                      AND r.BDATE BETWEEN {START} AND {STOP}
+                    ORDER BY r.BDATE DESC
+                )
+                WHERE ROWNUM <= 2
+            )
 		)
 	pivot
 		(
