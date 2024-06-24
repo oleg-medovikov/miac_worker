@@ -69,6 +69,12 @@ def svod_40_covid_new():
         except ValueError:
             continue
 
+    new_name_pred = f'/tmp/40_COVID_19_БОТКИНА_{DF["DAY"].min()}__{DF["DAY"].max()}_предварительный.xlsx'
+
+    new_name_osn = (
+        f'/tmp/40_COVID_19_БОТКИНА_{DF["DAY"].min()}__{DF["DAY"].max()}_основной.xlsx'
+    )
+
     for POKAZATEL in POKAZATELS:
         # Формируем список колонок
         COLUMNS = [x.replace("_", POKAZATEL + "_") for x in LIST_POK]
@@ -165,11 +171,6 @@ def svod_40_covid_new():
     DICT["REVAC"] = DF.loc[DF["DAY"] == DF["DAY"].max()]
     if DF["DAY"].min() != DF["DAY"].max():
         DICT["REVAC_OLD"] = DF.loc[DF["DAY"] == DF["DAY"].min()]
-
-    new_name_pred = f'temp/40_COVID_19_БОТКИНА_{DF["DAY"].min()}_{DF["DAY"].max()}_предварительный.xlsx'
-    new_name_osn = (
-        f'temp/40_COVID_19_БОТКИНА_{DF["DAY"].min()}_{DF["DAY"].max()}_основной.xlsx'
-    )
 
     shutil.copyfile("/mnt/COVID-списки/bot/40_COVID_19_pred_new.xlsx", new_name_pred)
     shutil.copyfile("/mnt/COVID-списки/bot/40_COVID_19_osn_new.xlsx", new_name_osn)

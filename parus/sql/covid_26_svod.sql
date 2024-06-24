@@ -1,11 +1,11 @@
-SELECT  district, lab_utr_mo, addr_pz,
+SELECT  day, district, lab_utr_mo, addr_pz,
                 CAST(lab_utr_01 AS int) lab_utr_01 ,  lab_utr_02 , CAST(lab_utr_03 AS int) lab_utr_03,
                 CAST(lab_utr_04 AS int) lab_utr_04 , CAST(lab_utr_05 AS int) lab_utr_05 , CAST(lab_utr_06 AS int) lab_utr_06,
                 CAST(lab_utr_07 AS int) lab_utr_07 , CAST(lab_utr_08 AS int) lab_utr_08 , CAST(lab_utr_09 AS int) lab_utr_09,
                 CAST(lab_utr_10 AS int) lab_utr_10
                 FROM (
                 SELECT
-                        r.BDATE day,
+                        to_char(r.BDATE, 'DD_MM_YYYY') day,
                         a.AGNNAME organization,
                     i.CODE pokazatel,
                     ro.NUMB row_index ,
@@ -31,7 +31,15 @@ SELECT  district, lab_utr_mo, addr_pz,
                 INNER JOIN PARUS.BLREPFORM rf
                 on(rd.PRN = rf.RN)
                 WHERE rf.code = '26 COVID 19'
-                and r.BDATE =  trunc(SYSDATE) - 2
+                and r.BDATE = (SELECT
+                                    MAX(r.BDATE) AS day
+                                FROM
+                                    PARUS.BLREPORTS r
+                                    INNER JOIN PARUS.BLREPFORMED rd ON (r.BLREPFORMED = rd.RN)
+                                    INNER JOIN PARUS.BLREPFORM rf ON (rd.PRN = rf.RN)
+                                WHERE
+                                    rf.code = '26 COVID 19'
+                                    AND r.BDATE < TRUNC(SYSDATE) + 3)
                 and i.CODE in ('district','lab_utr_MO','addr_PZ','lab_utr_01','lab_utr_02','lab_utr_03',
                         'lab_utr_04','lab_utr_05','lab_utr_06','lab_utr_07',
                         'lab_utr_08','lab_utr_09','lab_utr_10')

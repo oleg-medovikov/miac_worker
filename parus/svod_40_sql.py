@@ -166,7 +166,8 @@ select DAY, 'Медицинская организация' AS tip, indx, ORGANI
                                 ORDER BY r.BDATE DESC
                             )
                             WHERE ROWNUM <= 2
-                        ))
+                        )
+            )
         pivot
             (
             max(value)
