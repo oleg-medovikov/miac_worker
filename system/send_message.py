@@ -5,11 +5,13 @@ from time import sleep
 from conf import TELEGRAM_API
 
 
-def bot_send_text(mess: str, chat_id: int) -> bool:
+def bot_send_text(mess: str, chat_id: int, html=False) -> bool:
     mess = mess.replace("_", "\\_").replace("@", "\\@").replace("&", "\\&")
 
     send_text = f"https://api.telegram.org/bot{TELEGRAM_API}/sendMessage"
     data = {"chat_id": chat_id, "parse_mode": "Markdown", "text": mess}
+    if html:
+        data["parse_mode"] = "HTML"
     while True:
         try:
             requests.get(send_text, data=data)

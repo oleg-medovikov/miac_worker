@@ -35,7 +35,7 @@ def executor(TASK: Task):
 
             TASK.comment = str(ERROR)
             TASK.stop()
-            bot_send_text(f"{str(e)} \n{ERROR} \n{fname}", TASK.client)
+            bot_send_text(f"{str(e)}", TASK.client, html=True)
         else:
             # Если все хорошо, то получаем список, кому вернуть результат
             USERS = TASK.users()
