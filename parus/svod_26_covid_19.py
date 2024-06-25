@@ -37,18 +37,23 @@ def svod_26_covid_19():
     try:
         OLD = pd.read_excel(OLD_FILE, skiprows=3, header=None, sheet_name="Соединение")
     except Exception:
+        OLD_ = pd.DataFrame()
         OLD = pd.DataFrame()
     else:
         OLD = OLD.loc[~(OLD[2].isnull() & OLD[3].isnull() & OLD[5].isnull())]
-        OLD = OLD.fillna(value=values)
+        OLD_ = OLD.fillna(value=values).copy()
+        del OLD_[0]
         del OLD[0]
-        del OLD[14]
-        OLD["type"] = "file"
+        del OLD_[14]
+        for _ in [7, 9, 11, 13]:
+            OLD_[_] = 0
 
-    if len(OLD.columns) == len(DF.columns):
-        OLD.columns = DF.columns
+        OLD_["type"] = "file"
 
-    NEW_DF = pd.concat([DF, OLD], ignore_index=True)
+    if len(OLD_.columns) == len(DF.columns):
+        OLD_.columns = DF.columns
+
+    NEW_DF = pd.concat([DF, OLD_], ignore_index=True)
     NEW_DF = NEW_DF.drop_duplicates(subset=["LAB_UTR_MO", "ADDR_PZ", "LAB_UTR_02"])
 
     # DATE = (datetime.now() + timedelta(days=1)).strftime("%d_%m_%Y")

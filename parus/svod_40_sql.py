@@ -196,14 +196,15 @@ SQL_REVAC_TVSP = f"""SELECT  DAY, 'Пункт вакцинации' AS tip, 7 AS
 		,nvl(cast(pok_19 as int),0) pok_19
 		FROM (
         SELECT
-                to_char(r.BDATE, 'YYYY.MM.DD') day,
-                a.AGNNAME organization,
+            r.BDATE day,
+            --to_char(r.BDATE, 'YYYY.MM.DD') day,
+            a.AGNNAME organization,
             i.CODE pokazatel,
             ro.NUMB row_index ,
-                CASE WHEN STRVAL  IS NOT NULL THEN STRVAL
-                         WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
-                         WHEN DATEVAL IS NOT NULL THEN CAST(DATEVAL AS varchar(30))
-                        ELSE NULL END value
+            CASE WHEN STRVAL  IS NOT NULL THEN STRVAL
+                WHEN NUMVAL  IS NOT NULL THEN CAST(NUMVAL  AS varchar(30))
+                WHEN DATEVAL IS NOT NULL THEN CAST(DATEVAL AS varchar(30))
+            ELSE NULL END value
         FROM PARUS.BLTBLVALUES v
         INNER JOIN PARUS.BLTABLESIND si
         on(v.BLTABLESIND = si.RN)

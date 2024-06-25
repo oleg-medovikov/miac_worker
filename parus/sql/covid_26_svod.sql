@@ -39,7 +39,7 @@ SELECT  day, district, lab_utr_mo, addr_pz,
                                     INNER JOIN PARUS.BLREPFORM rf ON (rd.PRN = rf.RN)
                                 WHERE
                                     rf.code = '26 COVID 19'
-                                    AND r.BDATE < TRUNC(SYSDATE) + 3)
+                                    AND r.BDATE < TRUNC(SYSDATE) + 6)
                 and i.CODE in ('district','lab_utr_MO','addr_PZ','lab_utr_01','lab_utr_02','lab_utr_03',
                         'lab_utr_04','lab_utr_05','lab_utr_06','lab_utr_07',
                         'lab_utr_08','lab_utr_09','lab_utr_10')

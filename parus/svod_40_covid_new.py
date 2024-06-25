@@ -168,9 +168,9 @@ def svod_40_covid_new():
 
     DF = DF.sort_values(["ORGANIZATION", "INDX"])
 
-    DICT["REVAC"] = DF.loc[DF["DAY"] == DF["DAY"].max()]
+    DICT["REVAC"] = DF.loc[DF["DAY"] == DF["DAY"].max()].copy()
     if DF["DAY"].min() != DF["DAY"].max():
-        DICT["REVAC_OLD"] = DF.loc[DF["DAY"] == DF["DAY"].min()]
+        DICT["REVAC_OLD"] = DF.loc[DF["DAY"] == DF["DAY"].min()].copy()
 
     shutil.copyfile("/mnt/COVID-списки/bot/40_COVID_19_pred_new.xlsx", new_name_pred)
     shutil.copyfile("/mnt/COVID-списки/bot/40_COVID_19_osn_new.xlsx", new_name_osn)
