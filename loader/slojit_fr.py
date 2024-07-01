@@ -6,11 +6,11 @@ import os
 from multiprocessing import Pool
 import pandas as pd
 from datetime import datetime, timedelta
-import logging
 
 # from conf import MASTER
 from clas import Dir
 from base import covid_sql
+from system import bot_send_text
 
 # from system import send_message
 
@@ -51,7 +51,7 @@ def read_file(FILE):
     return df
 
 
-def slojit_fr():
+def slojit_fr(ids=None):
     "это функция складывает выгрузки ФР в 1 файл"
     # print('test 1')
 
@@ -374,5 +374,9 @@ def slojit_fr():
         df.to_csv(FEDREG_FILE, index=False, sep=";", encoding="utf-8")
 
     MESS += "```"
+
+    if ids:
+        for _ in ids.split(";"):
+            bot_send_text(MESS, int(_))
 
     return MESS
