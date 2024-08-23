@@ -3,7 +3,7 @@ MNEMOKOD = "40 COVID 19"
 # DATE_OLD = "trunc(SYSDATE - 2)"
 
 START = "trunc(SYSDATE - 30)"
-STOP = "trunc(SYSDATE + 7)"
+STOP = "trunc(SYSDATE + 5)"
 
 SQL_VACHIN = f"""
 SELECT

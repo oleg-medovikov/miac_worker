@@ -16,7 +16,7 @@ SELECT  DAY, pok_01
 	,nvl(cast(pok_60 as float),0) pok_60,nvl(cast(pok_61 as float),0) pok_61,nvl(cast(pok_62 as float),0) pok_62,nvl(cast(pok_63 as float),0) pok_63
 	,nvl(cast(pok_64 as float),0) pok_64,nvl(cast(pok_65 as float),0) pok_65,nvl(cast(pok_66 as float),0) pok_66,nvl(cast(pok_67 as float),0) pok_67
 	,nvl(cast(pok_68 as float),0) pok_68,nvl(cast(pok_69 as float),0) pok_69,nvl(cast(pok_70 as float),0) pok_70,nvl(cast(pok_71 as float),0) pok_71
-	,nvl(cast(pok_72 as float),0) pok_72,nvl(cast(pok_73 as float),0) pok_73,nvl(cast(pok_74 as float),0) pok_74,nvl(cast(pok_75 as float),0) pok_75 
+	,nvl(cast(pok_72 as float),0) pok_72,nvl(cast(pok_73 as float),0) pok_73,nvl(cast(pok_74 as float),0) pok_74,nvl(cast(pok_75 as float),0) pok_75
 	,nvl(cast(pok_76 as float),0) pok_76,nvl(cast(pok_77 as float),0) pok_77,nvl(cast(pok_78 as float),0) pok_78,nvl(cast(pok_79 as float),0) pok_79
 	,nvl(cast(pok_80 as float),0) pok_80,nvl(cast(pok_81 as float),0) pok_81
     FROM (
@@ -30,20 +30,28 @@ SELECT  DAY, pok_01
                  WHEN DATEVAL IS NOT NULL THEN CAST(DATEVAL AS varchar(30))
             ELSE NULL END value
     FROM PARUS.BLINDEXVALUES  d
-    INNER JOIN PARUS.BLSUBREPORTS s
-    ON (d.PRN = s.RN)
-    INNER JOIN PARUS.BLREPORTS r
-    ON(s.PRN = r.RN)
-    INNER JOIN PARUS.AGNLIST a 
-    on(r.AGENT = a.rn)
-    INNER JOIN PARUS.BLREPFORMED pf
-    on(r.BLREPFORMED = pf.RN)
-    INNER JOIN PARUS.BLREPFORM rf
-    on(pf.PRN = rf.RN)
-    INNER JOIN PARUS.BALANCEINDEXES bi 
-    on(d.BALANCEINDEX = bi.RN)
+    INNER JOIN PARUS.BLSUBREPORTS s ON (d.PRN = s.RN)
+    INNER JOIN PARUS.BLREPORTS r ON(s.PRN = r.RN)
+    INNER JOIN PARUS.AGNLIST a  on(r.AGENT = a.rn)
+    INNER JOIN PARUS.BLREPFORMED pf on(r.BLREPFORMED = pf.RN)
+    INNER JOIN PARUS.BLREPFORM rf on(pf.PRN = rf.RN)
+    INNER JOIN PARUS.BALANCEINDEXES bi on(d.BALANCEINDEX = bi.RN)
     WHERE rf.CODE = '29 COVID 19'
-    and r.BDATE =  trunc(SYSDATE - 1)
+    AND r.BDATE in (
+    		SELECT min(BDATE)
+				FROM (
+				    SELECT DISTINCT r.BDATE
+				    FROM PARUS.BLINDEXVALUES d
+				    INNER JOIN PARUS.BLSUBREPORTS s ON (d.PRN = s.RN)
+				    INNER JOIN PARUS.BLREPORTS r ON (s.PRN = r.RN)
+				    INNER JOIN PARUS.AGNLIST a ON (r.AGENT = a.rn)
+				    INNER JOIN PARUS.BLREPFORMED pf ON (r.BLREPFORMED = pf.RN)
+				    INNER JOIN PARUS.BLREPFORM rf ON (pf.PRN = rf.RN)
+				    WHERE rf.CODE = '29 COVID 19'
+				      AND r.BDATE < trunc(SYSDATE) + 4
+				    ORDER BY r.BDATE DESC
+				) WHERE ROWNUM <= 2
+					    )
     and bi.CODE LIKE '29_covid_0%'
     order by  d.BALANCEINDEX 
     )
@@ -67,7 +75,7 @@ SELECT  DAY, pok_01
 	,'29_covid_060' pok_60,'29_covid_061' pok_61,'29_covid_062' pok_62,'29_covid_063' pok_63
 	,'29_covid_064' pok_64,'29_covid_065' pok_65,'29_covid_066' pok_66,'29_covid_067' pok_67
 	,'29_covid_068' pok_68,'29_covid_069' pok_69,'29_covid_070' pok_70,'29_covid_071' pok_71
-	,'29_covid_072' pok_72,'29_covid_073' pok_73,'29_covid_074' pok_74,'29_covid_075' pok_75
+	,'29_covid_072' pok_72,'29_covid_073' pok_73,'29_covid_074' pok_74,'29_covid_075' pok_75	
 	,'29_covid_076' pok_76,'29_covid_077' pok_77,'29_covid_078' pok_78,'29_covid_079' pok_79
 	,'29_covid_080' pok_80,'29_covid_081' pok_81
     )
