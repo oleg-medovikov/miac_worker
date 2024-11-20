@@ -10,6 +10,7 @@ import zam_mz
 import regiz
 import cardio
 import year_otch
+import other
 
 
 __all__ = [
@@ -25,4 +26,5 @@ __all__ = [
     "regiz",
     "cardio",
     "year_otch",
+    "other",
 ]

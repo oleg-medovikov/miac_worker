@@ -7,6 +7,7 @@ from zam_mz import *
 from regiz import *
 from cardio import *
 from year_otch import *
+from other import *
 
 from system import bot_send_text, bot_send_file
 

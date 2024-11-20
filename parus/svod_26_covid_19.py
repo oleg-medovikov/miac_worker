@@ -35,16 +35,22 @@ def svod_26_covid_19():
     values = {6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0}
 
     try:
-        OLD = pd.read_excel(OLD_FILE, skiprows=3, header=None, sheet_name="Соединение")
+        OLD = pd.read_excel(
+            OLD_FILE,
+            skiprows=3,
+            header=None,
+            usecols="B,C,D,E,F,G,H,I,J,K,L,M,N",
+            sheet_name="Соединение",
+        )
     except Exception:
         OLD_ = pd.DataFrame()
         OLD = pd.DataFrame()
     else:
         OLD = OLD.loc[~(OLD[2].isnull() & OLD[3].isnull() & OLD[5].isnull())]
         OLD_ = OLD.fillna(value=values).copy()
-        del OLD_[0]
-        del OLD[0]
-        del OLD_[14]
+        # del OLD_[0]
+        # del OLD[0]
+        # del OLD_[14]
         for _ in [7, 9, 11, 13]:
             OLD_[_] = 0
 

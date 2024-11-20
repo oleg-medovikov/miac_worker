@@ -63,7 +63,7 @@ def slojit_fr(ids=None):
     # nameSheetShablon = "Sheet1"
 
     FILES = glob(PATH + "/Федеральный регистр лиц*.xlsx")
-    FILES += glob(PATH + "/Static/Федеральный регистр лиц*.xlsx")
+    FILES += glob(PATH + "/static/Федеральный регистр лиц*.xlsx")
 
     if not len(FILES):
         raise my_except("В папке нет файлов!")
