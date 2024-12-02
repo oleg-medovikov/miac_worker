@@ -19,24 +19,28 @@ insert [robo].[snils_comment]
     where a.[УНРЗ] is null
 """
 
+
 def load_snils_comment():
-    MASK = Dir.get('snils_com') + '/*'
-    
-    text = ''
-    for FILE in glob.glob( MASK ):
+    MASK = Dir.get("snils_com") + "/*"
+
+    text = ""
+    for FILE in glob.glob(MASK):
         try:
-            DF = pd.read_excel(file,usecols=['УНРЗ','Примечания'])
+            DF = pd.read_excel(FILE, usecols=["УНРЗ", "Примечания"])
         except Exception as e:
-            text +=  FILE.rsplit('/',1)[1] +'\n' + str(e) 
+            text += FILE.rsplit("/", 1)[1] + "\n" + str(e)
         else:
             try:
                 covid_exec("""TRUNCATE TABLE tmp.snils_comment""")
-            except:
-                pass
-            
-            covid_insert(DF,'snils_comment','tmp',False,'append')
-            
-            covid_exec( UPDATE )
+            except Exception as e:
+                text += FILE.rsplit("/", 1)[1] + "\n" + str(e)
 
-            text += '\n Хорошо обработан файл ' + file.split('/')[-1]
+            covid_insert(DF, "snils_comment", "tmp", False, "append")
+
+            covid_exec(UPDATE)
+
+        text += "\n Хорошо обработан файл " + FILE.split("/")[-1]
+
+    if text == "":
+        text = f"Не найдены файлы в директории {Dir.get('snils_com')}"
     return text
