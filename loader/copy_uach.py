@@ -1,8 +1,10 @@
 import pandas as pd
 import os
 from datetime import datetime, timedelta
+import paramiko
 
 from clas import Dir
+from conf import IACH_IP, IACH_PASS
 
 NAMES = [
     "п/н",
@@ -53,12 +55,7 @@ def copy_uach():
         + ".csv"
     )
 
-    IACH_FILE = (
-        Dir.get("covid_iac2")
-        + "/Федеральный регистр лиц, больных - "
-        + DATE
-        + "_ИАЦ.csv"
-    )
+    IACH_FILE = "/tmp/Федеральный регистр лиц, больных - " + DATE + "_ИАЦ.csv"
 
     if not os.path.exists(FEDREG_FILE):
         raise my_except("Файл фр не найден!")
@@ -79,6 +76,24 @@ def copy_uach():
     try:
         DF.to_csv(IACH_FILE, index=False, sep=";", encoding="cp1251")
     except Exception as e:
-        return f"Ошибка!  {IACH_FILE} Не удалось скопировать!\n {str(e)}"
+        return f"Ошибка!  {IACH_FILE} Не удалось записать!\n {str(e)}"
 
-    return "Файл скопирован!"
+    remote_path = f"/files/Новая папка/{IACH_FILE[5:]}"  # Путь на удаленном сервере
+
+    # Создание SFTP-клиента
+    try:
+        # Подключение к серверу
+        transport = paramiko.Transport((IACH_IP, 22))
+        transport.connect(username="miac", password=IACH_PASS)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+
+        # Копирование файла
+        sftp.put(IACH_FILE, remote_path)
+
+        # Закрытие соединения
+        sftp.close()
+        transport.close()
+    except Exception as e:
+        return f"Ошибка: {e}"
+
+    return f"Файл {IACH_FILE[5:]} успешно скопирован"

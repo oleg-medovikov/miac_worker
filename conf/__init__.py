@@ -15,6 +15,8 @@ from .config import (
     DATABASE_DN122,
     MASTER,
     DATABASE_PS,
+    IACH_IP,
+    IACH_PASS,
 )
 
 __all__ = [
@@ -34,4 +36,6 @@ __all__ = [
     "DATABASE_DN122",
     "DATABASE_PS",
     "MASTER",
+    "IACH_IP",
+    "IACH_PASS",
 ]

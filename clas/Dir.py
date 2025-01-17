@@ -1,7 +1,9 @@
+from pandas.core.generic import JSONSerializable
 from pydantic import BaseModel
 
 from conf import MIAC_API_URL, TOKEN
 import requests
+from simplejson.errors import JSONDecodeError
 
 
 class Dir(BaseModel):
@@ -20,7 +22,11 @@ class Dir(BaseModel):
         URL = MIAC_API_URL + "/get_dir"
 
         req = requests.get(URL, headers=HEADERS, json=NAME)
-        return req.json()
+        try:
+            json = req.json()
+        except JSONDecodeError:
+            json = {}
+        return json
 
     def add(self, USER_ID):
         "Добавляем новую директорию"
