@@ -1,7 +1,9 @@
 import pandas as pd
 import os
 from datetime import datetime, timedelta
-import paramiko
+
+# import paramiko
+import shutil
 
 from clas import Dir
 from conf import IACH_IP, IACH_PASS
@@ -78,21 +80,22 @@ def copy_uach():
     except Exception as e:
         return f"Ошибка!  {IACH_FILE} Не удалось записать!\n {str(e)}"
 
-    remote_path = f"/files/Новая папка/{IACH_FILE[5:]}"  # Путь на удаленном сервере
-
     # Создание SFTP-клиента
     try:
+        # remote_path = f"/files/Новая папка/{IACH_FILE[5:]}"  # Путь на удаленном сервере
         # Подключение к серверу
-        transport = paramiko.Transport((IACH_IP, 22))
-        transport.connect(username="miac", password=IACH_PASS)
-        sftp = paramiko.SFTPClient.from_transport(transport)
+        # transport = paramiko.Transport((IACH_IP, 22))
+        # transport.connect(username="miac", password=IACH_PASS)
+        # sftp = paramiko.SFTPClient.from_transport(transport)
 
         # Копирование файла
-        sftp.put(IACH_FILE, remote_path)
+        # sftp.put(IACH_FILE, remote_path)
 
         # Закрытие соединения
-        sftp.close()
-        transport.close()
+        # sftp.close()
+        # transport.close()
+        remote_path = Dir.get("covid_iac2") + IACH_FILE[4:]
+        shutil.move(IACH_FILE, remote_path)
     except Exception as e:
         return f"Ошибка: {e}"
 
