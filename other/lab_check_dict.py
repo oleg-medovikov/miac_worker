@@ -116,7 +116,7 @@ def lab_check_dict():
     dict_1477 = get_nsi_dictinary("1.2.643.5.1.13.13.11.1477")
 
     dateStr = datetime.now().strftime("%d.%m.%Y")
-    path = f"/mnt/lab/2024 год/КИС ЕМИАС/ПРОФИЛЬ лабораторий/Ответы МО/{dateStr}"  # /[!~]*.xlsx"
+    path = f"/mnt/lab/2025 год/КИС ЕМИАС/ПРОФИЛЬ лабораторий/Ответы МО/{dateStr}"  # /[!~]*.xlsx"
     if not os.path.exists(path):
         os.makedirs(path)
     if not os.path.exists(path + "/проверено"):
