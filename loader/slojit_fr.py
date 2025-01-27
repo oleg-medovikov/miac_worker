@@ -117,7 +117,14 @@ def slojit_fr(ids=None):
 
     # Дата выгрузки
     DAY = pd.to_datetime(df["Дата изменения РЗ"], format="%d.%m.%Y").max().date()
-    YESTERDAY = (DAY - timedelta(days=1)).strftime("%Y-%m-%d")
+    #YESTERDAY = (DAY - timedelta(days=1)).strftime("%Y-%m-%d")
+    SQL = """SELECT CONVERT(VARCHAR(10), MAX([date_rows]), 120) AS date
+FROM [robo].[values]
+WHERE [date_rows] < GETDATE()"""
+    try:
+        YESTERDAY = covid_sql(SQL).iat[0, 0]
+    except (ValueError, IndexError):
+        raise my_except("не получилось взять вчерашнюю дату")
 
     # Какое-то sql колдунство
     # берем нужное число выздоровевших с мах номером и вчерашней датой
