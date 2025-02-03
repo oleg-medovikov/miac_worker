@@ -32,6 +32,7 @@ INNER JOIN PARUS.BLREPFORM rf
 on(rd.PRN = rf.RN)
 WHERE rf.code = 'ДезинфСтерОбщ'
 and i.CODE in (__pokazatel__)
+and r.BDATE > TO_DATE('__start__', 'YYYYMMDD')
 """
 pokazatel = {
     "дезинфекция 1": [
