@@ -43,10 +43,10 @@ class SQL_otchet:
 
         if "__start__" and "__stop__" in str(self.sql):
             self.sql = str(self.sql).replace(
-                "__start__", (datetime.today() - timedelta(days=90)).strftime("%Y%m%d")
+                "__start__", (datetime.today() - timedelta(days=60)).strftime("%Y%m%d")
             )
             self.sql = str(self.sql).replace(
-                "__stop__", (datetime.today() + timedelta(days=90)).strftime("%Y%m%d")
+                "__stop__", (datetime.today() + timedelta(days=30)).strftime("%Y%m%d")
             )
 
     def name(self):

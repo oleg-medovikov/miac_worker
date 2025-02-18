@@ -28,6 +28,8 @@ INNER JOIN PARUS.BLREPFORM rf
 on(rd.PRN = rf.RN)
 WHERE rf.CODE = 'ИнфконтрольОБЩ' 
 and i.CODE IN ('shtat_01','shtat_02', 'shtat_03')
+and r.BDATE between  to_date(__start__,'yyyymmdd')
+    AND  to_date(__stop__,'yyyymmdd')
 """
 
 pokazatel = {
