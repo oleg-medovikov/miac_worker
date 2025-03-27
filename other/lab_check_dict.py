@@ -6,22 +6,29 @@ from datetime import datetime
 
 
 def get_nsi_dictinary(id: str):
-    URL = "http://10.128.66.207:2226/nsi/fhir/term/ValueSet/$expand&_format=json"
-    HEADER = {"Authorization": "N3 311a3e41-f020-4824-99bc-acc098ea7eb5"}
-    data = {
-        "resourceType": "Parameters",
-        "parameter": [
-            {
-                "name": "system",
-                "valueString": f"urn:oid:{id}",
-            },
-            {"name": "includeDesignations", "valueString": ""},
-        ],
-    }
-    req = requests.post(URL, headers=HEADER, json=data)
+    URL = "http://10.128.66.207:2226/nsiui/Api/Grid"
+    if id == "1.2.643.2.69.1.1.1.31":
+        data = {
+            "data": '{"tag":"dictionary_item","id_dictionary":27,"attributes":["code","display"],"regime":"data","count":20000,"page":1,"filter":[]}',
+            "guid": "",
+        }
+    elif id == "1.2.643.5.1.13.13.11.1081":
+        data = {
+            "data": '{"tag":"dictionary_item","id_dictionary":81,"attributes":["code","display"],"regime":"data","count":20000,"page":1,"filter":[]}',
+            "guid": "",
+        }
+    elif id == "1.2.643.5.1.13.13.11.1477":
+        data = {
+            "data": '{"tag":"dictionary_item","id_dictionary":759,"attributes":["code","display"],"regime":"data","count":20000,"page":1,"filter":[]}',
+            "guid": "",
+        }
+    else:
+        return {}
+
+    req = requests.post(URL, json=data)
     dict_ = {}
-    for _ in req.json()["parameter"][0]["resource"]["expansion"]["contains"]:
-        dict_[_["code"]] = _["display"]
+    for _, code, display in req.json()["response"]["data"]:
+        dict_[code] = display
     return dict_
 
 
