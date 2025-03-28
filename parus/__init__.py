@@ -37,6 +37,8 @@ from .kadry_schet_14_15_16 import kadry_schet_14_15_16
 from .czpv_part_4 import czpv_part_4
 from .patogens_ismp import patogens_ismp
 from .dolg_rastvor import dolg_rastvor
+from .dolg_fp_ptz import dolg_fp_ptz
+from .dolg_fp_ptz_polic import dolg_fp_ptz_polic
 
 __all__ = [
     "svod_4_2_covid_19",
@@ -78,4 +80,6 @@ __all__ = [
     "czpv_part_4",
     "patogens_ismp",
     "dolg_rastvor",
+    "dolg_fp_ptz",
+    "dolg_fp_ptz_polic",
 ]
