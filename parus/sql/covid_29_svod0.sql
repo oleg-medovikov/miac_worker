@@ -48,6 +48,7 @@ SELECT  DAY, pok_01
 				    INNER JOIN PARUS.BLREPFORMED pf ON (r.BLREPFORMED = pf.RN)
 				    INNER JOIN PARUS.BLREPFORM rf ON (pf.PRN = rf.RN)
 				    WHERE rf.CODE = '29 COVID 19'
+				      --AND r.BDATE < trunc(SYSDATE) - 1
 				      AND r.BDATE < trunc(SYSDATE) + 4
 				    ORDER BY r.BDATE DESC
 				) WHERE ROWNUM <= 2

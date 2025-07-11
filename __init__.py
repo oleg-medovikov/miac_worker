@@ -11,6 +11,7 @@ import regiz
 import cardio
 import year_otch
 import other
+import gir_vu
 
 
 __all__ = [
@@ -27,4 +28,5 @@ __all__ = [
     "cardio",
     "year_otch",
     "other",
+    "ger_vu",
 ]

@@ -17,6 +17,7 @@ from .ncrnbase import ncrn_sql, ncrn_exec, ncrn_insert
 from .dn122base import dn122_sql, dn122_exec, dn122_insert
 
 from .base_ps import ps_sql
+from .replica import replica_sql, replica_exec
 
 __all__ = [
     "parus_sql",
@@ -33,4 +34,6 @@ __all__ = [
     "dn122_exec",
     "dn122_insert",
     "ps_sql",
+    "replica_sql",
+    "replica_exec",
 ]
