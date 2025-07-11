@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-from conf import MASTER
+from conf import MASTER, OCSANA, ANNA
 from system import bot_send_text
 from base import ncrn_sql, ncrn_insert
 
@@ -53,14 +53,12 @@ def truncate_data(row):
 def process_group(args):
     """Обрабатывает одну группу независимо"""
     group, db_rows = args
-    to_save_group = pd.DataFrame()
-    to_insert_group = pd.DataFrame()
-
     if db_rows.empty:
         # если в базе нет данных о пациенте - заливаем группу и в файл и в бд
-        to_save_group = pd.concat([to_save_group, group], ignore_index=True)
-        to_insert_group = pd.concat([to_insert_group, group], ignore_index=True)
-        return to_save_group, to_insert_group, len(to_save_group)
+        return group, group, len(group)
+
+    to_save_group = pd.DataFrame()
+    to_insert_group = pd.DataFrame()
 
     # иначе нужно разобраться с разницей
 
@@ -163,7 +161,7 @@ def save_packages(packages, output_dir):
         file_path = os.path.join(
             output_dir, f"{dir_name}_{file_idx}_{num_rows}rows.csv"
         )
-        combined_df.to_csv(file_path, index=False)
+        combined_df.to_csv(file_path, index=False, sep=";")
         saved_files.append(file_path)
         # print(f"Создан файл {file_path} ({num_rows} строк)")
 
@@ -172,11 +170,11 @@ def save_packages(packages, output_dir):
 
 def process_gir_vu_data(df, output_dir="gir_vu_output"):
     if df.empty:
-        print("Входной DataFrame пуст")
         return []
 
-    mess = f"Начало обработки, групп: {df['local_gis_number'].nunique()}"
-    bot_send_text(mess, MASTER)
+    mess = f"Начало обработки, человек: {df['local_gis_number'].nunique()}"
+    for name in [MASTER, OCSANA, ANNA]:
+        bot_send_text(mess, name)
 
     # Получаем уникальные local_gis_number
     unique_gis = df["local_gis_number"].unique().tolist()
@@ -193,7 +191,8 @@ def process_gir_vu_data(df, output_dir="gir_vu_output"):
     """
     all_db_rows = ncrn_sql(query)
     mess = f"Получено {len(all_db_rows)} записей из БД"
-    bot_send_text(mess, MASTER)
+    for name in [MASTER, OCSANA, ANNA]:
+        bot_send_text(mess, name)
 
     # Создаем словарь с данными из БД
     db_dict = {}
@@ -206,8 +205,7 @@ def process_gir_vu_data(df, output_dir="gir_vu_output"):
     # Подготовка аргументов для параллельной обработки
     tasks = []
     for local_gis, group in df.groupby("local_gis_number"):
-        db_rows = db_dict.get(local_gis, pd.DataFrame())
-        tasks.append((group, db_rows))
+        tasks.append((group, db_dict.get(local_gis, pd.DataFrame())))
 
     # Параллельная обработка групп
     to_save_groups = []
@@ -229,11 +227,13 @@ def process_gir_vu_data(df, output_dir="gir_vu_output"):
                 )
 
             if i % 1000 == 0:
-                mess = f"Обработано групп: {i}/{len(tasks)}"
-                bot_send_text(mess, MASTER)
+                mess = f"Обработано человек: {i}/{len(tasks)}"
+                for name in [MASTER, OCSANA, ANNA]:
+                    bot_send_text(mess, name)
 
-    mess = f"Обработка завершена. Групп для сохранения: {len(to_save_groups)}"
-    bot_send_text(mess, MASTER)
+    mess = f"Обработка завершена. Человек для сохранения: {len(to_save_groups)}"
+    for name in [MASTER, OCSANA, ANNA]:
+        bot_send_text(mess, name)
 
     # Вставка новых записей в БД
     if not to_insert_total.empty:
@@ -257,4 +257,4 @@ def process_gir_vu_data(df, output_dir="gir_vu_output"):
         return saved_files
 
     # print("Нет данных для сохранения в файлы")
-    return
+    return []

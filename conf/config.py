@@ -27,6 +27,8 @@ DADATA_TOKEN = config("dadata_token", cast=str)
 DADATA_SECRET = config("dadata_secret", cast=str)
 
 MASTER = config("MASTER", cast=int)
+OCSANA = config("OCSANA", cast=int)
+ANNA = config("ANNA", cast=int)
 
 IACH_IP = config("IACH_IP", cast=str)
 IACH_PASS = config("IACH_PASS", cast=str)

@@ -7,18 +7,21 @@ from .process_gir_vu_data import process_gir_vu_data
 
 
 def gir_vu_vs1():
-    dict_ = get_organizations_dict()
+    mapping_dict = get_organizations_dict()
 
     # Путь к корневой директории
     root = "/mnt/gir_vu/vs_1"
-    dir_name = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+    dir_name = (datetime.today() - timedelta(days=3)).strftime("%Y-%m-%d")
     full_path = os.path.join(root, dir_name)
 
     df = get_patient_replica(dir_name)
 
     # подставляем oid организаций
-    df["mo_oid"] = df["org_key_to_oid"].astype(str).map(dict_)
-    del df["org_key_to_oid"]
+    try:
+        df["mo_oid"] = df["org_key_to_oid"].astype(str).map(mapping_dict)  # type: ignore
+        del df["org_key_to_oid"]  # type: ignore
+    except Exception as e:
+        return str(e)
 
     saved_files = process_gir_vu_data(df, full_path)
 
